@@ -36,10 +36,6 @@ x_filtered_pb <- filtered_pb %>%
 dat_pb <- filtered_pb %>%
   dplyr::filter(!SAMPLING.EVENT.IDENTIFIER %in% x_filtered_pb$SAMPLING.EVENT.IDENTIFIER)
 
-#saveRDS(dat_br, "Data/eBird/RDS/dat_br")
-#saveRDS(dat_md, "Data/eBird/RDS/dat_md")
-#saveRDS(dat_pb, "Data/eBird/RDS/dat_pb")
-
 # monhtly function
 dat_br <- dat_br %>%
   mutate(OBSERVATION.DATE = as.Date(OBSERVATION.DATE)) %>%
@@ -80,3 +76,6 @@ split_by_month_function <- function(month){
 }
 lapply(unique(dat_pb$MONTH), split_by_month_function)
 
+#saveRDS(dat_br, "Data/eBird/RDS/dat_br")
+#saveRDS(dat_md, "Data/eBird/RDS/dat_md")
+#saveRDS(dat_pb, "Data/eBird/RDS/dat_pb")
