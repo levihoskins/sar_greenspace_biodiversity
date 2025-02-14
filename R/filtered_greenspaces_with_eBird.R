@@ -56,6 +56,8 @@ pb_sf_filtered <- st_intersection(pb_sf, filtered_shapefile)
 ## Merge all point datasets
 all_points <- bind_rows(br_sf, md_sf, pb_sf)
 
+#saveRDS(all_points, "Data/eBird/all_points")
+
 ## Remove non-categorized points of filtered_shapefile
 filtered_shapefile_trimmed <- filtered_shapefile %>%
   st_filter(all_points, .predicate = st_intersects)
@@ -99,7 +101,7 @@ print(paste("Total number of filtered greenspace", greenspace_count)) #651
 
 
 # Repeat above
-## But for 20 checklists per month? Maybe 10 or just 50/year tbd (need at least 50 greenspaces)
+## But for 20 checklists per month? Maybe 50/year tbd (need at least 50 greenspaces)
 
 # Ensure correct data types for each county dataset
 br_sf_filtered$SAMPLING.EVENT.IDENTIFIER <- as.character(br_sf_filtered$SAMPLING.EVENT.IDENTIFIER)
@@ -131,10 +133,6 @@ valid_greenspaces <- greenspace_events %>%
   pull(LOCALITY.ID) %>%
   unique()
 
-# Ensure `filtered_shapefile` contains `LOCALITY.ID`
-filtered_shapefile_trimmed <- filtered_shapefile %>%
-  filter(LOCALITY.ID %in% valid_greenspaces)
-
 # Plot the map of greenspaces
 ggplot() +
   geom_sf(data = filtered_shapefile_trimmed, fill = "lightblue", color = "black") +
@@ -148,33 +146,41 @@ ggplot() +
 ggplot() +
   annotation_map_tile(type = "cartolight") +
   geom_sf(data = filtered_shapefile_trimmed, fill = "lightblue", color = "black") +
-  geom_sf(data = br_sf_filtered %>% filter(LOCALITY.ID %in% valid_greenspaces), color = "orange", size = 0.5) +
-  geom_sf(data = md_sf_filtered %>% filter(LOCALITY.ID %in% valid_greenspaces), color = "lightgreen", size = 0.5) +
-  geom_sf(data = pb_sf_filtered %>% filter(LOCALITY.ID %in% valid_greenspaces), color = "pink", size = 0.5) +
+  geom_sf(data = br_sf_filtered %>% filter(LOCALITY.ID %in% valid_greenspaces), color = "orange", size = 0.75) +
+  geom_sf(data = md_sf_filtered %>% filter(LOCALITY.ID %in% valid_greenspaces), color = "lightgreen", size = 0.75) +
+  geom_sf(data = pb_sf_filtered %>% filter(LOCALITY.ID %in% valid_greenspaces), color = "pink", size = 0.75) +
   theme_minimal() +
   labs(title = "Filtered Shapefile with Points (Minimum 20 Checklists per Month)")
 
-# Count the number of points in each filtered dataset for valid greenspaces
-## THIS DOES NOT COUNT GREENSPACES, RATHER TOTAL NUMBER CHECKLISTS
-br_count <- br_sf_filtered %>%
-  filter(LOCALITY.ID %in% valid_greenspaces) %>%
-  nrow()
+## Filter total for any greenspace without at least 50 checklists
+## Join eBird and spatial data
+combined_data <- filtered_shapefile %>%
+  st_join(all_points, by = c("Park_Name" = "LOCALITY.ID"))
 
-md_count <- md_sf_filtered %>%
-  filter(LOCALITY.ID %in% valid_greenspaces) %>%
-  nrow()
 
-pb_count <- pb_sf_filtered %>%
-  filter(LOCALITY.ID %in% valid_greenspaces) %>%
-  nrow()
+### I NEED THIS TO RUN BECAUSE OTHERWISE LOSE ALL COLUMNS
+park_counts <- combined_data %>%
+  group_by(Park_Name) %>%
+  summarise(lists = length(unique(SAMPLING.EVENT.IDENTIFIER))) %>%
+  filter(lists >= 50)
 
-# Calculate total number of points
-total_points <- br_count + md_count + pb_count
+final_shapefile <- combined_data %>%
+  inner_join(park_counts, by = "Park_Name")
 
-# Print the result
-print(paste("Total number of points plotted:", total_points))
+# Restore geometry (if lost)
+final_shapefile <- st_as_sf(final_shapefile, 
+                            geometry = st_geometry(combined_data), 
+                            crs = st_crs(combined_data))
 
-# Calculate species richness per LOCALITY.ID per month
-species_richness <- all_points %>%
-  group_by(LOCALITY.ID, MONTH) %>%
-  summarise(species_richness = length(unique(COMMON.NAME)), .groups = "drop")
+# Save as shapefile
+st_write(final_shapefile, "Data/Polygons/final_shapefile.shp", delete_dsn = TRUE)
+
+final_data <- final_shapefile %>%
+  st_join(all_points, by = c("Park_Name" = "LOCALITY.ID"))
+
+# Remove geometry before saving
+final_data_df <- final_data %>% st_drop_geometry()
+
+# Save as CSV
+write.csv(final_data_df, "Data/eBird/final_data.csv", row.names = FALSE)
+
