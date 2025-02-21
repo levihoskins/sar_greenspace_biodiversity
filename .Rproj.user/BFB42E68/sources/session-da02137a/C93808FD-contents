@@ -87,7 +87,8 @@ md_count <- nrow(st_filter(md_sf, filtered_shapefile_trimmed, .predicate = st_in
 pb_count <- nrow(st_filter(pb_sf, filtered_shapefile_trimmed, .predicate = st_intersects))
 
 ## Count number of filtered greenspace
-greenspace_count <- nrow(st_filter(filtered_shapefile_trimmed,all_points, .predicate = st_intersects))
+greenspace_count <- nrow(st_filter(filtered_shapefile_trimmed,all_points, 
+                                   .predicate = st_intersects))
 
 ## Total count of all points
 total_count <- br_count + md_count + pb_count
@@ -164,19 +165,33 @@ park_counts <- combined_data %>%
   summarise(lists = length(unique(SAMPLING.EVENT.IDENTIFIER))) %>%
   filter(lists >= 50)
 
-final_shapefile <- combined_data %>%
-  inner_join(park_counts, by = "Park_Name")
+final_shapefile <- st_join(combined_data, park_counts, join = st_intersects)
 
 # Restore geometry (if lost)
 final_shapefile <- st_as_sf(final_shapefile, 
                             geometry = st_geometry(combined_data), 
                             crs = st_crs(combined_data))
 
+# Rename column names to be under 10 characters so script will save as a shapefile
+final_shapefile <- final_shapefile %>%
+  rename(
+    COMMON = COMMON.NAME,
+    SCIENTIFIC = SCIENTIFIC.NAME,
+    L.ID = LOCALITY.ID,
+    L.TYPE = LOCALITY.TYPE,
+    O.DATE = OBSERVATION.DATE,
+    O.COUNT = OBSERVATION.COUNT,
+    OBSERV.ID = OBSERVER.ID,
+    SEI = SAMPLING.EVENT.IDENTIFIER,
+    ParkNameY = Park_Name.y,
+    ParkNameX = Park_Name.x
+  )
+
 # Save as shapefile
-st_write(final_shapefile, "Data/Polygons/final_shapefile.shp", delete_dsn = TRUE)
+#st_write(final_shapefile, "Data/Polygons/final_shapefile.shp", delete_dsn = TRUE)
 
 final_data <- final_shapefile %>%
-  st_join(all_points, by = c("Park_Name" = "LOCALITY.ID"))
+  st_join(all_points, by = c("ParkNameX" = "L.ID"))
 
 # Remove geometry before saving
 final_data_df <- final_data %>% st_drop_geometry()
