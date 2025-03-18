@@ -16,32 +16,28 @@ final_shapefile <- st_read("Data/Polygons/final_shapefile.shp")
 
 ### NEED TO GET RID OF NAs ###
 
-# Join CSV back with the original shapefile to restore geometry
-final_data <- final_shapefile %>%
-  left_join(final_data_df, by = "Park_Name")  # Ensure "Park_Name" is a common key
-
 ## Number of unique checklists
-length(unique(final_data$LOCALITY.ID)) #5008
+length(unique(final_shapefile$L_ID)) #6353
 
 # Calculate richness per greenspace per locality.id per month
-location_richness <- final_data %>%
-  group_by(Park_Name, LOCALITY.ID, MONTH) %>%
-  summarise(species_richness = n_distinct(COMMON.NAME), .groups = 'drop') 
+location_richness <- final_shapefile %>%
+  group_by(Park_Addre, L_ID, MONTH) %>%
+  summarise(species_richness = n_distinct(COMMON), .groups = 'drop') 
 
 write.csv(location_richness, "Data/location_richness.csv")
 
 # Bar plot of species richness per locality within each park, per month
-ggplot(location_richness, aes(x = MONTH, y = species_richness, fill = Park_Name)) +
+ggplot(location_richness, aes(x = MONTH, y = species_richness, fill = Park_Addre)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ LOCALITY.ID) + 
+  facet_wrap(~ L_ID) + 
   theme_minimal() +
   labs(x = "Month", y = "Species Richness", title = "Species Richness per Locality by Month") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # Box plot
-ggplot(location_richness, aes(x = MONTH, y = species_richness, fill = Park_Name)) +
+ggplot(location_richness, aes(x = MONTH, y = species_richness, fill = Park_Addre)) +
   geom_boxplot() +
-  facet_wrap(~ Park_Name) + 
+  facet_wrap(~ Park_Addre) + 
   theme_minimal() +
   labs(x = "Month", y = "Species Richness", title = "Distribution of Species Richness per Month by Park")
 
