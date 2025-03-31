@@ -1,0 +1,45 @@
+# Load Packages
+library("leaflet")
+
+# Load scripts
+
+
+##### Start Leaflet
+# Calculate via park, size, month 
+location_richness_area_monthly <- final_shapefile %>%
+  group_by(ParkNameX, Park_Size_, MONTH) %>%
+  summarise(species_richness = n_distinct(COMMON), .groups = 'drop') %>%
+  mutate(
+    Season = case_when(
+      MONTH %in% c("Mar", "Apr", "May") ~ "SM", 
+      MONTH %in% c("Jun", "Jul") ~ "S",                                    
+      MONTH %in% c("Dec", "Jan", "Feb") ~ "W",                              
+      MONTH %in% c("Aug", "Sep", "Oct", "Nov") ~ "FM" 
+    )
+  )
+
+# Define season colors
+season_colors <- c("SM" = "lightgreen", 
+                   "S" = "lavender",
+                   "W" = "lightblue", 
+                   "FM" = "magenta",
+                   "Unknown" = "gray") 
+
+# Create a leaflet map
+leaflet(location_richness) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~longitude,
+    lat = ~latitude,
+    radius = ~sqrt(species_richness) * 2,
+    fillOpacity = 0.7,
+    popup = ~paste0("<b>", ParkNameX, "</b><br>",
+                    "Species Richness: ", species_richness, "<br>",
+                    "Month: ", MONTH)
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    colors = unname(season_colors), 
+    labels = names(season_colors),  
+    title = "Seasonal Status"
+  )

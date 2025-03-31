@@ -1,0 +1,512 @@
+x = "Month",
+y = "Species Richness",
+color = "Park Size") +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1),
+panel.background = element_rect(fill = "transparent", color = NA),
+plot.background = element_rect(fill = "transparent", color = NA)) +
+guides(color = guide_colorbar(title = "Park Size"))
+ggplot(location_richness, aes(x = MONTH, y = species_richness, group = ParkNameX, color = Park_Size_)) +
+geom_line(alpha = 0.7) +
+geom_smooth(aes(group = 1), method = "loess", se = FALSE, color = "black", linewidth = 1) +  # Trend line
+scale_color_viridis_c(option = "plasma") +
+labs(title = "Species Richness by Season and Month",
+x = "Month",
+y = "Species Richness",
+color = "Park Size") +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1),
+panel.background = element_rect(fill = "transparent", color = NA),
+plot.background = element_rect(fill = "transparent", color = NA)) +
+guides(color = guide_colorbar(title = "Park Size"), level=c(0.95,0.96))
+ggsave('Transparent_LineMap_Line_Best.png', bg = 'transparent')
+library("dplyr")
+library("sf")
+library("raster")
+library("lubridate")
+library("readr")
+library("rnaturalearth")
+library("rnaturalearthdata")
+library("concaveman")
+library("ggspatial")
+library("prettymapr")
+library("ggplot2")
+# Read in shapefiles + add attributes
+fl_shapefile <-st_read("Data/Polygons/filtered_shapefile.shp")
+fl_shapefile <-st_cast(fl_shapefile, "POLYGON")
+fl_shapefile$geometry <- st_geometry(fl_shapefile)
+fl_shapefile$area <- st_area(fl_shapefile$geometry)
+# Filter based on Park_Size_ for determining greenspaces that are okay
+## Will filter more later based on everything else
+filtered_shapefile <- fl_shapefile %>%
+dplyr::filter(Park_Size_ >=5) %>%
+dplyr::filter(Park_Size_ <= 20000)
+# Read in eBird data
+dat_br <- readRDS("Data/eBird/RDS/dat_br")
+dat_md <- readRDS("Data/eBird/RDS/dat_md")
+dat_pb <- readRDS("Data/eBird/RDS/dat_pb")
+# Convert to sf objects
+br_sf <- dat_br %>%
+st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
+md_sf <- dat_md %>%
+st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
+pb_sf <- dat_pb %>%
+st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
+# Overlay the eBird data with greenspaces
+## Check crs
+st_crs(br_sf)
+st_crs(md_sf)
+st_crs(pb_sf)
+st_crs(filtered_shapefile)
+br_sf <- st_transform(br_sf, st_crs(filtered_shapefile))
+md_sf <- st_transform(md_sf, st_crs(filtered_shapefile))
+pb_sf <- st_transform(pb_sf, st_crs(filtered_shapefile))
+# Filter points that are within the filtered_shapefile
+br_sf_filtered <- st_intersection(br_sf, filtered_shapefile)
+md_sf_filtered <- st_intersection(md_sf, filtered_shapefile)
+pb_sf_filtered <- st_intersection(pb_sf, filtered_shapefile)
+## Merge all point datasets
+all_points <- bind_rows(br_sf_filtered, md_sf_filtered, pb_sf_filtered)
+## Remove non-categorized points of filtered_shapefile
+filtered_shapefile_trimmed <- filtered_shapefile %>%
+st_filter(all_points, .predicate = st_intersects)
+## Parks with at least 50 greenspaces
+park_counts <- all_points %>%
+group_by(Park_Place.x) %>%
+summarise(lists = length(unique(SAMPLING.EVENT.IDENTIFIER))) %>%
+filter(lists >= 50)
+View(all_points)
+## Parks with at least 50 greenspaces
+park_counts <- all_points %>%
+group_by(LOCALITY.ID) %>%
+summarise(lists = length(unique(SAMPLING.EVENT.IDENTIFIER))) %>%
+filter(lists >= 50)
+View(park_counts)
+final_shapefile <- st_join(all_points, park_counts, join = st_intersects)
+View(final_shapefile)
+final_shapefile_clean <- na.omit(final_shapefile)
+# Restore geometry (if lost)
+final_shapefile_clean <- st_as_sf(final_shapefile_clean,
+geometry = st_geometry(all_points),
+crs = st_crs(all_points))
+# Save as shapefile
+st_write(final_shapefile_clean, "Data/Polygons/final_shapefile_clean.shp", delete_dsn = TRUE)
+View(final_shapefile_clean)
+View(final_shapefile_clean)
+## Rename columns to be under 10 characters for save of shp
+final_shapefile_clean <- final_shapefile_clean %>%
+rename(
+COMMON = COMMON.NAME,
+SCIENTIFIC = SCIENTIFIC.NAME,
+LATITUDE = LATITUDE,
+LONGITUDE = LONGITUDE,
+COUNTY = COUNTY,
+STATE = STATE,
+LOCALITY = LOCALITY,
+L.ID.X = LOCALITY.ID.x,
+L.ID.Y = LOCALITY.ID.y,
+L.TYPE = LOCALITY.TYPE,
+DATE = OBSERVATION.DATE,
+O.COUNT = OBSERVATION.COUNT,
+OBSERV.ID = OBSERVER.ID,
+SEI = SAMPLING.EVENT.IDENTIFIER,
+MONTH = MONTH,
+Shape_Area = Shape_Area,
+Park_Sourc = Park_Sourc,
+Park_Urban = Park_Urban,
+Park_Place = Park_Place,
+Park_Count = Park_Count,
+Park_Addre = Park_Addre,
+Park_Size_ = Park_Size_,
+Park_Siz_1 = Park_Siz_1,
+Park_Size1 = Park_Size1,
+Park_Name = Park_Name,
+area = area,
+lists = lists,
+geometry = geometry
+)
+# Save as shapefile
+st_write(final_shapefile_clean, "Data/Polygons/final_shapefile_clean.shp", delete_dsn = TRUE)
+# Save as shapefile
+st_write(final_shapefile_clean, "Data/Polygons/final_shapefile_clean.shp")
+ete_dsn = TRUE)
+# Save as shapefile
+st_write(final_shapefile_clean, "Data/Polygons/final_shapefile_clean.shp", delete_dsn = TRUE)
+dir.create("Data/Polygons/", recursive = TRUE)
+file.remove("Data/Polygons/final_shapefile_clean.shp")
+# Remove the existing shapefile if it exists
+if (file.exists("Data/Polygons/final_shapefile_clean.shp")) {
+file.remove("Data/Polygons/final_shapefile_clean.shp")
+}
+# Save as shapefile
+st_write(final_shapefile_clean, "Data/Polygons/final_shapefile_clean_saved.shp", delete_dsn = TRUE)
+# Read in packages
+library("ggplot2")
+library("dplyr")
+library("readr")
+library("tidyr")
+library("vegan")
+library("lubridate")
+library("data.table")
+library("sf")
+# Read the shapefile and remove rows with NAs
+final_shapefile_clean <- st_read("Data/Polygons/final_shapefile_clean_saved.shp")
+# Calculate via park, size, month
+location_richness <- final_shapefile_clean %>%
+group_by(Park_Name, Park_Size_, MONTH) %>%
+summarise(species_richness = n_distinct(COMMON), .groups = 'drop')
+ggplot() +
+geom_sf(data = location_richness, fill = "lightblue", color = "black") +
+theme_minimal() +
+labs(title = "Filtered Shapefile with Points")
+## Check number of parks remaining after filter
+unique_parks <- n_distinct(location_richness$Park_Name)
+# Scatterplot
+ggplot(location_richness, aes(x = Park_Size_, y = species_richness)) +
+geom_point(alpha = 0.7) +
+scale_x_log10() +
+labs(title = "Species Richness vs Park Size",
+x = "Park Size",
+y = "Species Richness") +
+theme_minimal()
+# Scatterplot
+ggplot(location_richness, aes(x = Park_Size_, y = species_richness)) +
+geom_point(alpha = 0.7) +
+labs(title = "Species Richness vs Park Size",
+x = "Park Size",
+y = "Species Richness") +
+theme_minimal()
+location_richness <- location_richness %>%
+filter(Park_Size_ <= 1500)
+# Scatterplot
+ggplot(location_richness, aes(x = Park_Size_, y = species_richness)) +
+geom_point(alpha = 0.7) +
+scale_x_log10() +
+labs(title = "Species Richness vs Park Size",
+x = "Park Size",
+y = "Species Richness") +
+theme_minimal()
+## Scatterplot with line of best fit
+ggplot(location_richness, aes(x = Park_Size_, y = species_richness)) +
+geom_point(alpha = 0.7) +  # Scatterplot
+geom_smooth(method = "lm", se = FALSE, color = "green") +
+scale_x_log10() +
+labs(title = "Species Richness vs Park Size",
+x = "Park Size",
+y = "Species Richness") +
+theme(
+panel.background = element_rect(fill = "transparent", color = NA),
+plot.background = element_rect(fill = "transparent", color = NA),
+legend.background = element_rect(fill='transparent'),
+legend.box.background = element_rect(fill='transparent')
+)
+# Create a new column for color based on Park_Size_
+location_richness <- location_richness %>%
+mutate(Park_Size_Color = ifelse(Park_Size_ < 250, "Small", "Large"))
+ggplot(location_richness, aes(x = Park_Size_, y = species_richness, size = Park_Size_, color = Park_Size_Color)) +
+geom_point(alpha = 0.7) +
+geom_smooth(method = "lm", se = FALSE, color = "red") +
+scale_x_log10() +
+scale_size_continuous(
+name = "Park Size",
+range = c(2, 10)
+) +
+scale_color_manual(
+values = c("Small" = "lightblue", "Large" = "lightgreen")
+) +
+labs(title = "Species Richness vs Park Size",
+x = "Park Size",
+y = "Species Richness",
+color = "Park Size") +
+theme_minimal()
+# Line map
+## Create a new column for color coding based on Park_Size_
+location_richness <- location_richness %>%
+mutate(Park_Size_Color = ifelse(Park_Size_ < 250, "Small", "Large"))
+# Ensure the MONTH variable is a factor and set the correct order
+location_richness$MONTH <- factor(location_richness$MONTH,
+levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
+ordered = TRUE)
+### Plot with correctly ordered months
+### Plot with a continuous color scale for park size
+ggplot(location_richness, aes(x = MONTH, y = species_richness, group = ParkNameX, color = Park_Size_)) +
+geom_line(alpha = 0.7) +
+scale_color_viridis_c(option = "plasma") +
+labs(title = "Species Richness by Season and Month",
+x = "Month",
+y = "Species Richness",
+color = "Park Size") +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1),
+panel.background = element_rect(fill = "transparent", color = NA),
+plot.background = element_rect(fill = "transparent", color = NA)) +
+guides(color = guide_colorbar(title = "Park Size"))
+### Plot with correctly ordered months
+### Plot with a continuous color scale for park size
+ggplot(location_richness, aes(x = MONTH, y = species_richness, group = Park_Name, color = Park_Size_)) +
+geom_line(alpha = 0.7) +
+scale_color_viridis_c(option = "plasma") +
+labs(title = "Species Richness by Season and Month",
+x = "Month",
+y = "Species Richness",
+color = "Park Size") +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1),
+panel.background = element_rect(fill = "transparent", color = NA),
+plot.background = element_rect(fill = "transparent", color = NA)) +
+guides(color = guide_colorbar(title = "Park Size"))
+#### Add a line of best fit
+ggplot(location_richness, aes(x = MONTH, y = species_richness, group = ParkNameX, color = Park_Size_)) +
+geom_line(alpha = 0.7) +
+geom_smooth(aes(group = 1), method = "loess", se = FALSE, color = "black", linewidth = 1) +  # Trend line
+scale_color_viridis_c(option = "plasma") +
+labs(title = "Species Richness by Season and Month",
+x = "Month",
+y = "Species Richness",
+color = "Park Size") +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1),
+panel.background = element_rect(fill = "transparent", color = NA),
+plot.background = element_rect(fill = "transparent", color = NA)) +
+guides(color = guide_colorbar(title = "Park Size"), level=c(0.95,0.96))
+#### Add a line of best fit
+ggplot(location_richness, aes(x = MONTH, y = species_richness, group = Park_Name, color = Park_Size_)) +
+geom_line(alpha = 0.7) +
+geom_smooth(aes(group = 1), method = "loess", se = FALSE, color = "black", linewidth = 1) +  # Trend line
+scale_color_viridis_c(option = "plasma") +
+labs(title = "Species Richness by Season and Month",
+x = "Month",
+y = "Species Richness",
+color = "Park Size") +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1),
+panel.background = element_rect(fill = "transparent", color = NA),
+plot.background = element_rect(fill = "transparent", color = NA)) +
+guides(color = guide_colorbar(title = "Park Size"), level=c(0.95,0.96))
+##### Start Leaflet
+# Calculate via park, size, month
+location_richness_area_monthly <- final_shapefile %>%
+group_by(Park_Name, Park_Size_, MONTH) %>%
+summarise(species_richness = n_distinct(COMMON), .groups = 'drop') %>%
+mutate(
+Season = case_when(
+MONTH %in% c("Mar", "Apr", "May") ~ "SM",
+MONTH %in% c("Jun", "Jul") ~ "S",
+MONTH %in% c("Dec", "Jan", "Feb") ~ "W",
+MONTH %in% c("Aug", "Sep", "Oct", "Nov") ~ "FM"
+)
+)
+View(location_richness)
+##### Start Leaflet
+# Calculate via park, size, month
+location_richness_area_monthly <- final_shapefile_clean %>%
+group_by(Park_Name, Park_Size_, MONTH) %>%
+summarise(species_richness = n_distinct(COMMON), .groups = 'drop') %>%
+mutate(
+Season = case_when(
+MONTH %in% c("Mar", "Apr", "May") ~ "SM",
+MONTH %in% c("Jun", "Jul") ~ "S",
+MONTH %in% c("Dec", "Jan", "Feb") ~ "W",
+MONTH %in% c("Aug", "Sep", "Oct", "Nov") ~ "FM"
+)
+)
+# Define season colors
+season_colors <- c("SM" = "lightgreen",
+"S" = "lavender",
+"W" = "lightblue",
+"FM" = "magenta",
+"Unknown" = "gray")
+# Create a leaflet map
+leaflet(location_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+lng = ~LONGITUDE,
+lat = ~LATITUDE,
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", ParkNameX, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+# Load Packages
+library("leaflet")
+# Create a leaflet map
+leaflet(location_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+lng = ~LONGITUDE,
+lat = ~LATITUDE,
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", ParkNameX, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+View(final_shapefile_clean)
+# Create a leaflet map
+leaflet(location_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+LONGITUDE = ~lon,
+LATITUDE = ~lat,
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", ParkNameX, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+# Create a leaflet map
+leaflet(location_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", ParkNameX, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+# Create the map with updated species richness per Park_Name per Month
+leaflet(location_richness_area_monthly) %>%
+addTiles() %>%
+addCircleMarkers(
+lng = ~LONGITUDE,
+lat = ~LATITUDE,
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", ParkNameX, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+# Join shp with location richness
+final_shapefile_with_richness <- final_shapefile_clean %>%
+left_join(location_richness_area_monthly, by = c("Park_Name", "Park_Size_", "MONTH"))
+# Join shp with location richness
+final_shapefile_with_richness <- final_shapefile_clean %>%
+st_join(location_richness_area_monthly, by = c("Park_Name", "Park_Size_", "MONTH"))
+# Create a leaflet map
+leaflet(final_shapefile_with_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+lng = ~LONGITUDE,
+lat = ~LATITUDE,
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", ParkNameX, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+# Create a leaflet map
+leaflet(final_shapefile_with_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+lng = ~LONGITUDE,
+lat = ~LATITUDE,
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", Park_Name, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+View(final_shapefile_with_richness)
+# Create a leaflet map
+leaflet(final_shapefile_with_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+lng = ~LONGITUDE,
+lat = ~LATITUDE,
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", Park_Name.x, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+# Create a leaflet map
+leaflet(final_shapefile_with_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+lng = ~LONGITUDE,
+lat = ~LATITUDE,
+radius = ~sqrt(species_richness) * 2,
+fillOpacity = 0.7,
+popup = ~paste0("<b>", Park_Name.x, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH.y)
+) %>%
+addLegend(
+position = "bottomright",
+colors = unname(season_colors),
+labels = names(season_colors),
+title = "Seasonal Status"
+)
+# Create a color palette based on species richness
+color_pal <- colorNumeric(palette = "RdYlBu", domain = final_shapefile_with_richness$species_richness)
+leaflet(final_shapefile_with_richness) %>%
+addTiles() %>%
+addCircleMarkers(
+lng = ~LONGITUDE,
+lat = ~LATITUDE,
+radius = ~sqrt(species_richness) * 2,
+color = ~color_pal(species_richness),
+fillOpacity = 0.7,
+popup = ~paste0("<b>", Park_Name.x, "</b><br>",
+"Species Richness: ", species_richness, "<br>",
+"Month: ", MONTH.y)
+) %>%
+addLegend(
+position = "bottomright",
+pal = color_pal,
+values = ~species_richness,
+title = "Species Richness"
+)
+ggsave('Leaflet.png')
+install.packages("htmlwidgets")
+install.packages("htmlwidgets")
