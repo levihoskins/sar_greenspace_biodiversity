@@ -1,5 +1,6 @@
 # Load Packages
 library("leaflet")
+install.packages("htmlwidgets")
 
 # Read the shapefile and remove rows with NAs
 final_shapefile_clean <- st_read("Data/Polygons/final_shapefile_clean_saved.shp")
@@ -56,4 +57,25 @@ leaflet(final_shapefile_with_richness) %>%
     title = "Seasonal Status"
   )
 
+# Create a color palette based on species richness
+color_pal <- colorNumeric(palette = "RdYlBu", domain = final_shapefile_with_richness$species_richness)
 
+leaflet(final_shapefile_with_richness) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~LONGITUDE, 
+    lat = ~LATITUDE, 
+    radius = ~sqrt(species_richness) * 2, 
+    color = ~color_pal(species_richness), 
+    fillOpacity = 0.7,
+    popup = ~paste0("<b>", Park_Name.x, "</b><br>",
+                    "Species Richness: ", species_richness, "<br>",
+                    "Month: ", MONTH.y)
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    pal = color_pal,
+    values = ~species_richness,
+    title = "Species Richness"
+  )
+ggsave('Leaflet.png')
