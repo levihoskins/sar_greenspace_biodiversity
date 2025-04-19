@@ -1,5 +1,6 @@
 # download eBird data
 
+# Load packages
 library("tidyverse")
 library("dplyr")
 library("sf")

@@ -1,0 +1,27 @@
+{
+    "id": "6D29D50A",
+    "path": "C:/Users/levihoskins/Desktop/sar_greenspace_biodiversity/sar_greenspace_biodiversity/R/GEE -Human Modification Index.R",
+    "project_path": "R/GEE -Human Modification Index.R",
+    "type": "r_source",
+    "hash": "1523524645",
+    "contents": "",
+    "dirty": false,
+    "created": 1744571530368.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "73,84",
+        "scrollLine": "72"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1745101843,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1745101844016,
+    "read_only": false,
+    "read_only_alternatives": []
+}

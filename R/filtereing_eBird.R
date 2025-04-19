@@ -1,6 +1,6 @@
 # filtering eBird data to remove any outliers, random checklists, incomplete, etc.
 
-# load in packages
+# Load packages
 library("dplyr")
 library("sf")
 library("raster")
@@ -36,7 +36,7 @@ x_filtered_pb <- filtered_pb %>%
 dat_pb <- filtered_pb %>%
   dplyr::filter(!SAMPLING.EVENT.IDENTIFIER %in% x_filtered_pb$SAMPLING.EVENT.IDENTIFIER)
 
-# monhtly function
+# add in a month column - month function
 dat_br <- dat_br %>%
   mutate(OBSERVATION.DATE = as.Date(OBSERVATION.DATE)) %>%
   mutate(MONTH = month(OBSERVATION.DATE, label = TRUE, abbr = TRUE))

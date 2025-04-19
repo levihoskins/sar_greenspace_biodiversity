@@ -1,4 +1,4 @@
-# Read in packages
+# Load packages
 library("dplyr")
 library("sf")
 library("raster")
@@ -22,7 +22,7 @@ fl_shapefile$area <- st_area(fl_shapefile$geometry)
 ## Will filter more later based on everything else
 filtered_shapefile <- fl_shapefile %>%
   dplyr::filter(Park_Size_ >=5) %>%
-  dplyr::filter(Park_Size_ <= 20000)
+  dplyr::filter(Park_Size_ <= 1500)
 
 # Read in eBird data
 dat_br <- readRDS("Data/eBird/RDS/dat_br")
@@ -71,7 +71,7 @@ ggplot() +
   theme_minimal() +
   labs(title = "Filtered Shapefile with Points")
 
-## Plot with map of Florida
+### Plot with map of Florida
 ggplot() +
   annotation_map_tile(type = "cartolight") +
   geom_sf(data = filtered_shapefile_trimmed, fill = "lightblue", color = "black") +
@@ -81,6 +81,11 @@ ggplot() +
   theme_minimal() +
   labs(title = "Filtered Shapefile with Points")
 
+#########################
+# Export figure for paper
+#########################
+#ggsave('Greenspaces.png', bg = 'transparent')
+
 # Repeat above
 ## But for 50 checklists total
 
@@ -88,11 +93,10 @@ ggplot() +
 park_counts <- all_points %>%
   group_by(LOCALITY.ID) %>%
   summarise(lists = length(unique(SAMPLING.EVENT.IDENTIFIER))) %>%
+  st_join(., all_points, by="Locality.ID") %>%
   filter(lists >= 50)
 
-final_shapefile <- st_join(all_points, park_counts, join = st_intersects)
-
-final_shapefile_clean <- na.omit(final_shapefile)
+final_shapefile_clean <- na.omit(park_counts)
 
 # Restore geometry (if lost)
 final_shapefile_clean <- st_as_sf(final_shapefile_clean, 
@@ -109,8 +113,7 @@ final_shapefile_clean <- final_shapefile_clean %>%
     COUNTY = COUNTY,
     STATE = STATE,
     LOCALITY = LOCALITY,
-    L.ID.X = LOCALITY.ID.x,
-    L.ID.Y = LOCALITY.ID.y,
+    L.ID = LOCALITY.ID.x,
     L.TYPE = LOCALITY.TYPE,
     DATE = OBSERVATION.DATE,
     O.COUNT = OBSERVATION.COUNT,
@@ -133,4 +136,5 @@ final_shapefile_clean <- final_shapefile_clean %>%
   )
 
 # Save as shapefile
-st_write(final_shapefile_clean, "Data/Polygons/final_shapefile_clean_saved.shp", delete_dsn = TRUE)
+st_write(final_shapefile_clean, "Data/Polygons/final_shapefile_clean_saved.shp",
+         delete_dsn = TRUE)
