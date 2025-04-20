@@ -1,2 +1,2 @@
 # sar_greenspace_biodiversity
-Investigating spatiotemporal patterns of migratory birds in urban greenspaces
+Studying how urban greenspaces are used throughout the full-annual cycle by birds
