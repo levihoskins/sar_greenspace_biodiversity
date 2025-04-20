@@ -4,46 +4,29 @@ library("dplyr")
 library("sf")
 library("ggspatial")
 
-# Read the shapefile and remove rows with NAs
-final_shapefile_clean <- st_read("Data/Polygons/final_shapefile_clean_saved.shp")
+# Read the shapefile
+final_avonet <- st_read("Data/AVONET/final_avonet.shp")
 
-# Rename columns because they decided to change names
-final_shapefile_clean <- final_shapefile_clean %>%
+# Rename columns to original names
+final_avonet <- final_avonet %>%
   rename(
-    COMMON = COMMON,
-    SCIENTIFIC = SCIENTI,
-    LATITUDE = LATITUD,
-    LONGITUDE = LONGITU,
-    COUNTY = COUNTY,
-    STATE = STATE,
-    LOCALITY = LOCALITY,
-    L.ID = L_ID,
-    L.TYPE = L_TYPE,
-    DATE = DATE,
-    O.COUNT = O_COUNT,
-    OBSERV.ID = OBSERV_,
-    SEI = SEI,
-    MONTH = MONTH, 
-    Shape_Area = Shap_Ar,
-    Park_Sourc = Prk_Src,
-    Park_Urban = Prk_Urb,
-    Park_Place = Prk_Plc,
-    Park_Count = Prk_Cnt,
-    Park_Addre = Prk_Add,
-    Park_Size_ = Prk_Sz_,
-    Park_Siz_1 = Prk_S_1,
-    Park_Size1 = Prk_Sz1,
-    Park_Name = Park_Nm,
-    area = area,
-    lists = lists,
-    geometry = geometry
+    COMMON = COMMON, SCIENTIFIC = SCIENTI, LATITUDE = LATITUD, LONGITUDE = LONGITU,
+    COUNTY = COUNTY, STATE = STATE, LOCALITY = LOCALITY, L.ID = L_ID, L.TYPE = L_TYPE,
+    DATE = DATE, O.COUNT = O_COUNT, OBSERV.ID = OBSERV_, SEI = SEI, MONTH = MONTH, 
+    Shape_Area = Shap_Ar, Park_Sourc = Prk_Src, Park_Urban = Prk_Urb,
+    Park_Place = Prk_Plc, Park_Count = Prk_Cnt, Park_Addre = Prk_Addr_x,
+    Park_Size_ = Prk_Sz_, Park_Siz_1 = Prk_S_1, Park_Size1 = Prk_Sz1,
+    Park_Name = Park_Nm, area = area, lists = lists, geometry = geometry,
+    species_richness = spcs_rc, Sequence = Sequenc, Family1 = Family1, Order1 = Order1,
+    Avibase_ID1 = Avb_ID1, Complete.measures = Cmplt_m, Beak.Length_Culman = Bk_Ln_C,
+    Beak.Length_Nares = Bk_Ln_N, Beak.Width = Bk_Wdth, Beak.Depth = Bk_Dpth, 
+    Tarsus.Length = Trss_Ln, Wing.Length = Wng_Lng, Kipps.Distance = Kpps_Ds,
+    Secondary1 = Scndry1, Hand_Wing.Index = Hnd.W_I, Tail.Length = Tl_Lngt,
+    Mass = Mass, Habitat = Habitat, Habitat.Density = Hbtt_Dn, Migration = Migratn,
+    Trophic.Level = Trphc_L, Tropic.Niche = Trphc_N, Primary.Lifestyle = Prmry_L,
+    Min.Lattitude = Mn_Lttd, Max.Lattitude = Mx_Lttd, Centroid.Lattitude = Cntrd_Lt,
+    Centroid.Longitude = Cntrd_Ln, Range.Size = Rang_Sz
   )
-
-# Calculate via park, size, month
-location_richness <- final_shapefile_clean %>%
-  group_by(Park_Addre, MONTH) %>%
-  mutate(species_richness = n_distinct(SCIENTIFIC)) %>%
-  ungroup()
 
 ## Google Earth Engine - Human Modification Index
 mean_gHM <- read.csv("Data/GEE/mean_gHM_South_FL.csv")
@@ -57,7 +40,7 @@ mean_gHM_clean <- mean_gHM %>%
   summarise(across(everything(), ~ first(na.omit(.)), .names = "first_{.col}"))
 
 # First, join while keeping all rows from location_richness
-combined <- location_richness %>%
+combined <- final_avonet %>%
   left_join(mean_gHM_clean, by = "Park_Addre", suffix = c("", ".y"))
 
 # Keep only these columns

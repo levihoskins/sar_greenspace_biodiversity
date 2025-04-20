@@ -9,47 +9,29 @@ library("ggpmisc")
 ## DO NOT FORGET PARK_SIZE_ is in HECTARES
 ##########################################
 
-# Read the shapefile and remove rows with NAs
-final_shapefile_clean <- st_read("Data/Polygons/final_shapefile_clean_saved.shp")
+# Read the shapefile
+final_avonet <- st_read("Data/AVONET/final_avonet.shp")
 
-# Rename columns because they decided to change names
-final_shapefile_clean <- final_shapefile_clean %>%
+# Rename columns to original names
+final_avonet <- final_avonet %>%
   rename(
-    COMMON = COMMON,
-    SCIENTIFIC = SCIENTI,
-    LATITUDE = LATITUD,
-    LONGITUDE = LONGITU,
-    COUNTY = COUNTY,
-    STATE = STATE,
-    LOCALITY = LOCALITY,
-    L.ID = L_ID,
-    L.TYPE = L_TYPE,
-    DATE = DATE,
-    O.COUNT = O_COUNT,
-    OBSERV.ID = OBSERV_,
-    SEI = SEI,
-    MONTH = MONTH, 
-    Shape_Area = Shap_Ar,
-    Park_Sourc = Prk_Src,
-    Park_Urban = Prk_Urb,
-    Park_Place = Prk_Plc,
-    Park_Count = Prk_Cnt,
-    Park_Addre = Prk_Add,
-    Park_Size_ = Prk_Sz_,
-    Park_Siz_1 = Prk_S_1,
-    Park_Size1 = Prk_Sz1,
-    Park_Name = Park_Nm,
-    area = area,
-    lists = lists,
-    geometry = geometry
+    COMMON = COMMON, SCIENTIFIC = SCIENTI, LATITUDE = LATITUD, LONGITUDE = LONGITU,
+    COUNTY = COUNTY, STATE = STATE, LOCALITY = LOCALITY, L.ID = L_ID, L.TYPE = L_TYPE,
+    DATE = DATE, O.COUNT = O_COUNT, OBSERV.ID = OBSERV_, SEI = SEI, MONTH = MONTH, 
+    Shape_Area = Shap_Ar, Park_Sourc = Prk_Src, Park_Urban = Prk_Urb,
+    Park_Place = Prk_Plc, Park_Count = Prk_Cnt, Park_Addre = Prk_Addr_x,
+    Park_Size_ = Prk_Sz_, Park_Siz_1 = Prk_S_1, Park_Size1 = Prk_Sz1,
+    Park_Name = Park_Nm, area = area, lists = lists, geometry = geometry,
+    species_richness = spcs_rc, Sequence = Sequenc, Family1 = Family1, Order1 = Order1,
+    Avibase_ID1 = Avb_ID1, Complete.measures = Cmplt_m, Beak.Length_Culman = Bk_Ln_C,
+    Beak.Length_Nares = Bk_Ln_N, Beak.Width = Bk_Wdth, Beak.Depth = Bk_Dpth, 
+    Tarsus.Length = Trss_Ln, Wing.Length = Wng_Lng, Kipps.Distance = Kpps_Ds,
+    Secondary1 = Scndry1, Hand_Wing.Index = Hnd.W_I, Tail.Length = Tl_Lngt,
+    Mass = Mass, Habitat = Habitat, Habitat.Density = Hbtt_Dn, Migration = Migratn,
+    Trophic.Level = Trphc_L, Tropic.Niche = Trphc_N, Primary.Lifestyle = Prmry_L,
+    Min.Lattitude = Mn_Lttd, Max.Lattitude = Mx_Lttd, Centroid.Lattitude = Cntrd_Lt,
+    Centroid.Longitude = Cntrd_Ln, Range.Size = Rang_Sz
   )
-
-# Calculate via park, size, month
-location_richness <- final_shapefile_clean %>%
-  group_by(Park_Addre, MONTH) %>%
-  mutate(species_richness = n_distinct(SCIENTIFIC)) %>%
-  ungroup()
-
 
 #################################
 ### Preliminary Graphs for Poster
@@ -57,14 +39,14 @@ location_richness <- final_shapefile_clean %>%
 
 # Line map
 ### Ensure the MONTH variable is a factor and set the correct order
-location_richness$MONTH <- factor(location_richness$MONTH, 
+joined_data_clean$MONTH <- factor(joined_data_clean$MONTH, 
                                   levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
                                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
                                   ordered = TRUE)
 
 ### Plot with correctly ordered months
 ### Plot with a continuous color scale for park size
-ggplot(location_richness, aes(x = MONTH, y = species_richness, group = Park_Name, color = log(Park_Size_))) +
+ggplot(joined_data_clean, aes(x = MONTH, y = species_richness, group = Park_Name, color = log(Park_Size_))) +
   geom_line(alpha = 0.7) +
   scale_color_viridis_c(option = "viridis") +
   labs(title = "Species Richness by Season and Month",
@@ -77,10 +59,9 @@ ggplot(location_richness, aes(x = MONTH, y = species_richness, group = Park_Name
         plot.background = element_rect(fill = "transparent", color = NA),
         panel.grid = element_blank()) +
   guides(color = guide_colorbar(title = "Park Size"))
-ggsave('Figures/Transparent_LineMap_Log.png', bg = 'transparent')
 
 ### Location_Richness_Seasonality
-location_richness_area_season <- final_shapefile_clean %>%
+location_richness_area_season <- joined_data_clean %>%
   group_by(Park_Name, Park_Size_, MONTH) %>%
   summarise(species_richness = n_distinct(SCIENTIFIC), .groups = 'drop') %>%
   mutate(
@@ -120,7 +101,6 @@ location_richness_area_season %>%
     panel.grid = element_blank(),
     legend.position = "none"
   )
-ggsave('Figures/_Log_Transparent_Species_Richness_Seasonality.png', bg = 'transparent')
 
 ### Graphing species Richness across park per month
 location_richness_area_season %>%
@@ -147,26 +127,21 @@ location_richness_area_season %>%
     panel.grid = element_blank(),
     legend.position = "none"
   )
-)
-ggsave('Figures/Log_greenspaces_monthly.png',)
-#########
-## EDA ##
-#########
 
 ## Number of sites
-length(unique(location_richness$Park_Addre))
+length(unique(joined_data_clean$Park_Addre))
 
 ## Test for correlations between richness and checklists (avoiding bias)
-hist(location_richness$species_richness)
-hist(location_richness$lists)
-hist(sqrt(location_richness$lists))
+hist(joined_data_clean$species_richness)
+hist(joined_data_clean$lists)
+hist(sqrt(joined_data_clean$lists))
 
-cor.test(location_richness$species_richness, sqrt(location_richness$lists))
+cor.test(joined_data_clean$species_richness, sqrt(joined_data_clean$lists))
 
-## Mean, SD, Range of Species Richness
-location_richness$species_richness <- as.numeric(location_richness$species_richness)
+## Mean, SD, Range of Species Richness## Mean, SD,joined_data_clean Range of Species Richness
+joined_data_clean$species_richness <- as.numeric(joined_data_clean$species_richness)
 
-summary_richness <- location_richness %>%
+summary_richness <- joined_data_clean %>%
   group_by(Park_Name) %>%
   summarise(SR=mean(species_richness)) %>%
   summarise(mean=mean(SR),
@@ -175,7 +150,7 @@ summary_richness <- location_richness %>%
             max=max(SR))
 
 ## Number of data points by location
-test <- location_richness %>%
+test <- joined_data_clean %>%
   group_by(Park_Name) %>%
   summarise(N=length(unique(SEI))) %>%
   arrange(N) %>%
@@ -184,7 +159,7 @@ test <- location_richness %>%
   coord_flip()
 
 ### Plot between richness and Park size but make Log
-location_richness %>%
+joined_data_clean %>%
   group_by(Park_Name) %>%
   summarise(Park_size = mean(Park_Size_),
             species_richness = mean(species_richness)) %>%
@@ -194,7 +169,7 @@ location_richness %>%
   theme_bw()
 
 ### Flip of graph above
-location_richness %>%
+joined_data_clean %>%
   group_by(Park_Name) %>%
   summarise(species_richness = mean(species_richness),
             Park_Size_Ha = mean(Park_Size_)) %>%
@@ -204,7 +179,7 @@ location_richness %>%
   theme_bw()
 
 ### Take log of Park_Size_ and rename axises for figure
-location_richness %>%
+joined_data_clean %>%
   group_by(Park_Name) %>%
   summarise(species_richness = mean(species_richness),
             Park_Size_Ha = mean(Park_Size_)) %>%
@@ -232,16 +207,16 @@ ggsave('Figures/Transparent_Histogram_log.png', bg = 'transparent')
 ##############################################
 
 ## Take the Standard Deviation per Park for species richness (for error bars)
-sd_per_park <- location_richness %>%
+sd_per_park <- joined_data_clean %>%
   group_by(Park_Addre) %>%
   summarise(species_richness_sd = sd(species_richness, na.rm = TRUE))
 
 ## Add back to shapefile
-location_richness <- location_richness %>%
+joined_data_clean <- joined_data_clean %>%
   st_join(sd_per_park, by = "Park_Addre")
 
 ### Summmarize to one row per park (average them)
-park_summary <- location_richness %>%
+park_summary <- joined_data_clean %>%
   group_by(Park_Addre.x) %>%
   summarise(
     mean_richness = mean(species_richness, na.rm = TRUE),
