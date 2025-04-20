@@ -147,7 +147,8 @@ location_richness_area_season %>%
     panel.grid = element_blank(),
     legend.position = "none"
   )
-
+)
+ggsave('Figures/Log_greenspaces_monthly.png',)
 #########
 ## EDA ##
 #########
