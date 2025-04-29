@@ -1,0 +1,24 @@
+{
+    "id": "A0364555",
+    "path": "C:/Users/levihoskins/Desktop/sar_greenspace_biodiversity/sar_greenspace_biodiversity/R/GEE-dynamic_world.R",
+    "project_path": "R/GEE-dynamic_world.R",
+    "type": "r_source",
+    "hash": "3676044947",
+    "contents": "",
+    "dirty": false,
+    "created": 1745939792235.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1745170902,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1745170902,
+    "read_only": false,
+    "read_only_alternatives": []
+}
