@@ -16,26 +16,19 @@ final_avonet <- st_read("Data/AVONET/final_avonet.shp")
 final_avonet <- final_avonet %>%
   rename(
     COMMON = COMMON, SCIENTIFIC = SCIENTI, LATITUDE = LATITUD, LONGITUDE = LONGITU,
-    COUNTY = COUNTY, STATE = STATE, LOCALITY = LOCALITY, L.ID = L_ID, L.TYPE = L_TYPE,
+    COUNTY = COUNTY, LOCALITY = LOCALIT, L.ID = L_ID, L.TYPE = L_TYPE,
     DATE = DATE, O.COUNT = O_COUNT, OBSERV.ID = OBSERV_, SEI = SEI, MONTH = MONTH, 
-    Shape_Area = Shap_Ar, Park_Sourc = Prk_Src, Park_Urban = Prk_Urb,
-    Park_Place = Prk_Plc, Park_Count = Prk_Cnt, Park_Addre = Prk_Addr_x,
-    Park_Size_ = Prk_Sz_, Park_Siz_1 = Prk_S_1, Park_Size1 = Prk_Sz1,
-    Park_Name = Park_Nm, area = area, lists = lists, geometry = geometry,
-    species_richness = spcs_rc, Sequence = Sequenc, Family1 = Family1, Order1 = Order1,
-    Avibase_ID1 = Avb_ID1, Complete.measures = Cmplt_m, Beak.Length_Culman = Bk_Ln_C,
-    Beak.Length_Nares = Bk_Ln_N, Beak.Width = Bk_Wdth, Beak.Depth = Bk_Dpth, 
-    Tarsus.Length = Trss_Ln, Wing.Length = Wng_Lng, Kipps.Distance = Kpps_Ds,
-    Secondary1 = Scndry1, Hand_Wing.Index = Hnd.W_I, Tail.Length = Tl_Lngt,
-    Mass = Mass, Habitat = Habitat, Habitat.Density = Hbtt_Dn, Migration = Migratn,
-    Trophic.Level = Trphc_L, Tropic.Niche = Trphc_N, Primary.Lifestyle = Prmry_L,
-    Min.Lattitude = Mn_Lttd, Max.Lattitude = Mx_Lttd, Centroid.Lattitude = Cntrd_Lt,
-    Centroid.Longitude = Cntrd_Ln, Range.Size = Rang_Sz
+    Shape_Area = Shap_Ar, Park_Addre = Prk_Add, Park_Size_ = Prk_Sz_, 
+    Park_Siz_1 = Prk_S_1, Park_Size1 = Prk_Sz1, Park_Name = Park_Nm, 
+    area = area, lists = lists, geometry = geometry,
+    species_richness = spcs_rc, Migration = Migratn, Season = Season,
   )
 
-#################################
-### Preliminary Graphs for Poster
-#################################
+######################################
+### Preliminary Graphs to explore data
+######################################
+
+length(unique(final_avonet$Park_Addre)) #54
 
 # Line map
 ### Ensure the MONTH variable is a factor and set the correct order
@@ -46,7 +39,7 @@ final_avonet$MONTH <- factor(final_avonet$MONTH,
 
 ### Plot with correctly ordered months
 ### Plot with a continuous color scale for park size
-ggplot(final_avonet, aes(x = MONTH, y = species_richness, group = Park_Name, color = log(Park_Size_))) +
+ggplot(final_avonet, aes(x = MONTH, y = species_richness, group = L.ID, color = log(Park_Size_))) +
   geom_line(alpha = 0.7) +
   scale_color_viridis_c(option = "viridis") +
   labs(title = "Species Richness by Season and Month",
@@ -131,7 +124,7 @@ location_richness_area_season %>%
 ## Number of sites
 length(unique(final_avonet$Park_Addre))
 
-## Test for correlations between richness and checklists (avoiding bias)
+## Test for correlations between richness and checklists
 hist(final_avonet$species_richness)
 hist(final_avonet$lists)
 hist(sqrt(final_avonet$lists))
@@ -183,24 +176,25 @@ final_avonet %>%
   group_by(Park_Name) %>%
   summarise(species_richness = mean(species_richness),
             Park_Size_Ha = mean(Park_Size_)) %>%
-  mutate(log_Park_Size_Ha = log(Park_Size_Ha)) %>%
-  ggplot(aes(x = log_Park_Size_Ha, y = species_richness)) +
+  ggplot(aes(x = Park_Size_Ha, y = species_richness)) +
   geom_point() +
-  geom_smooth(method = "lm", se = TRUE, color = "green", fill = "lightgreen", level = 0.95) +
+  geom_smooth(method = "lm", se = TRUE, color = "#467010", fill = "#e0f19c", level = 0.95) +
   stat_poly_eq(
-    formula = y ~ x,
+    formula = y ~ log10(x), 
     aes(label = paste(..rr.label.., ..p.value.label.., sep = "~~~")),
     parse = TRUE,
     size = 3,
     label.x = "left",
     label.y = "top"
   ) +
-  labs(x = "log(Park Size)", y = "Species Richness") +
+  scale_x_log10() +  # log-transform the x-axis
+  labs(x = "Park Size (ha, log scale)", y = "Species Richness") +
   theme_bw() +
   theme(panel.background = element_blank(), 
         plot.background = element_blank(),
         panel.grid = element_blank())
 ggsave('Figures/Transparent_Histogram_log.png', bg = 'transparent')
+
 
 ##############################################
 # Look at Species Richness per park on average
@@ -237,4 +231,4 @@ ggplot(park_summary, aes(x = reorder(Park_Addre.x, mean_richness), y = mean_rich
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank()) +
   theme(panel.grid.minor.y = element_blank(), panel.grid.major.y = element_blank()) +
   coord_flip()
-ggsave('Figures/Summarized_Species_Richness_Park_error_bars.png')
+ggsave('Figures/Summarized_Species_Richness_Park_error_bars.png', bg = "transparent")
