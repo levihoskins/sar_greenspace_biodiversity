@@ -187,11 +187,4 @@ emmip(
   type = "response",
   at = list(
     ghmi_mean = seq(min(migratory_residential$ghmi_mean, na.rm = TRUE),
-                    max(migratory_residential$ghmi_mean, na.rm = TRUE),
-                    length.out = 50),
-    log10_Park_Size_ = park_vals
-  )
-) +
-  facet_wrap(~ Season) +
-  labs(x = "GHMI", y = "Predicted Species Richness", colour = "Migration status") +
-  theme_bw()
+  

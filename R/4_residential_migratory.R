@@ -7,17 +7,23 @@ library("rnaturalearth")
 library("rnaturalearthdata")
 library("glmmTMB")
 
-# Read file
+# Read files
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
+final_shapefile_clean <- readRDS("Data/Intermediate_Data/final_shapefile_clean.RDS")
+
+## Clean up shapefile so that i can combine geometry back into final data frame
+final_shapefile_clean <- final_shapefile_clean %>%
+  dplyr::select(Park_Addre, geometry) %>%
+  group_by(Park_Addre) %>%
+  summarise(geometry = st_union(geometry), .groups = "drop")
+
+final_data_with_geometry <- final_data_for_analysis %>%
+  left_join(final_shapefile_clean, by = "Park_Addre") %>%
+  st_as_sf()
 
 ###################################
 ### CODE FOR FIGURE 1 -- Study Area
 ###################################
-# Ensure projected CRS for better display
-final_avonet_proj <- st_transform(final_avonet, crs = 5070) %>%
-  dplyr::select(Park_Name, Park_Addre, Park_Size_, area, species_richness, Season) %>%
-  distinct()
-
 # Begin graph with Florida underlay
 world <- ne_countries(scale = "medium", returnclass = "sf")
 usa <- ne_states(country = "united states of america", returnclass = "sf")
@@ -31,7 +37,7 @@ south_florida_counties <- fl_counties %>%
 # ggplot of study area with species richness, number of checklists per greenspace, and number of greenspaces
 study_area <- ggplot() +
   geom_sf(data = south_florida_counties, fill = "white", color = "black") +
-  geom_sf(data = final_avonet_proj, aes(size = lists, fill = species_richness),
+  geom_sf(data = final_data_with_geometry, aes(size = number_of_checklists, fill = species_richness),
           shape = 21, color = "black", alpha = 0.8) +
   scale_fill_gradient(
     name = "Species Richness",
@@ -53,103 +59,53 @@ study_area
 # save with transparent background
 ggsave('Figures/Study_Area_Figure_1.png', bg = 'transparent', plot = study_area)
 
+
+
+##### START THIS NOW
 ####################################
 ### RESUME Residential vs. Migratory
 ####################################
 
-## Separate into two RDS files for Migratory and Residential
-## first add in migratory status
-migratory_residential <- final_avonet %>%
-  mutate(
-    migration_status = case_when(
-      Migration == 1 ~ "residential",
-      Migration %in% c(2, 3) ~ "migratory",
-      TRUE ~ NA_character_
-    )
-  )
-
-m_r_temp <- migratory_residential %>% 
-  dplyr::select(-geometry) %>%
-  dplyr::select(species_richness, Season, Park_Size_, lists, migration_status) %>% 
-  distinct()
-
-### Migratory
-migratory_data <- migratory_residential %>%
-  filter(migration_status == "migratory")
-length(unique(migratory_data$SCIENTIFIC.NAME)) #256
-
-### Add richness
-migratory_data <- migratory_data %>%
-  group_by(Park_Addre, MONTH) %>%
-  mutate(migratory_richness = n_distinct(SCIENTIFIC.NAME)) %>%
-  ungroup()
-
-#### SaveRDS
-#saveRDS(migratory_data, "Data/AVONET/migratory_data.rds")
-
-### Residential
-residential_data <- migratory_residential %>%
-  filter(migration_status == "residential")
-length(unique(residential_data$SCIENTIFIC.NAME)) #95
-
-### Add richness
-residential_data <- residential_data %>%
-  group_by(Park_Addre, MONTH) %>%
-  mutate(residential_richness = n_distinct(SCIENTIFIC.NAME)) %>%
-  ungroup()
-
-#### SaveRDS
-#saveRDS(residential_data, "Data/AVONET/residential_data.rds")
-
-### GRAPHICAL REPRESENTATION FOR RESIDENTIAL VS MIGRATORY
-### Using a negative binomial GLMM (glmmTMB)
-
-############################################
 # Residential GLMM
-############################################
 glmm_residential <- glmmTMB(
-  residential_richness ~ log10(area),
-  data = residential_data,
+  residential ~ log10(area),
+  data = final_data_with_geometry,
   family = nbinom2
 )
 summary(glmm_residential)
 
-residential_data <- residential_data %>%
+richness_per_park <- richness_per_park %>%
   mutate(
     predicted_residential = predict(glmm_residential, newdata = ., type = "response")
   )
 
-NBGLMM_Park_Size_Residential <-ggplot(residential_data, aes(x = Park_Siz_1, y = predicted_residential)) +
+NBGLMM_Park_Size_Residential <- ggplot(richness_per_park, aes(x = Park_Siz_1, y = predicted_residential)) +
   geom_point(alpha = 0.5, color = "black") +
-  geom_line(aes(group = Park_Name), color = "blue", alpha = 0.6) +
+  geom_line(aes(group = Park_Addre), color = "blue", alpha = 0.6) +
   labs(x = "Park Area (m²)", y = "Predicted Residential Richness", title = "Residential") +
   theme_minimal()
 
-# Save as PNG
 ggsave('Figures/NBGLMM_Park_Size_Residential.png', bg = 'transparent', plot = NBGLMM_Park_Size_Residential)
 
-############################################
 # Migratory GLMM
-############################################
 glmm_migratory <- glmmTMB(
-  migratory_richness ~ log10(area),
-  data = migratory_data,
+  migratory ~ log10(area),
+  data = richness_per_park,
   family = nbinom2
 )
 summary(glmm_migratory)
 
-migratory_data <- migratory_data %>%
+richness_per_park <- richness_per_park %>%
   mutate(
     predicted_migratory = predict(glmm_migratory, newdata = ., type = "response")
   )
 
-NBGLMM_Park_Size_Migratory <- ggplot(migratory_data, aes(x = Park_Siz_1, y = predicted_migratory)) +
+NBGLMM_Park_Size_Migratory <- ggplot(richness_per_park, aes(x = Park_Siz_1, y = predicted_migratory)) +
   geom_point(alpha = 0.5, color = "black") +
-  geom_line(aes(group = Park_Name), color = "red", alpha = 0.6) +
+  geom_line(aes(group = Park_Addre), color = "red", alpha = 0.6) +
   labs(x = "Park Area (m²)", y = "Predicted Migratory Richness", title = "Migratory") +
   theme_minimal()
 
-# Save as PNG
 ggsave('Figures/NBGLMM_Park_Size_Migratory.png', bg = 'transparent', plot = NBGLMM_Park_Size_Migratory)
 
 
