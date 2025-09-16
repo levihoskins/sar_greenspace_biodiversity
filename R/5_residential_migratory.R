@@ -8,13 +8,15 @@ library("rnaturalearthdata")
 library("glmmTMB")
 
 # Read file
-final_avonet <- readRDS("Data/AVONET/final_avonet.RDS")
+final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
 
 ###################################
 ### CODE FOR FIGURE 1 -- Study Area
 ###################################
 # Ensure projected CRS for better display
-final_avonet_proj <- st_transform(final_avonet, crs = 5070)
+final_avonet_proj <- st_transform(final_avonet, crs = 5070) %>%
+  dplyr::select(Park_Name, Park_Addre, Park_Size_, area, species_richness, Season) %>%
+  distinct()
 
 # Begin graph with Florida underlay
 world <- ne_countries(scale = "medium", returnclass = "sf")
