@@ -8,25 +8,64 @@ library("emmeans")
 library("stats")
 library("tidyr")
 library("gt")
+library("RColorBrewer")
+library("stringr")
 
-# Read the shapefile and rename columns
-final_avonet <- st_read("Data/AVONET/final_avonet.shp")
-final_avonet <- final_avonet %>%
-  rename(
-    COMMON = COMMON, SCIENTIFIC = SCIENTI, LATITUDE = LATITUD, LONGITUDE = LONGITU,
-    COUNTY = COUNTY, LOCALITY = LOCALIT, L.ID = L_ID, L.TYPE = L_TYPE,
-    DATE = DATE, O.COUNT = O_COUNT, OBSERV.ID = OBSERV_, SEI = SEI, MONTH = MONTH, 
-    Shape_Area = Shap_Ar, Park_Addre = Prk_Add, Park_Size_ = Prk_Sz_, 
-    Park_Siz_1 = Prk_S_1, Park_Size1 = Prk_Sz1, Park_Name = Park_Nm, 
-    area = area, lists = lists, geometry = geometry,
-    species_richness = spcs_rc, Migration = Migratn, Season = Season
-  )
+# Read file
+final_avonet <- readRDS("Data/AVONET/final_avonet.RDS")
 
 # Project to UTM (meters)
 final_avonet_proj <- st_transform(final_avonet, crs = 26917)
 
+## Read in GHMI and Dynamic World
+ghmi <- read_csv("Data/GHMI_Dynamic_World/GHMI.csv")
+dynamic_world <- read_csv("Data/GHMI_Dynamic_World/DynamicWorld.csv")
+
+# Clean GHMI
+ghmi_clean <- ghmi %>%
+  group_by(Park_Addre) %>%
+  summarise(ghmi_mean = mean(mean, na.rm = TRUE), .groups = "drop")
+
+# Clean Dynamic World
+# Keep only the most common dominant_class per park -- aggregates the data
+dynamic_world_clean <- dynamic_world %>%
+  group_by(Park_Addre, dominant_class) %>%
+  tally() %>%
+  slice_max(order_by = n, n = 1, with_ties = FALSE) %>%
+  ungroup()
+
+# Join with final_avonet
+final_avonet_gee <- final_avonet %>%
+  left_join(dynamic_world_clean, by = "Park_Addre") %>%
+  left_join(ghmi_clean, by = "Park_Addre")
+
+# Convert dominant_class to factor
+final_avonet_gee$dominant_class <- as.factor(final_avonet_gee$dominant_class)
+
+# Add migration status
+migratory_residential <- final_avonet_gee %>%
+  mutate(
+    migration_status = case_when(
+      Migration == 1 ~ "residential",
+      Migration %in% c(2, 3) ~ "migratory",
+      TRUE ~ NA_character_
+    )
+  )
+
+# Reorder season categories so that they appear correct when plotted
+migratory_residential$Season <- factor(
+  migratory_residential$Season,
+  levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
+  ordered = TRUE
+)
+
+migratory_residential$migration_status <- factor(
+  migratory_residential$migration_status,
+  levels = c("residential", "migratory")
+)
+
 ## Get migration status and make sure park names are correct
-migratory_residential <- final_avonet %>%
+migratory_residential <- migratory_residential %>%
   mutate(
     migration_status = case_when(
       Migration == 1 ~ "residential",
@@ -35,13 +74,13 @@ migratory_residential <- final_avonet %>%
     ),
     Park_Addre_clean = toupper(Park_Addre)
   ) %>%
-  group_by(Park_Addre, Park_Size_, MONTH) %>%
+  group_by(migration_status, Season, Park_Addre, Park_Size_, MONTH, ghmi_mean, dominant_class, lists) %>%
   mutate(species_richness = n_distinct(SCIENTIFIC)) %>%
   ungroup()
 
 # Group by parks
 greenspaces <- migratory_residential %>%
-  group_by(Park_Addre) %>%
+  group_by(migration_status, Season, Park_Addre, Park_Size_, ghmi_mean, dominant_class, lists) %>%
   summarise(geometry = st_union(geometry), .groups = "drop")
 
 # read in ParkServe data
@@ -112,73 +151,213 @@ model_species <- glmmTMB(
   family = nbinom2
 )
 
-model_migratory <- glmmTMB(
-  migratory ~ log1p(nearest_dist_m) + (1 | Park_Addre),
-  data = greenspace_model_data,
-  family = nbinom2
-)
-
-model_residential <- glmmTMB(
-  residential ~ log1p(nearest_dist_m) + (1 | Park_Addre),
-  data = greenspace_model_data,
-  family = nbinom2
-)
-
-# Summaries
 summary(model_species)
-summary(model_migratory)
-summary(model_residential)
 
 # Extract slopes
-slopes_df <- bind_rows(
-  tidy(model_species, effects = "fixed", conf.int = TRUE) %>% 
+slopes_df <- tidy(model_species, effects = "fixed", conf.int = TRUE) %>% 
     filter(term == "log1p(nearest_dist_m)") %>% 
-    mutate(model = "Species Richness"),
-  
-  tidy(model_migratory, effects = "fixed", conf.int = TRUE) %>% 
-    filter(term == "log1p(nearest_dist_m)") %>% 
-    mutate(model = "Migratory Species"),
-  
-  tidy(model_residential, effects = "fixed", conf.int = TRUE) %>% 
-    filter(term == "log1p(nearest_dist_m)") %>% 
-    mutate(model = "Residential Species")
+    mutate(model = "Species Richness")
+
+
+###### 
+## Big Model with GHMI, Season, SAR, Isolation
+######
+# Run Negative Binomial GLMMs with 'Nearest_neighbor' as random effect
+model_species <- glmmTMB(
+  species_richness ~ log10(Park_Size_) * log10(nearest_dist_m) * ghmi_mean * Season * migration_status + log10(lists),
+  data = greenspace_model_data,
+  family = nbinom2
 )
 
-# PLOT
-ggplot(slopes_df, aes(
-  x = model,
-  y = estimate,
-  color = model
-)) +
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.3, size = 1) +
-  geom_point(size = 4) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+summary(model_species)
+Anova(model_species, type = "III")  
+
+# Get marginal trends for GHMI by Season
+emm_ghmi_season <- emtrends(
+  model_species,
+  var = "ghmi_mean",
+  specs = ~ Season,
+  type = "response"
+)
+
+# Convert to data frame for ggplot
+emm_ghmi_season_df <- as.data.frame(emm_ghmi_season)
+
+# Plot marginal slopes
+ggplot(emm_ghmi_season_df,
+       aes(x = Season, y = ghmi_mean.trend, group = Season)) +
+  geom_point(size = 4, color = "forestgreen") +
+  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
+                width = 0.6, color = "forestgreen") +
   labs(
     title = NULL,
-    x = NULL,
-    y = "Nearest Distance (slope estimate)",
-    color = "Model"
+    y = "Marginal Slope of GHMI",
+    x = NULL
   ) +
-  scale_color_manual(values = c(
-    "Migratory Species"   = "#2c7fb8",
-    "Residential Species" = "#feb24c",
-    "Species Richness"    = "#2a4c09"
-  )) +
-  theme_minimal(base_size = 14) +
+  theme_minimal() +
   theme(
     panel.grid.major.y = element_blank(),
     panel.grid.major.x = element_blank(),
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
+    axis.ticks = element_line(color = "grey30"),
+    legend.position = "none",
     axis.title = element_text(face = "bold"),
     axis.text = element_text(color = "black")
   ) +
   coord_flip() +
   theme(aspect.ratio = 0.5)
 
-# Save PNG
-ggsave('Figures/Nearest_Distance_Overall.png', bg = 'transparent')
+###### Response Curve: Predicted Species Richness vs GHMI ######
+
+# Create response curve using emmip
+emmip(
+  model_species,
+  Season ~ ghmi_mean,
+  type = "response",
+  at = list(
+    ghmi_mean = seq(
+      min(greenspace_model_data$ghmi_mean, na.rm = TRUE),
+      max(greenspace_model_data$ghmi_mean, na.rm = TRUE),
+      length.out = 50
+    )
+  )
+) +
+  labs(
+    x = "GHMI (Human Modification Index)",
+    y = "Predicted Species Richness",
+    colour = "Season"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(face = "bold"),
+    axis.title = element_text(face = "bold"),
+    axis.text  = element_text(color = "black")
+  )
+
+
+# Create a grid of predictor values for response curve
+pred_grid <- with(greenspace_model_data,
+                  expand.grid(
+                    ghmi_mean = seq(min(ghmi_mean, na.rm = TRUE),
+                                    max(ghmi_mean, na.rm = TRUE),
+                                    length.out = 50),
+                    Season = unique(Season),
+                    migration_status = unique(migration_status),
+                    Park_Size_ = quantile(Park_Size_, probs = c(0.25, 0.5, 0.75), na.rm = TRUE),  # Q1, median, Q3
+                    nearest_dist_m = quantile(nearest_dist_m, probs = c(0.25, 0.5, 0.75), na.rm = TRUE), # Q1, median, Q3
+                    lists = median(lists, na.rm = TRUE)
+                  )
+)
+
+# Get predicted values from the model
+pred_grid$predicted_richness <- predict(
+  model_species,
+  newdata = pred_grid,
+  type = "response",
+  re.form = NA  # marginalize over random effect
+)
+
+# Optional: create a factor label for Park Size × Isolation
+pred_grid$size_isolation <- paste0("ParkSize=", pred_grid$Park_Size_, 
+                                   "m, Nearest=", pred_grid$nearest_dist_m, "m")
+
+# Plot predicted species richness vs GHMI, colored by Season, faceted by size/isolation
+ggplot(pred_grid, aes(x = ghmi_mean, y = predicted_richness, color = Season)) +
+  geom_line(size = 1) +
+  facet_wrap(~ size_isolation, scales = "free_y") +
+  labs(
+    x = "GHMI (Human Modification Index)",
+    y = "Predicted Species Richness",
+    colour = "Season"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(face = "bold"),
+    axis.title = element_text(face = "bold"),
+    axis.text  = element_text(color = "black")
+  )
+
+
+# Create a prediction grid with median/quantile values
+pred_grid <- expand.grid(
+  ghmi_mean = seq(min(greenspace_model_data$ghmi_mean, na.rm = TRUE),
+                  max(greenspace_model_data$ghmi_mean, na.rm = TRUE),
+                  length.out = 50),
+  Season = unique(greenspace_model_data$Season),
+  migration_status = unique(greenspace_model_data$migration_status),
+  Park_Size_ = seq(min(greenspace_model_data$Park_Size_, na.rm = TRUE),
+                   max(greenspace_model_data$Park_Size_, na.rm = TRUE),
+                   length.out = 3),   # small, medium, large
+  nearest_dist_m = seq(min(greenspace_model_data$nearest_dist_m, na.rm = TRUE),
+                       max(greenspace_model_data$nearest_dist_m, na.rm = TRUE),
+                       length.out = 3),  # near, medium, far
+  lists = median(greenspace_model_data$lists, na.rm = TRUE)
+)
+
+# Predict species richness (marginal over random effects)
+pred_grid$predicted_richness <- predict(
+  model_species,
+  newdata = pred_grid,
+  type = "response",
+  re.form = NA
+)
+
+# Plot using continuous gradients for Park Size and Isolation
+ggplot(pred_grid, aes(x = ghmi_mean, y = predicted_richness, 
+                      color = Park_Size_, linetype = factor(nearest_dist_m), group = interaction(Park_Size_, nearest_dist_m, Season))) +
+  geom_line(size = 1) +
+  facet_wrap(~Season) +  # separate panels for each Season
+  scale_color_viridis_c(option = "C", name = "Park Size (log10 m²)") +
+  scale_linetype_manual(values = c("solid", "dashed", "dotdash"), name = "Isolation (log10 m)") +
+  labs(
+    x = "GHMI (Human Modification Index)",
+    y = "Predicted Species Richness"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "top",
+    legend.title = element_text(face = "bold"),
+    axis.title = element_text(face = "bold"),
+    axis.text  = element_text(color = "black")
+  )
+
+# Tidy the model
+species_mod_summary <- tidy(model_species, conf.int = TRUE) %>%
+  filter(effect == "fixed") %>%
+  # Create a readable predictor name from term
+  mutate(predictor = term) %>%
+  # Assign Scale (adjust logic as needed)
+  mutate(Scale = case_when(
+    grepl("Park_Size|nearest_dist", predictor) ~ "Local",
+    grepl("ghmi", predictor) ~ "Landscape",
+    grepl("Season|migration_status|lists", predictor) ~ "Other",
+    TRUE ~ NA_character_
+  )) %>%
+  mutate(model = "Big Model GHMI")
+
+# Filter out Intercept and lists
+species_mod_summary %>%
+  filter(!predictor %in% c("(Intercept)", "log10(lists)")) %>%
+  ggplot(aes(x = predictor, y = estimate, color = Scale)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.4) +
+  coord_flip() +
+  theme_bw(base_size = 12) +
+  scale_color_brewer(palette = "Dark2") +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  ylab("Effect size") +
+  xlab("") +
+  theme(
+    axis.text.x = element_text(color = "black"),
+    axis.text.y = element_text(color = "black")
+  )
+
+
+
 
 ##############################################
 ### MODEL THIS FOR THE FULL ANNUAL CYCLE

@@ -9,18 +9,8 @@ library("stats")
 library("tidyr")
 library("gt")
 
-# Read the shapefile and rename columns
-final_avonet <- st_read("Data/AVONET/final_avonet.shp")
-final_avonet <- final_avonet %>%
-  rename(
-    COMMON = COMMON, SCIENTIFIC = SCIENTI, LATITUDE = LATITUD, LONGITUDE = LONGITU,
-    COUNTY = COUNTY, LOCALITY = LOCALIT, L.ID = L_ID, L.TYPE = L_TYPE,
-    DATE = DATE, O.COUNT = O_COUNT, OBSERV.ID = OBSERV_, SEI = SEI, MONTH = MONTH, 
-    Shape_Area = Shap_Ar, Park_Addre = Prk_Add, Park_Size_ = Prk_Sz_, 
-    Park_Siz_1 = Prk_S_1, Park_Size1 = Prk_Sz1, Park_Name = Park_Nm, 
-    area = area, lists = lists, geometry = geometry,
-    species_richness = spcs_rc, Migration = Migratn, Season = Season
-  )
+# Read file
+final_avonet <- readRDS("Data/AVONET/final_avonet.RDS")
 
 # Project to UTM (meters)
 final_avonet_proj <- st_transform(final_avonet, crs = 26917)

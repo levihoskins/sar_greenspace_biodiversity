@@ -4,19 +4,14 @@ library("dplyr")
 library("glmmTMB")
 library("emmeans")
 library("ggplot2")
+library("lme4")
+library("performance")
+library("car")
 
-# Read shapefile & rename columns
-final_avonet <- st_read("Data/AVONET/final_avonet.shp")
-final_avonet <- final_avonet %>%
-  rename(
-    COMMON = COMMON, SCIENTIFIC = SCIENTI, LATITUDE = LATITUD, LONGITUDE = LONGITU,
-    COUNTY = COUNTY, LOCALITY = LOCALIT, L.ID = L_ID, L.TYPE = L_TYPE,
-    DATE = DATE, O.COUNT = O_COUNT, OBSERV.ID = OBSERV_, SEI = SEI, MONTH = MONTH, 
-    Shape_Area = Shap_Ar, Park_Addre = Prk_Add, Park_Size_ = Prk_Sz_, 
-    Park_Siz_1 = Prk_S_1, Park_Size1 = Prk_Sz1, Park_Name = Park_Nm, 
-    area = area, lists = lists, geometry = geometry,
-    species_richness = spcs_rc, Migration = Migratn, Season = Season
-  )
+#### THE ISSUE CAN BE SOLVED IN THIS SCRIPT, OCCURS IN either script 4 or 5 -- need to look into
+
+# Read file
+final_avonet <- readRDS("Data/AVONET/final_avonet.RDS")
 
 # Add migration status
 migratory_residential <- final_avonet %>%
@@ -35,71 +30,119 @@ migratory_residential$Season <- factor(
   ordered = TRUE
 )
 
-#######################
-### Super basic NB GLMM
-#######################
-
-# Fit Negative Binomial GLMM
-## Season model
-glmm_season <- glmmTMB(
-  species_richness ~ Season + (1 | Park_Addre),
-  data = migratory_residential,
-  family = nbinom2
-)
-
-summary(glmm_season)
-
-# emmeans pairwise comparisons for Season
-emm_season <- emmeans(glmm_season, ~ Season)
-pairs_season <- pairs(emm_season)  
-
-print(emm_season)
-print(pairs_season)
-
-# Convert to df for plotting
-season_df <- as.data.frame(emm_season)
-
-# Plot
-ggplot(season_df, aes(x = Season, y = emmean, color = Season)) +
-  geom_point(size = 5) +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.2) +
-  labs(
-    title = "Predicted Species Richness per Season",
-    y = "Predicted Richness",
-    x = "Season"
-  ) +
-  scale_color_manual(values = c(
-    "Overwintering" = "#e0f19c",
-    "Spring Migration" = "#b1d8b7",
-    "Breeding" = "#467010",
-    "Fall Migration" = "#2a4c09"
-  )) +
-  theme_minimal() +
-  coord_flip()
-
-#########################################
-### Add in migration status as a variable
-#########################################
 migratory_residential$migration_status <- factor(
   migratory_residential$migration_status,
   levels = c("residential", "migratory")
 )
 
+# Create a clean, distinct dataset for plotting or modeling
+clean_avonet <- migratory_residential %>%
+  dplyr::select(species_richness, Season, Park_Siz_1, lists, migration_status) %>%
+  distinct()
+
+# View the result
+head(clean_avonet)
+
+####################
+### Exploratory data
+####################
+# Number of Greenspaces
+length(unique(final_avonet$Park_Addre)) #127
+
+# Total number of observers
+length(unique(final_avonet$SAMPLING.EVENT.IDENTIFIER)) #55003
+
+## size of greensapces
+median(migratory_residential$Park_Size_) #82.79207
+range(migratory_residential$Park_Size_) #5.157864 #364.582466
+sd(migratory_residential$Park_Size_) #87.81135
+
+### quick visualization of park size median (in red)
+ggplot(migratory_residential, aes(x=Park_Size_))+
+  geom_histogram(fill="gray80", color="black")+
+  geom_vline(xintercept = 82.79207, col = "red")+
+  theme_bw()+
+  scale_x_log10()
+
+### Find Mean, SD, Highest, and Lowest SR
+mean(final_avonet$species_richness) #109.4772
+sd(final_avonet$species_richness) #34.26076
+
+## Get name of park
+richness_summary <- final_avonet %>%
+  st_drop_geometry() %>%
+  group_by(Park_Name) %>%
+  summarise(total_species = n_distinct(SCIENTIFIC)) %>%
+  ungroup()
+
+lowest_SR_park  <- richness_summary %>% filter(total_species == min(total_species))
+lowest_SR_park # Water Oaks Park -- 30
+highest_SR_park <- richness_summary %>% filter(total_species == max(total_species)) 
+highest_SR_park # Bill Baggs Cape Florida State Park - 234
+
+# Quick visualization to show lists and richness 
+# Histogram of 'lists'
+hist(final_avonet$lists,
+     main = "Distribution of Lists",
+     xlab = "Number of Lists",
+     col = "skyblue")
+
+# Histogram of 'species_richness'
+hist(final_avonet$species_richness,
+     main = "Distribution of Species Richness",
+     xlab = "Species Richness",
+     col = "pink")
+
+###histogram elimantes lm as an option because not normal
+
+### run a simple model to check glmm (poisson or nb)
+poisson_glmm <- glm(species_richness ~ log10(Park_Size_) + log10(lists), 
+                family=poisson, 
+                data = final_avonet)
+summary(poisson_glmm)
+
+check_model(poisson_glmm)
+###### overdispersed so go with negative binomial
+
+nb_glmm <- glmmTMB(species_richness ~ log10(Park_Size_) + log10(lists), 
+                family=nbinom2, 
+                data = final_avonet)
+summary(nb_glmm)
+
+check_model(nb_glmm)
+#### much better fit
+
+##############################
+# Fitting a model for SAR only
+##############################
+SAR_glmm <- glmmTMB(species_richness ~ log10(Park_Size_) + log10(lists), 
+                family=nbinom2, 
+                data = final_avonet)
+summary(SAR_glmm)
+
+#######################################
+# GLMM for migration status interaction
+#######################################
+MR_glmm <- glmmTMB(species_richness ~ log10(Park_Size_) * migration_status + log10(lists), 
+                   family = nbinom2, 
+                   data = migratory_residential)
+summary(MR_glmm)
+Anova(MR_glmm, type = "II")
+
+##################################
+# Glmm + migration + seasonality
+# Adding effort covariates (lists)
+##################################
 # Fit NB GLMMs with migration_status
 ## Season × migration_status
-glmm_season_status <- glmmTMB(
-  species_richness ~ Season * migration_status + (1 | Park_Addre),
-  data = migratory_residential,
-  family = nbinom2
-)
-
+glmm_season_status <- glmmTMB(species_richness ~ log10(Park_Size_) * migration_status * Season + log10(lists),
+                              data = migratory_residential,
+                              family = nbinom2)
 summary(glmm_season_status)
-
-# Model comparison
-AIC(glmm_month_status, glmm_season_status)
+Anova(glmm_season_status, type = "III")
 
 # Get emmeans
-emm_season_status <- emmeans(glmm_season_status, ~ Season * migration_status)
+emm_season_status <- emmeans(glmm_season_status, ~ Season | migration_status)
 pairs_season_status <- pairs(emm_season_status)
 
 print(emm_season_status)
@@ -133,30 +176,40 @@ ggplot(season_status_df,
     ) +
   coord_flip()
 
-## Plot (Paper -- but not the one I am keeping)
+# If your emmeans are on the log scale, exponentiate to get response scale
+season_status_df <- season_status_df %>%
+  mutate(
+    emmean_resp = exp(emmean),
+    lower_resp = exp(asymp.LCL),
+    upper_resp = exp(asymp.UCL)
+  )
+
 ggplot(season_status_df,
-       aes(x = Season, y = emmean, color = migration_status, group = migration_status)) +
-  geom_point(position = position_dodge(width = 0.2), size = 3.5) +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
-                position = position_dodge(width = 0.2), width = 0.2, size = 0.7) +
+       aes(x = Season, y = emmean_resp, color = migration_status, group = migration_status)) +
+  geom_point(position = position_dodge(width = 0.25), size = 3.5) +
+  geom_errorbar(aes(ymin = lower_resp, ymax = upper_resp),
+                position = position_dodge(width = 0.25), width = 0.2, size = 0.7) +
   labs(
-    title = "Predicted Species Richness by Season & Migration Status",
-    y = "Species Richness (Slope)",
+    y = "Predicted Species Richness",
     x = NULL,
     color = "Migration Status"
   ) +
   scale_color_manual(values = c("migratory" = "#2c7fb8", "residential" = "#feb24c")) +
-  theme_minimal(base_size = 14, base_family = "serif") +
+  theme_minimal() +
   theme(
-    panel.grid.major.y = element_blank(),
-    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),   
+    panel.grid.major.x = element_blank(),        
     axis.ticks = element_line(color = "grey30"),
     legend.position = "top",
-    legend.title = element_text(face = "bold"),
-    axis.title = element_text(face = "bold"),
-    axis.text = element_text(color = "black")
+    axis.text = element_text(color = "black", size = 11),
+    axis.title = element_text(size = 12, face = "bold"),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11)
   ) +
   coord_flip()
+
+ggsave('Figures/Migratory_Residential_SAR_emmeans.png', bg = 'transparent')
+
 
 ### Validating the model
 # For Season × migration_status model
@@ -164,131 +217,15 @@ sim_res_season <- simulateResiduals(glmm_season_status, n = 100)
 plot(sim_res_season)
 testDispersion(sim_res_season)
 
+### Quick visualization
+ggplot(data = migratory_residential, aes(x = area, y = species_richness)) +
+  geom_point(aes(color = migration_status)) +
+  geom_smooth(aes(color = migration_status), method = 'lm', se = T) + 
+  theme_bw() +
+  xlab("log Area (m2)") +
+  ylab("Total Richness") +
+  scale_x_log10()
+
+ggsave('Figures/Migratory_Residential_SR_Area.png', bg = 'transparent')
 
 
-
-############################
-### Adding effort covariates
-############################
-## Season as a fixed effect
-# Season model with effort covariate and migration status
-glmm_season_status_ec <- glmmTMB(
-  species_richness ~ Season * migration_status + lists + (1 | Park_Addre),
-  data = migratory_residential,
-  family = nbinom2
-)
-
-# emmeans
-emm_season_status_ec <- emmeans(glmm_season_status_ec, ~ Season * migration_status)
-pairs_season_status_ec <- pairs(emm_season_status_ec)
-
-print(emm_season_status_ec)
-print(pairs_season_status_ec)
-
-# Convert to DF for plotting
-season_status_ec_df <- as.data.frame(emm_season_status_ec)
-
-# Plot (Poster)
-ggplot(season_status_ec_df,
-       aes(x = Season, y = emmean, color = migration_status, group = migration_status)) +
-  geom_point(position = position_dodge(width = 0.6), size = 4) +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
-                position = position_dodge(width = 0.6), width = 0.6) +
-  labs(
-    title = NULL,
-    y = "Predicted Species Richness (with effort covariate)",
-    x = NULL,
-    color = "Migration Status"
-  ) +
-  scale_color_manual(values = c("migratory" = "#b1d8b7", "residential" = "#2a4c09")) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.y = element_blank(),
-    panel.grid.major.x = element_blank(),
-    axis.ticks = element_line(color = "grey30"),
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
-    axis.title = element_text(face = "bold"),
-    axis.text = element_text(color = "black")
-  ) +
-  coord_flip() +
-  theme(aspect.ratio = 0.5 )
-
-# Plot (Figure)
-ggplot(season_status_ec_df,
-       aes(x = Season, y = emmean, color = migration_status, group = migration_status)) +
-  geom_point(position = position_dodge(width = 0.6), size = 4) +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
-                position = position_dodge(width = 0.6), width = 0.6) +
-  labs(
-    title = NULL,
-    y = "Predicted Species Richness (Effort-Adjusted)",
-    x = NULL,
-    color = "Migration Status"
-  ) +
-  scale_color_manual(values = c("migratory" = "#2c7fb8", "residential" = "#feb24c")) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.y = element_blank(),
-    panel.grid.major.x = element_blank(),
-    axis.ticks = element_line(color = "grey30"),
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
-    axis.title = element_text(face = "bold"),
-    axis.text = element_text(color = "black")
-  ) +
-  coord_flip() +
-  theme(aspect.ratio = 0.5)
-
-ggsave('Figures/Predicted_SR_effort_covariate.png', bg = 'transparent')
-
-################################
-### Season as a random intercept ### Gives exact same as above
-################################
-glmm_season_random <- glmmTMB(
-  species_richness ~ Season * migration_status + lists + (1 | Park_Addre) + (1 | Season),
-  data = migratory_residential,
-  family = nbinom2
-)
-
-# Get emmeans
-emm_season_random_ec <- emmeans(glmm_season_random, 
-                                ~ Season * migration_status,
-                                at = list(Season = unique(migratory_residential$Season)))
-
-# Pairwise comparisons
-pairs_season_random_ec <- pairs(emm_season_random_ec)
-
-print(emm_season_random_ec)
-print(pairs_season_random_ec)
-
-# Convert to df for plotting
-season_random_ec_df <- as.data.frame(emm_season_random_ec)
-
-head(season_random_ec_df)
-
-# Plot
-ggplot(season_random_ec_df,
-       aes(x = Season, y = emmean, color = migration_status, group = migration_status)) +
-  geom_point(position = position_dodge(width = 0.6), size = 4) +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
-                position = position_dodge(width = 0.6), width = 0.6) +
-  labs(
-    title = NULL,
-    y = "Predicted Species Richness (Effort-Adjusted)",
-    x = NULL,
-    color = "Migration Status"
-  ) +
-  scale_color_manual(values = c("migratory" = "#2c7fb8", "residential" = "#feb24c")) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.y = element_blank(),
-    panel.grid.major.x = element_blank(),
-    axis.ticks = element_line(color = "grey30"),
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
-    axis.title = element_text(face = "bold"),
-    axis.text = element_text(color = "black")
-  ) +
-  coord_flip() +
-  theme(aspect.ratio = 0.5)
