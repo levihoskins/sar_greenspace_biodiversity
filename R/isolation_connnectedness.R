@@ -9,33 +9,22 @@ library("stats")
 library("tidyr")
 library("gt")
 
-# Read file
-final_avonet <- readRDS("Data/AVONET/final_avonet.RDS")
+# Read files
+final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
+final_shapefile_clean <- readRDS("Data/Intermediate_Data/final_shapefile_clean.RDS")
 
-# Project to UTM (meters)
-final_avonet_proj <- st_transform(final_avonet, crs = 26917)
-
-## Get migration status and make sure park names are correct
-migratory_residential <- final_avonet %>%
-  mutate(
-    migration_status = case_when(
-      Migration == 1 ~ "residential",
-      Migration %in% c(2, 3) ~ "migratory",
-      TRUE ~ NA_character_
-    ),
-    Park_Addre_clean = toupper(Park_Addre)
-  ) %>%
-  group_by(Park_Addre, Park_Size_, MONTH) %>%
-  mutate(species_richness = n_distinct(SCIENTIFIC)) %>%
-  ungroup()
-
-# Group by parks
-greenspaces <- migratory_residential %>%
-  group_by(Park_Addre_clean) %>%
+## Clean up shapefile so that i can combine geometry back into final data frame
+final_shapefile_clean <- final_shapefile_clean %>%
+  dplyr::select(Park_Addre, geometry) %>%
+  group_by(Park_Addre) %>%
   summarise(geometry = st_union(geometry), .groups = "drop")
 
+final_data_with_geometry <- final_data_for_analysis %>%
+  left_join(final_shapefile_clean, by = "Park_Addre") %>%
+  st_as_sf()
+
 # Use centroids
-greenspaces <- greenspaces %>%
+greenspaces <- final_data_with_geometry %>%
   mutate(centroid = st_centroid(geometry))
 
 # Calculate pairwise distances between centroids

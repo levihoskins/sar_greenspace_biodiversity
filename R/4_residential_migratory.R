@@ -6,6 +6,7 @@ library("sf")
 library("rnaturalearth")
 library("rnaturalearthdata")
 library("glmmTMB")
+library("broom")
 
 # Read files
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
@@ -80,9 +81,19 @@ final_data_with_geometry <- final_data_with_geometry %>%
 nb_richness_plot_status <- ggplot(final_data_with_geometry, aes(x = Park_Size_, y = predicted_richness, color = analysis)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
-  geom_smooth(method = "loess", se = FALSE) +
+  geom_smooth(method = "lm", se = FALSE) +
   labs(x = "Park Area (hectares)", y = "Predicted Species Richness", color = "Analysis") +
   theme_minimal()
 nb_richness_plot_status
 
 ggsave("Figures/nb_richness_plot_status.png", plot = nb_richness_plot_status, bg = "transparent")
+
+# fit linear models separately by analysis group
+slopes <- final_data_with_geometry %>%
+  group_by(analysis) %>%
+  do(tidy(lm(predicted_richness ~ log10(Park_Size_), data = .))) %>%
+  filter(term == "log10(Park_Size_)") %>%
+  select(analysis, estimate, std.error, p.value)
+slopes
+
+

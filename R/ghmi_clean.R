@@ -33,32 +33,11 @@ final_avonet_ghmi <- final_avonet %>%
   left_join(ghmi_clean, by = "Park_Addre")
 
 #---------------------------------------
-# Add migration status and reorder factors
-#---------------------------------------
-migratory_residential <- final_avonet_ghmi %>%
-  mutate(
-    migration_status = case_when(
-      Migration == 1 ~ "residential",
-      Migration %in% c(2, 3) ~ "migratory",
-      TRUE ~ NA_character_
-    ),
-    Season = factor(Season,
-                    levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
-                    ordered = TRUE),
-    migration_status = factor(migration_status, levels = c("residential", "migratory"))
-  )
-
-migratory_residential_singular <- migratory_residential %>% 
-  dplyr::select(-geometry) %>%
-  dplyr::select(species_richness, Season, Park_Size_, lists, migration_status) %>% 
-  distinct()
-
-#---------------------------------------
 # Fit Negative Binomial GLMM: GHMI × Season
 #---------------------------------------
 nb_glmm_ghmi_season <- glmmTMB(
-  species_richness ~ ghmi_mean * Season + log10(lists),
-  data = migratory_residential_singular,
+  species_richness ~ ghmi_mean * Season + log10(number_of_checklists),
+  data = gee_final_data_for_analysis,
   family = nbinom2
 )
 
@@ -68,7 +47,7 @@ Anova(nb_glmm_ghmi_season, type = "III")
 #---------------------------------------
 # Marginal slopes of GHMI by season
 #---------------------------------------
-med_lists <- median(migratory_residential_singular$lists, na.rm = TRUE)
+med_lists <- median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
 
 emm_ghmi_season <- emtrends(
   nb_glmm_ghmi_season,
@@ -106,8 +85,8 @@ p2 <- emmip(
   type = "response",
   at = list(
     ghmi_mean = seq(
-      quantile(migratory_residential_singular$ghmi_mean, 0.05, na.rm = TRUE),
-      quantile(migratory_residential_singular$ghmi_mean, 0.95, na.rm = TRUE),
+      quantile(gee_final_data_for_analysis$ghmi_mean, 0.05, na.rm = TRUE),
+      quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
       length.out = 50
     ),
     lists = med_lists
@@ -127,71 +106,12 @@ p1 + p2 + plot_annotation(
 # GLMM: GHMI × Park Size × Season × Migration
 #---------------------------------------
 glmm_season_size_ghmi <- glmmTMB(
-  species_richness ~ Park_Size_ * Season * ghmi_mean * migration_status + log10(lists),
+  species_richness ~ Park_Size_ * Season * ghmi_mean * analysis + log10(number_of_checklists),
   family = nbinom2,
-  data = migratory_residential_singular
+  data = gee_final_data_for_analysis
 )
 
 summary(glmm_season_size_ghmi)
 Anova(glmm_season_size_ghmi, type = "III")
 
-#---------------------------------------
-# Tidy model for plotting effect sizes
-#---------------------------------------
-species_mod_summary <- tidy(glmm_season_size_ghmi, conf.int = TRUE) %>%
-  filter(effect == "fixed") %>%
-  mutate(
-    predictor = term,
-    interaction_order = str_count(term, ":") + 1,
-    Scale = case_when(
-      grepl("Park_Size_", predictor) ~ "Local",
-      grepl("ghmi", predictor) ~ "Landscape",
-      grepl("Season|migration_status|lists", predictor) ~ "Other",
-      TRUE ~ NA_character_
-    ),
-    model = "GHMI + Park Size + Season"
-  ) %>%
-  filter(!predictor %in% c("(Intercept)", "log10(lists)")) %>%
-  arrange(interaction_order, predictor) %>%
-  mutate(predictor = factor(predictor, levels = predictor))
 
-# Plot effect sizes
-ggplot(species_mod_summary, aes(x = predictor, y = estimate, color = Scale)) +
-  geom_point(size = 3) +
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.4) +
-  coord_flip() +
-  theme_bw(base_size = 12) +
-  scale_color_brewer(palette = "Dark2") +
-  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
-  ylab("Effect size") +
-  xlab("") +
-  theme(axis.text = element_text(color = "black"))
-
-#---------------------------------------
-# Predicted GHMI effects at median park size
-#---------------------------------------
-mean_ghmi <- mean(migratory_residential_singular$ghmi_mean, na.rm = TRUE)
-park_vals <- quantile(migratory_residential_singular$Park_Size_, probs = c(0.1, 0.5, 0.9), na.rm = TRUE)
-ghmi_vals <- quantile(migratory_residential_singular$ghmi_mean, probs = c(0.1, 0.5, 0.9), na.rm = TRUE)
-
-nb_model_ghmi <- glmmTMB(
-  species_richness ~ log10(Park_Size_) * migration_status * Season * ghmi_mean + log10(lists),
-  data = migratory_residential_singular,
-  family = nbinom2
-)
-
-emmip(
-  nb_model_ghmi,
-  migration_status ~ ghmi_mean | Season,
-  by = "migration_status",
-  type = "response",
-  at = list(
-    ghmi_mean = seq(min(migratory_residential$ghmi_mean, na.rm = TRUE),
-                    max(migratory_residential$ghmi_mean, na.rm = TRUE),
-                    length.out = 50),
-    log10_Park_Size_ = park_vals
-  )
-) +
-  facet_wrap(~ Season) +
-  labs(x = "GHMI", y = "Predicted Species Richness", colour = "Migration status") +
-  theme_bw()

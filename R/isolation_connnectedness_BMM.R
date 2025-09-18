@@ -11,11 +11,19 @@ library("gt")
 library("RColorBrewer")
 library("stringr")
 
-# Read file
-final_avonet <- readRDS("Data/AVONET/final_avonet.RDS")
+# Read files
+final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
+final_shapefile_clean <- readRDS("Data/Intermediate_Data/final_shapefile_clean.RDS")
 
-# Project to UTM (meters)
-final_avonet_proj <- st_transform(final_avonet, crs = 26917)
+## Clean up shapefile so that i can combine geometry back into final data frame
+final_shapefile_clean <- final_shapefile_clean %>%
+  dplyr::select(Park_Addre, geometry) %>%
+  group_by(Park_Addre) %>%
+  summarise(geometry = st_union(geometry), .groups = "drop")
+
+final_data_with_geometry <- final_data_for_analysis %>%
+  left_join(final_shapefile_clean, by = "Park_Addre") %>%
+  st_as_sf()
 
 ## Read in GHMI and Dynamic World
 ghmi <- read_csv("Data/GHMI_Dynamic_World/GHMI.csv")
@@ -35,53 +43,24 @@ dynamic_world_clean <- dynamic_world %>%
   ungroup()
 
 # Join with final_avonet
-final_avonet_gee <- final_avonet %>%
+gee_final_data_for_analysis <- final_data_for_analysis %>%
   left_join(dynamic_world_clean, by = "Park_Addre") %>%
   left_join(ghmi_clean, by = "Park_Addre")
 
 # Convert dominant_class to factor
-final_avonet_gee$dominant_class <- as.factor(final_avonet_gee$dominant_class)
-
-# Add migration status
-migratory_residential <- final_avonet_gee %>%
-  mutate(
-    migration_status = case_when(
-      Migration == 1 ~ "residential",
-      Migration %in% c(2, 3) ~ "migratory",
-      TRUE ~ NA_character_
-    )
-  )
+gee_final_data_for_analysis$dominant_class <- as.factor(gee_final_data_for_analysis$dominant_class)
 
 # Reorder season categories so that they appear correct when plotted
-migratory_residential$Season <- factor(
-  migratory_residential$Season,
+gee_final_data_for_analysis$Season <- factor(
+  gee_final_data_for_analysis$Season,
   levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
   ordered = TRUE
 )
 
-migratory_residential$migration_status <- factor(
-  migratory_residential$migration_status,
-  levels = c("residential", "migratory")
+gee_final_data_for_analysis$analysis <- factor(
+  gee_final_data_for_analysis$analysis,
+  levels = c("residential", "migratory", "total")
 )
-
-## Get migration status and make sure park names are correct
-migratory_residential <- migratory_residential %>%
-  mutate(
-    migration_status = case_when(
-      Migration == 1 ~ "residential",
-      Migration %in% c(2, 3) ~ "migratory",
-      TRUE ~ NA_character_
-    ),
-    Park_Addre_clean = toupper(Park_Addre)
-  ) %>%
-  group_by(migration_status, Season, Park_Addre, Park_Size_, MONTH, ghmi_mean, dominant_class, lists) %>%
-  mutate(species_richness = n_distinct(SCIENTIFIC)) %>%
-  ungroup()
-
-# Group by parks
-greenspaces <- migratory_residential %>%
-  group_by(migration_status, Season, Park_Addre, Park_Size_, ghmi_mean, dominant_class, lists) %>%
-  summarise(geometry = st_union(geometry), .groups = "drop")
 
 # read in ParkServe data
 # we probably want to consider the distance to nearest green space or natural area, not just greenspaces
@@ -116,38 +95,31 @@ gs_poly_df <- gs_poly %>%
 saveRDS(gs_poly, "Data/Intermediate_Data/distance_to_nearest_greenspace_parkserve.RDS")
 
 # now add this to the greenspaces data frame
-greenspaces <- greenspaces %>%
+greenspaces <- gee_final_data_for_analysis %>%
   left_join(., gs_poly_df %>% dplyr::select(Park_Addre, nearest_dist_m, nearest_dist_km), by=c("Park_Addre"))
 
 summary(greenspaces$nearest_dist_m)
+
+greenspaces$dominant_class <- as.numeric(as.character(greenspaces$dominant_class))
+
+saveRDS(greenspaces, "Data/final_data_for_big_script.RDS")
+
+# Plot
+ggplot() +
+  geom_sf(data = greenspaces, fill = "forestgreen", color = "darkgreen", alpha = 0.4) +
+  geom_sf(data = lines_df, color = "red", size = 0.5) +
+  geom_sf(data = st_as_sf(greenspaces, coords = st_coordinates(greenspaces$centroid), crs = st_crs(greenspaces)),
+          aes(geometry = geometry), color = "black", size = 1) +
+  theme_minimal()
 
 
 #############
 ## Build GLMM
 #############
-# Calculate richness per migration_status per park & county from migratory_residential
-richness_by_migration <- migratory_residential %>%
-  filter(!is.na(migration_status)) %>%
-  group_by(Park_Addre_clean, COUNTY, migration_status) %>%
-  summarise(richness = n_distinct(SCIENTIFIC), .groups = "drop") %>%
-  pivot_wider(names_from = migration_status, values_from = richness, values_fill = 0) %>%
-  mutate(species_richness = migratory + residential)
-
-# Join richness_by_migration to greenspaces
-greenspace_model_data <- greenspaces %>%
-  st_join(richness_by_migration, by = c("Park_Addre_clean", "COUNTY"))
-
-# Replace NA richness values with zero
-greenspace_model_data <- greenspace_model_data %>%
-  mutate(
-    migratory_richness = ifelse(is.na(migratory), 0, migratory),
-    residential_richness = ifelse(is.na(residential), 0, residential)
-  )
-
 # Run Negative Binomial GLMMs with 'Nearest_neighbor' as random effect
 model_species <- glmmTMB(
   species_richness ~ log1p(nearest_dist_m) + (1 | Park_Addre),
-  data = greenspace_model_data,
+  data = greenspaces,
   family = nbinom2
 )
 
@@ -164,8 +136,8 @@ slopes_df <- tidy(model_species, effects = "fixed", conf.int = TRUE) %>%
 ######
 # Run Negative Binomial GLMMs with 'Nearest_neighbor' as random effect
 model_species <- glmmTMB(
-  species_richness ~ log10(Park_Size_) * log10(nearest_dist_m) * ghmi_mean * Season * migration_status + log10(lists),
-  data = greenspace_model_data,
+  species_richness ~ log10(Park_Size_) * log10(nearest_dist_m) * ghmi_mean * Season * analysis + log10(number_of_checklists),
+  data = greenspaces,
   family = nbinom2
 )
 
@@ -215,8 +187,8 @@ emmip(
   type = "response",
   at = list(
     ghmi_mean = seq(
-      min(greenspace_model_data$ghmi_mean, na.rm = TRUE),
-      max(greenspace_model_data$ghmi_mean, na.rm = TRUE),
+      min(greenspaces$ghmi_mean, na.rm = TRUE),
+      max(greenspaces$ghmi_mean, na.rm = TRUE),
       length.out = 50
     )
   )
@@ -237,16 +209,16 @@ emmip(
 
 
 # Create a grid of predictor values for response curve
-pred_grid <- with(greenspace_model_data,
+pred_grid <- with(greenspaces,
                   expand.grid(
                     ghmi_mean = seq(min(ghmi_mean, na.rm = TRUE),
                                     max(ghmi_mean, na.rm = TRUE),
                                     length.out = 50),
                     Season = unique(Season),
-                    migration_status = unique(migration_status),
+                    analysis = unique(analysis),
                     Park_Size_ = quantile(Park_Size_, probs = c(0.25, 0.5, 0.75), na.rm = TRUE),  # Q1, median, Q3
                     nearest_dist_m = quantile(nearest_dist_m, probs = c(0.25, 0.5, 0.75), na.rm = TRUE), # Q1, median, Q3
-                    lists = median(lists, na.rm = TRUE)
+                    number_of_checklists = median(number_of_checklists, na.rm = TRUE)
                   )
 )
 
@@ -283,18 +255,18 @@ ggplot(pred_grid, aes(x = ghmi_mean, y = predicted_richness, color = Season)) +
 
 # Create a prediction grid with median/quantile values
 pred_grid <- expand.grid(
-  ghmi_mean = seq(min(greenspace_model_data$ghmi_mean, na.rm = TRUE),
-                  max(greenspace_model_data$ghmi_mean, na.rm = TRUE),
+  ghmi_mean = seq(min(greenspaces$ghmi_mean, na.rm = TRUE),
+                  max(greenspaces$ghmi_mean, na.rm = TRUE),
                   length.out = 50),
-  Season = unique(greenspace_model_data$Season),
-  migration_status = unique(greenspace_model_data$migration_status),
-  Park_Size_ = seq(min(greenspace_model_data$Park_Size_, na.rm = TRUE),
-                   max(greenspace_model_data$Park_Size_, na.rm = TRUE),
+  Season = unique(greenspaces$Season),
+  analysis = unique(greenspaces$analysis),
+  Park_Size_ = seq(min(greenspaces$Park_Size_, na.rm = TRUE),
+                   max(greenspaces$Park_Size_, na.rm = TRUE),
                    length.out = 3),   # small, medium, large
-  nearest_dist_m = seq(min(greenspace_model_data$nearest_dist_m, na.rm = TRUE),
-                       max(greenspace_model_data$nearest_dist_m, na.rm = TRUE),
+  nearest_dist_m = seq(min(greenspaces$nearest_dist_m, na.rm = TRUE),
+                       max(greenspaces$nearest_dist_m, na.rm = TRUE),
                        length.out = 3),  # near, medium, far
-  lists = median(greenspace_model_data$lists, na.rm = TRUE)
+  number_of_checklists = median(greenspaces$number_of_checklists, na.rm = TRUE)
 )
 
 # Predict species richness (marginal over random effects)
@@ -363,20 +335,11 @@ species_mod_summary %>%
 ### MODEL THIS FOR THE FULL ANNUAL CYCLE
 ###but as seasonality is included in the model (fixed effect)
 ##############################################
-# Summarize species richness by greenspace per season
-richness_by_greenspace <- migratory_residential %>%
-  group_by(Park_Addre_clean, COUNTY, Park_Size_, lists, Season, migration_status) %>%
-  summarise(species_richness = n_distinct(SCIENTIFIC), .groups = "drop")
-
-# Join richness to greenspaces dataset with distance to neighbor
-season_model_data <- greenspaces %>%
-  st_join(richness_by_greenspace, by = "Park_Addre_clean")
-
 #overall
 glmm_season_migration <- glmmTMB(
-  species_richness ~ log1p(nearest_dist_km) * Season * migration_status + lists +
+  species_richness ~ log1p(nearest_dist_km) * Season * analysis + log(number_of_checklists) +
     log1p(Park_Size_) + (1 | Park_Addre),
-  data = season_model_data,
+  data = greenspaces,
   family = nbinom2
 )
 summary(glmm_season_migration)
@@ -385,7 +348,7 @@ summary(glmm_season_migration)
 margins_all <- emtrends(
   glmm_season_migration,
   var   = "nearest_dist_km",
-  specs = c("Season", "migration_status")
+  specs = c("Season", "analysis")
 ) %>% as.data.frame()
 
 add_ci <- function(df) {
@@ -403,15 +366,16 @@ margins_all <- add_ci(margins_all)
 # Define color
 status_colors <- c(
   "migratory"   = "#b1d8b7",
-  "residential" = "#2a4c09"
+  "residential" = "#2a4c09",
+  "total" = "#476010"
 )
 
 ggplot(margins_all, 
        aes(x = Season, 
            y = nearest_dist_km.trend, 
            ymin = lower.CL, ymax = upper.CL,
-           color = migration_status,
-           group = migration_status)) +
+           color = analysis,
+           group = analysis)) +
   geom_point(size = 3, position = position_dodge(width = 0.6)) +
   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
                 width = 0.2, 

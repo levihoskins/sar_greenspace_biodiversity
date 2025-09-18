@@ -17,11 +17,9 @@ library("patchwork")
 library("broom")
 library("car")
 
-# Read file
-final_avonet <- readRDS("Data/AVONET/final_avonet.RDS")
-
-## Read in GHMI and Dynamic World
-ghmi <- read_csv("Data/GHMI_Dynamic_World/GHMI.csv")
+# Read in files (ghmi and dynamic world as well)
+final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
+ghmi <- read_csv("Data/GHMI_Dynamic_World/mean_GHMI_parks.csv")
 dynamic_world <- read_csv("Data/GHMI_Dynamic_World/DynamicWorld.csv")
 
 # Clean GHMI
@@ -38,55 +36,45 @@ dynamic_world_clean <- dynamic_world %>%
   ungroup()
 
 # Join with final_avonet
-final_avonet_gee <- final_avonet %>%
+gee_final_data_for_analysis <- final_data_for_analysis %>%
   left_join(dynamic_world_clean, by = "Park_Addre") %>%
   left_join(ghmi_clean, by = "Park_Addre")
 
 # Convert dominant_class to factor
-final_avonet_gee$dominant_class <- as.factor(final_avonet_gee$dominant_class)
-
-# Add migration status
-migratory_residential <- final_avonet_gee %>%
-  mutate(
-    migration_status = case_when(
-      Migration == 1 ~ "residential",
-      Migration %in% c(2, 3) ~ "migratory",
-      TRUE ~ NA_character_
-    )
-  )
+gee_final_data_for_analysis$dominant_class <- as.factor(gee_final_data_for_analysis$dominant_class)
 
 # Reorder season categories so that they appear correct when plotted
-migratory_residential$Season <- factor(
-  migratory_residential$Season,
+gee_final_data_for_analysis$Season <- factor(
+  gee_final_data_for_analysis$Season,
   levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
   ordered = TRUE
 )
 
-migratory_residential$migration_status <- factor(
-  migratory_residential$migration_status,
-  levels = c("residential", "migratory")
+gee_final_data_for_analysis$analysis <- factor(
+  gee_final_data_for_analysis$analysis,
+  levels = c("residential", "migratory", "total")
 )
 
 ##################
 ## Overdispersion
 #################
 # Fit Poisson GLM
-#glm_model <- glm(species_richness ~ ghmi_mean + dominant_class + lists, 
-#                 data = final_avonet_gee, family = poisson())
+glm_model <- glm(species_richness ~ ghmi_mean + dominant_class + log(number_of_checklists), 
+                 data = gee_final_data_for_analysis, family = poisson())
 
 # Summary of the model
-#summary(glm_model)
+summary(glm_model)
 
 # Calculate dispersion
-#dispersion <- sum(residuals(glm_model, type = "pearson")^2) / df.residual(glm_model)
-#print(paste("Dispersion:", dispersion))
+dispersion <- sum(residuals(glm_model, type = "pearson")^2) / df.residual(glm_model)
+print(paste("Dispersion:", dispersion))
 
 #########################################
 # NB GLMM: GHMI × Season + log10(lists)
 #########################################
 nb_glmm_ghmi_season <- glmmTMB(
-  species_richness ~ ghmi_mean * Season + log10(lists),
-  data   = migratory_residential,
+  species_richness ~ ghmi_mean * Season + log10(number_of_checklists),
+  data   = gee_final_data_for_analysis,
   family = nbinom2
 )
 
@@ -134,8 +122,8 @@ emmip(
   type = "response",
   at = list(
     ghmi_mean = seq(
-      min(migratory_residential$ghmi_mean, na.rm = TRUE),
-      max(migratory_residential$ghmi_mean, na.rm = TRUE),
+      min(gee_final_data_for_analysis$ghmi_mean, na.rm = TRUE),
+      max(gee_final_data_for_analysis$ghmi_mean, na.rm = TRUE),
       length.out = 50
     )
   )
@@ -154,8 +142,8 @@ emmip(
     axis.text  = element_text(color = "black")
   )
 
-levels(migratory_residential$Season)
-contrasts(migratory_residential$Season)
+levels(gee_final_data_for_analysis$Season)
+contrasts(gee_final_data_for_analysis$Season)
 
 emmeans(nb_glmm_ghmi_season, ~ Season)
 
@@ -165,231 +153,28 @@ emmip(
   type = "response",
   at = list(
     ghmi_mean = seq(
-      quantile(migratory_residential$ghmi_mean, 0.05, na.rm = TRUE),
-      quantile(migratory_residential$ghmi_mean, 0.95, na.rm = TRUE),
+      quantile(gee_final_data_for_analysis$ghmi_mean, 0.05, na.rm = TRUE),
+      quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
       length.out = 50
     ),
-    lists = median(migratory_residential$lists, na.rm = TRUE)
+    lists = median(gee_final_data_for_analysis$lists, na.rm = TRUE)
   )
 )
 
-#---------------------------------------
-# 1. Set realistic values for predictions
-#---------------------------------------
-mean_ghmi  <- mean(migratory_residential$ghmi_mean, na.rm = TRUE)
-med_lists  <- median(migratory_residential$lists, na.rm = TRUE)
-
-#---------------------------------------
-# 2. Slopes of GHMI by season (emtrends)
-#---------------------------------------
-emm_ghmi_season <- emtrends(
-  nb_glmm_ghmi_season,
-  var = "ghmi_mean",
-  specs = ~ Season,
-  type = "response",
-  at = list(lists = med_lists)
-)
-
-emm_ghmi_season_df <- as.data.frame(emm_ghmi_season)
-
-p1 <- ggplot(emm_ghmi_season_df,
-             aes(x = Season, y = ghmi_mean.trend)) +
-  geom_point(size = 4, color = "forestgreen") +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
-                width = 0.6, color = "forestgreen") +
-  labs(
-    title = "Slope of GHMI Effect",
-    y = "Marginal Slope of GHMI",
-    x = NULL
-  ) +
-  theme_minimal() +
-  theme(
-    panel.grid.major = element_blank(),
-    axis.ticks = element_line(color = "grey30"),
-    axis.title = element_text(face = "bold"),
-    axis.text  = element_text(color = "black")
-  ) +
-  coord_flip() +
-  theme(aspect.ratio = 0.5)
-
-#---------------------------------------
-# 3. Predicted richness vs GHMI by season
-#---------------------------------------
-p2 <- emmip(
-  nb_glmm_ghmi_season,
-  Season ~ ghmi_mean,
-  type = "response",
-  at = list(
-    ghmi_mean = seq(
-      quantile(migratory_residential$ghmi_mean, 0.05, na.rm = TRUE),
-      quantile(migratory_residential$ghmi_mean, 0.95, na.rm = TRUE),
-      length.out = 50
-    ),
-    lists = med_lists
-  )
-) +
-  labs(
-    title = "Predicted Species Richness",
-    x = "GHMI (Human Modification Index)",
-    y = "Predicted Species Richness",
-    colour = "Season"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    panel.grid = element_blank(),
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
-    axis.title = element_text(face = "bold"),
-    axis.text  = element_text(color = "black")
-  )
-
-#---------------------------------------
-# 4. Compare side by side
-#---------------------------------------
-p1 + p2 + plot_annotation(
-  title = "GHMI Effects on Species Richness by Season",
-  subtitle = "Left: sensitivity (slopes, at median list effort) | Right: predicted richness (across observed GHMI range)"
-)
-
-#---------------------------------------
-# 5. Double-check predicted marginal means
-#---------------------------------------
-emmeans(nb_glmm_ghmi_season, ~ Season,
-        at = list(ghmi_mean = mean_ghmi,
-                  lists = med_lists))
-
+ggsave("Figures/ghmi_predicted_response_seasons.png", bg = "transparent")
 
 #### Repeat above but add in Park_Size_ as a variable in the model
-glmm_season_size_ghmi <- glmmTMB(species_richness ~ Park_Size_ * Season * ghmi_mean * migration_status
-                                 + log10(lists), family = nbinom2, data = migratory_residential)
+glmm_season_size_ghmi <- glmmTMB(species_richness ~ Park_Size_ * Season * ghmi_mean * analysis
+                                 + log10(number_of_checklists), family = nbinom2, data = gee_final_data_for_analysis)
 summary(glmm_season_size_ghmi)
 Anova(glmm_season_size_ghmi, type = "III")
-
-
-# Tidy the new model
-species_mod_summary <- tidy(glmm_season_size_ghmi, conf.int = TRUE) %>%
-  filter(effect == "fixed") %>%
-  # Use term names directly
-  mutate(predictor = term,
-         # Count ":" to determine interaction order (main effects first)
-         interaction_order = str_count(term, ":") + 1,
-         # Assign Scale
-         Scale = case_when(
-           grepl("Park_Size_", predictor) ~ "Local",
-           grepl("ghmi", predictor) ~ "Landscape",
-           grepl("Season|migration_status|lists", predictor) ~ "Other",
-           TRUE ~ NA_character_
-         ),
-         model = "GHMI + Park Size + Season")
-
-# Filter out Intercept and lists
-plot_data <- species_mod_summary %>%
-  filter(!predictor %in% c("(Intercept)", "log10(lists)")) %>%
-  # Order predictor factor by interaction order, then alphabetically
-  arrange(interaction_order, predictor) %>%
-  mutate(predictor = factor(predictor, levels = predictor))
-
-
-species_mod_summary %>%
-  dplyr::filter(! predictor %in% c("Intercept", "log10(lists)")) %>%
-  ggplot(., aes(x=predictor, y=estimate, color=Scale))+
-  geom_point()+
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.high))+
-  coord_flip()+
-  theme_bw()+
-  theme(axis.text=element_text(color="black"))+
-  ylab("Effect size")+
-  xlab("")+
-  geom_hline(yintercept=0, color="red", linetype="dashed")+
-  scale_color_brewer(palette="Dark2")+
-  ggtitle("Negative Binonmial GLMM")
-
-# Plot
-ggplot(plot_data, aes(x = predictor, y = estimate, color = Scale)) +
-  geom_point(size = 3) +
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.4) +
-  coord_flip() +
-  theme_bw(base_size = 12) +
-  scale_color_brewer(palette = "Dark2") +
-  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
-  ylab("Effect size") +
-  xlab("") +
-  theme(
-    axis.text.x = element_text(color = "black"),
-    axis.text.y = element_text(color = "black")
-  )
-
-
-
-
-#---------------------------------------
-# 0. Define realistic reference values
-#---------------------------------------
-mean_ghmi   <- mean(migratory_residential$ghmi_mean, na.rm = TRUE)
-med_lists   <- median(migratory_residential$lists, na.rm = TRUE)
-park_vals   <- quantile(log10(migratory_residential$Park_Size_), probs = c(0.1, 0.5, 0.9), na.rm = TRUE)
-ghmi_vals   <- quantile(migratory_residential$ghmi_mean, probs = c(0.1, 0.5, 0.9), na.rm = TRUE)
-
-#---------------------------------------
-# Dominant class × Season
-#---------------------------------------
-nb_glmm_domclass_season <- glmmTMB(
-  species_richness ~ dominant_class * Season + log10(lists),
-  data   = migratory_residential,
-  family = nbinom2
-)
-
-summary(nb_glmm_domclass_season)
-Anova(nb_glmm_domclass_season, type = "III")
-
-emm_domclass_season <- emmeans(
-  nb_glmm_domclass_season,
-  ~ dominant_class | Season,
-  type = "response",
-  at = list(lists = med_lists)
-) %>% as.data.frame()
-
-# Recode dominant_class into Dynamic World labels
-emm_domclass_season %>%
-  mutate(
-    dominant_class = as.numeric(dominant_class),
-    dominant_label = factor(
-      dominant_class,
-      levels = 0:6,
-      labels = c("Water","Trees","Grass","Flooded Veg.","Crops","Shrub/Scrub","Built Area")
-    )
-  )
-
-ggplot(plot_df, aes(x = dominant_label, y = response, colour = Season, group = Season)) +
-  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL, fill = Season),
-              alpha = 0.15, colour = NA) +
-  geom_line(size = 0.7) +
-  geom_point(size = 2) +
-  labs(
-    x = "Dynamic World Dominant Class",
-    y = "Predicted Species Richness",
-    colour = "Season", fill = "Season"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    panel.grid = element_blank(),
-    axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
-    axis.text.y = element_text(color = "black"),
-    axis.title = element_text(face = "bold"),
-    legend.position = "top",
-    legend.title = element_text(face = "bold")
-  )
-
-
-
-
 
 #########################################
 # NB GLMM: dominant_class × Season + log10(lists)
 #########################################
 nb_glmm_domclass_season <- glmmTMB(
-  species_richness ~ dominant_class * Season + log10(lists),
-  data   = migratory_residential,
+  species_richness ~ dominant_class * Season + log10(number_of_checklists),
+  data   = gee_final_data_for_analysis,
   family = nbinom2
 )
 
@@ -456,13 +241,13 @@ ggplot(plot_df,
     plot.title = element_text(face = "bold", hjust = 0.5)
   )
 
-
+ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent")
 
 
 ###Negative Binomial
 ### GHMI
-nb_model_ghmi <- glmmTMB(species_richness ~ log10(Park_Size_) * migration_status * Season * ghmi_mean + log10(lists),
-                              data = migratory_residential,
+nb_model_ghmi <- glmmTMB(species_richness ~ log10(Park_Size_) * analysis * Season * ghmi_mean + log10(number_of_checklists),
+                              data = gee_final_data_for_analysis,
                               family = nbinom2)
 summary(nb_model_ghmi)
 Anova(nb_model_ghmi, type = "III")
@@ -650,6 +435,9 @@ ghmi_plot + dw_plot + plot_layout(ncol = 1)
 
 ########
 # FIX THIS
+
+
+
 
 
 
