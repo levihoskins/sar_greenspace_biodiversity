@@ -72,7 +72,7 @@ all_points <- all_points %>%
 length(unique(all_points$Park_Addre))
 
 #############################################
-### Greenspaces with 5 checklists per season
+### Greenspaces with 10 checklists per season
 #############################################
 # Make season a column
 valid_ids_season <- all_points %>%
@@ -135,7 +135,8 @@ total_richness_season <- final_shapefile_clean %>%
             number_of_checklists = n_distinct(SAMPLING.EVENT.IDENTIFIER)) %>%
   ungroup()
 
-# list of the 21 species with their migratory status that are not included with avonet
+# list of the 21 species with their migratory status that are not included with AVONOT
+## Adding in their migratory status with All About Birds distribution
 manual_status <- tibble::tibble(
   SCIENTIFIC.NAME = c(
     "Ardea ibis", 
@@ -161,7 +162,7 @@ manual_status <- tibble::tibble(
     "Icterus bullockii"
   ),
   migration_status = c(
-    "residential",  # Ardea ibis (Cattle Egret)
+    "residential",  # Cattle Egret
     "residential",  # Laughing Gull
     "residential",  # Double-crested Cormorant
     "migratory",    # Cooper’s Hawk
@@ -181,7 +182,7 @@ manual_status <- tibble::tibble(
     "residential",  # Barn Owl
     "migratory",    # Franklin’s Gull
     "residential",  # Rose-ringed Parakeet (exotic)
-    "migratory"     # Bullock’s Oriole
+    "migratory"     # Bullock’s Oriole (accidental)
   )
 )
 
@@ -220,7 +221,7 @@ total_richness_migratory_status_season <- final_shapefile_clean %>%
 # get just park-level data (unique to each park)
 park_level_data <- final_shapefile_clean %>%
   st_set_geometry(NULL) %>%
-  dplyr::select(Shape_Area, Park_Addre, Park_Size_, Park_Siz_1, area) %>%
+  dplyr::select(Shape_Area, Park_Addre, Park_Siz_1, area) %>%
   distinct() %>%
   group_by(Park_Addre) %>%
   arrange(desc(area)) %>%
@@ -294,9 +295,6 @@ total_species_by_status
 #########################################
 ### 5 checklists per greenspace per year
 #########################################
-### Use 5 because COVID had such a dip in numbers, as did 2010 and 2013
-#########################################
-
 # Greenspaces with at least 5 checklists in every year they appear
 #valid_ids <- all_points %>%
 #  mutate(YEAR = lubridate::year(OBSERVATION.DATE)) %>%

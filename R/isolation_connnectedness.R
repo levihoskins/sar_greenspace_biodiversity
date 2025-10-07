@@ -50,7 +50,7 @@ lines_df <- lapply(1:nrow(greenspaces), function(i) {
   st_sfc(crs = st_crs(greenspaces)) %>%
   st_as_sf() %>%
   mutate(
-    from = greenspaces$Park_Addre_clean,
+    from = greenspaces$Park_Addre,
     to = greenspaces$nearest_neighbor
   )
 

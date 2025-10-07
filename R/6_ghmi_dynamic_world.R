@@ -16,6 +16,7 @@ library("ggeffects")
 library("patchwork")
 library("broom")
 library("car")
+library("tidyr")
 
 # Read in files (ghmi and dynamic world as well)
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
@@ -50,6 +51,7 @@ gee_final_data_for_analysis$Season <- factor(
   ordered = TRUE
 )
 
+## do the same for analysis variables
 gee_final_data_for_analysis$analysis <- factor(
   gee_final_data_for_analysis$analysis,
   levels = c("residential", "migratory", "total")
@@ -65,9 +67,11 @@ glm_model <- glm(species_richness ~ ghmi_mean + dominant_class + log(number_of_c
 # Summary of the model
 summary(glm_model)
 
+check_model(glm_model)
+
 # Calculate dispersion
 dispersion <- sum(residuals(glm_model, type = "pearson")^2) / df.residual(glm_model)
-print(paste("Dispersion:", dispersion))
+print(paste("Dispersion:", dispersion)) #9.12868035444644
 
 #########################################
 # NB GLMM: GHMI × Season + log10(lists)
@@ -116,38 +120,7 @@ ggplot(emm_ghmi_season_df,
   theme(aspect.ratio = 0.5)
 
 # Create a response curve (predicted richness vs GHMI for each Season)
-emmip(
-  nb_glmm_ghmi_season,
-  Season ~ ghmi_mean,
-  type = "response",
-  at = list(
-    ghmi_mean = seq(
-      min(gee_final_data_for_analysis$ghmi_mean, na.rm = TRUE),
-      max(gee_final_data_for_analysis$ghmi_mean, na.rm = TRUE),
-      length.out = 50
-    )
-  )
-) +
-  labs(
-    x = "GHMI (Human Modification Index)",
-    y = "Predicted Species Richness",
-    colour = "Season"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    panel.grid = element_blank(),
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
-    axis.title = element_text(face = "bold"),
-    axis.text  = element_text(color = "black")
-  )
-
-levels(gee_final_data_for_analysis$Season)
-contrasts(gee_final_data_for_analysis$Season)
-
-emmeans(nb_glmm_ghmi_season, ~ Season)
-
-emmip(
+ghmi_predicted_response <- emmip(
   nb_glmm_ghmi_season,
   Season ~ ghmi_mean,
   type = "response",
@@ -157,20 +130,75 @@ emmip(
       quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
       length.out = 50
     ),
-    lists = median(gee_final_data_for_analysis$lists, na.rm = TRUE)
+    lists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
   )
-)
+) +
+  labs(
+    x = "GHMI (Human Modification Index)",
+    y = "Predicted Species Richness",
+    colour = "Season"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid = element_blank(), 
+    legend.position = "bottom"
+  )
 
-ggsave("Figures/ghmi_predicted_response_seasons.png", bg = "transparent")
+ghmi_predicted_response
 
-#### Repeat above but add in Park_Size_ as a variable in the model
-glmm_season_size_ghmi <- glmmTMB(species_richness ~ Park_Size_ * Season * ghmi_mean * analysis
+ggsave("Figures/ghmi_predicted_response.png", ghmi_predicted_response, bg = "transparent")
+
+#### Repeat above but add in Shape_Area as a variable in the model
+glmm_season_size_ghmi <- glmmTMB(species_richness ~ log10(Shape_Area) + Season * ghmi_mean * analysis
                                  + log10(number_of_checklists), family = nbinom2, data = gee_final_data_for_analysis)
 summary(glmm_season_size_ghmi)
 Anova(glmm_season_size_ghmi, type = "III")
 
+# prediction grid: vary Shape_Area & ghmi_mean, hold checklists at median
+pred_grid <- with(gee_final_data_for_analysis,
+                  list(
+                    Shape_Area = seq(min(Shape_Area, na.rm = TRUE),
+                                     max(Shape_Area, na.rm = TRUE),
+                                     length.out = 40),
+                    ghmi_mean = seq(min(ghmi_mean, na.rm = TRUE),
+                                    max(ghmi_mean, na.rm = TRUE),
+                                    length.out = 4), # fewer steps to keep plot clean
+                    number_of_checklists = median(number_of_checklists, na.rm = TRUE)
+                  ))
+
+# get predicted responses
+emm_size_ghmi <- emmeans(
+  glmm_season_size_ghmi,
+  ~ log10(Shape_Area) * ghmi_mean | Season * analysis,
+  at = pred_grid,
+  type = "response"
+)
+
+emm_size_ghmi_df <- as.data.frame(emm_size_ghmi)
+
+# plot
+ggplot(emm_size_ghmi_df,
+       aes(x = Shape_Area / 10000, y = response, colour = ghmi_mean,
+           group = interaction(ghmi_mean, analysis))) +
+  geom_line(size = 1) +
+  facet_wrap(~Season) +
+  scale_x_log10() +
+  scale_colour_viridis_c(option = "plasma") +
+  labs(
+    x = "Park Area (hectares, log scale)",
+    y = "Predicted Species Richness",
+    colour = "GHMI",
+    linetype = "Analysis"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = "transparent", colour = NA),
+    plot.background = element_rect(fill = "transparent", colour = NA)
+  )
+
 #########################################
-# NB GLMM: dominant_class × Season + log10(lists)
+# NB GLMM: dominant_class × Season + log10(number_of_checklists)
 #########################################
 nb_glmm_domclass_season <- glmmTMB(
   species_richness ~ dominant_class * Season + log10(number_of_checklists),
@@ -209,16 +237,12 @@ plot_df <- emm_domclass_season %>%
   ) %>%
   mutate(
     dominant_label = forcats::fct_reorder(dominant_label, response, .fun = mean)
-  )
+  ) %>%
+  drop_na() 
 
 # Plot with asymptotic CIs and separate curves by season
 ggplot(plot_df,
-       aes(
-         x     = dominant_label,
-         y     = response,
-         colour = Season,
-         group  = Season,
-         fill   = Season
+       aes(x = dominant_label, y = response, colour = Season, group = Season, fill = Season
        )) +
   geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.12, colour = NA) +
   geom_line(size = 0.7) +
@@ -233,209 +257,89 @@ ggplot(plot_df,
   theme_minimal(base_size = 12) +
   theme(
     panel.grid = element_blank(),
-    axis.title = element_text(face = "bold"),
     axis.text.x = element_text(color = "black", angle = 45, hjust = 1),
     axis.text.y = element_text(color = "black"),
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
+    legend.position = "bottom",
     plot.title = element_text(face = "bold", hjust = 0.5)
   )
 
 ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent")
 
 
-###Negative Binomial
-### GHMI
-nb_model_ghmi <- glmmTMB(species_richness ~ log10(Park_Size_) * analysis * Season * ghmi_mean + log10(number_of_checklists),
-                              data = gee_final_data_for_analysis,
-                              family = nbinom2)
-summary(nb_model_ghmi)
-Anova(nb_model_ghmi, type = "III")
 
-# Choose 3 representative park sizes (change these values if desired):
-park_vals <- quantile(migratory_residential$log10_Park_Size_, probs = c(0.1, 0.5, 0.9), na.rm = TRUE)
-
-# Richness vs ghmi, faceted by Season, colored by migration_status,
-emmip(
-  nb_model_ghmi,
-  migration_status ~ ghmi_mean | Season,
-  by = "migration_status",
-  type = "response",
-  at = list(
-    ghmi_mean = seq(min(migratory_residential$ghmi_mean, na.rm = TRUE),
-                    max(migratory_residential$ghmi_mean, na.rm = TRUE),
-                    length.out = 50),
-    log10_Park_Size_ = park_vals
-  )
-) +
-  facet_wrap(~ Season) +
-  labs(
-    x = "GHMI (human modification)",
-    y = "Predicted Species Richness",
-    colour = "Migration status",
-    title = "Effect of GHMI at different Park Sizes (small, medium, large)"
-  ) +
-  theme_bw()
-
-### Richness vs park size, colored by low / medium / high ghmi, faceted by Season
-emmip(
-  nb_model_ghmi,
-  migration_status ~ log10(Park_Size_) | Season,
-  by = "ghmi_mean",
-  type = "response",
-  at = list(
-    `log10(Park_Size_)` = seq(min(log10(migratory_residential$Park_Size_), na.rm = TRUE),
-                              max(log10(migratory_residential$Park_Size_), na.rm = TRUE),
-                              length.out = 50),
-    ghmi_mean = ghmi_vals
-  )
-) +
-  facet_wrap(~ Season) +
-  labs(
-    x = "log10(Park Size)",
-    y = "Predicted Species Richness",
-    colour = "GHMI (low, med, high)",
-    title = "Effect of Park Size at different levels of Human Modification"
-  ) +
-  theme_bw()
 
 ###Negative Binomial
 ### dynamic world
-nb_model_dw <- glmmTMB(species_richness ~ log10(Park_Size_) * migration_status * Season * dominant_class + log10(lists),
-                         data = migratory_residential,
+### with everythin else
+nb_model_dw <- glmmTMB(species_richness ~ log10(Shape_Area) + analysis * Season * dominant_class + log10(number_of_checklists),
+                         data = gee_final_data_for_analysis,
                          family = nbinom2)
 summary(nb_model_dw)
 Anova(nb_model_dw, type = "III")
 
-emmip(
+# Get emmeans and convert to a data frame
+emm_domclass_season <- emmeans(
   nb_model_dw,
-  ~ log10(Park_Size_) | Season,
-  by = "dominant_class",
-  type = "response",
-  at = list(
-    `log10(Park_Size_)` = seq(
-      min(log10(migratory_residential$Park_Size_), na.rm = TRUE),
-      max(log10(migratory_residential$Park_Size_), na.rm = TRUE),
-      length.out = 50
-    )
-  )
-) +
-  ggplot2::labs(
-    x = "log10(Park Size)",
-    y = "Predicted Species Richness",
-    colour = "Dominant Class"
-  ) +
-  ggplot2::theme_bw()
+  ~ dominant_class | Season,
+  type = "response"
+) %>% 
+  as.data.frame()
 
-nb_model <- glm.nb(species_richness ~ ghmi_mean + dominant_class + lists, data = final_avonet_gee)
-summary(nb_model)
+# Recode numeric dominant_class to Dynamic World labels
+plot_df <- emm_domclass_season %>%
+  mutate(
+    dominant_class = as.numeric(dominant_class),
+    dominant_label = factor(
+      dominant_class,
+      levels = c(0, 1, 2, 3, 4, 5, 6),
+      labels = c(
+        "Water",
+        "Trees",
+        "Grass",
+        "Flooded Vegetation",
+        "Crops",
+        "Shrub / Scrub",
+        "Built Area"
+      )
+    )
+  ) %>%
+  mutate(
+    dominant_label = forcats::fct_reorder(dominant_label, response, .fun = mean)
+  ) %>%
+  drop_na()
+
+# Plot with asymptotic CIs and separate curves by season
+ggplot(plot_df,
+       aes(x = dominant_label, y = response, colour = Season, group = Season, fill = Season
+       )) +
+  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.12, colour = NA) +
+  geom_line(size = 0.7) +
+  geom_point(size = 2) +
+  labs(
+    x = "Dynamic World Dominant Class",
+    y = "Predicted Species Richness",
+    title = NULL,
+    colour = "Season",
+    fill   = "Season"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.x = element_text(color = "black", angle = 45, hjust = 1),
+    axis.text.y = element_text(color = "black"),
+    legend.position = "bottom"
+  )
+
+ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent")
+
+
 
 #visualize ghmi mean vs species richness
-ggplot(final_avonet_gee, aes(x = ghmi_mean, y = species_richness)) +
+ggplot(gee_final_data_for_analysis, aes(x = ghmi_mean, y = species_richness)) +
   geom_point(alpha = 0.6) +
-  geom_smooth(method = "glm", method.args = list(family = "poisson"), se = TRUE) +
+  geom_smooth(method = "lm", method.args = list(family = "poisson"), se = TRUE) +
   theme_minimal() +
   labs(title = "Species Richness vs GHMI", x = "GHMI (Human Modification Index)", y = "Species Richness")
-
-# Habitat type vs species richness
-ggplot(final_avonet_gee, aes(x = dominant_class, y = species_richness)) +
-  geom_boxplot() +
-  theme_minimal() +
-  labs(title = "Species Richness by Habitat Type", x = "Habitat Type", y = "Species Richness")
-
-ghmi_effect <- ggpredict(nb_model, terms = "ghmi_mean")
-habitat_effect <- ggpredict(nb_model, terms = "dominant_class")
-list_effect <- ggpredict(nb_model, terms = "lists")
-
-plot(ghmi_effect) +
-  labs(title = "Marginal Effect of GHMI on Species Richness",
-       x = "GHMI (Global Human Modification Index)",
-       y = "Predicted Species Richness") +
-  theme_minimal()
-
-plot(habitat_effect) +
-  labs(title = "Marginal Effect of Habitat Type",
-       x = "Dominant Habitat Class",
-       y = "Predicted Species Richness") +
-  theme_minimal()
-
-plot(list_effect) +
-  labs(title = "Marginal Effect of Sampling Effort (Lists)",
-       x = "Number of Sampling Lists",
-       y = "Predicted Species Richness") +
-  theme_minimal()
-
-plot(ghmi_effect) + plot(habitat_effect) + plot(list_effect) +
-  plot_layout(ncol = 1) 
-
-
-
-
-#### Adding marginal effects
-glmm_env_effort <- glmmTMB(
-  species_richness ~ ghmi_mean + dominant_class + log10(lists) + (1 | Park_Addre),
-  data = final_avonet_gee,
-  family = nbinom2
-)
-summary(glmm_env_effort)
-
-## marginal effects with emmeans
-### ghmi
-ghmi_effect <- ggpredict(glmm_env_effort, terms = "ghmi_mean")
-### dynamic_world
-emm_dw_class <- emmeans(glmm_env_effort, ~ dominant_class)
-dw_class_df <- as.data.frame(emm_dw_class)
-
-## plot ghmit
-plot(ghmi_effect) +
-  labs(
-    title = "Marginal Effect of GHMI on Species Richness",
-    x = "GHMI (Global Human Modification Index)",
-    y = "Predicted Species Richness"
-  ) +
-  theme_minimal()
-
-ggplot(ghmi_effect, aes(x = x, y = predicted)) +
-  geom_line(color = "#2c7fb8", size = 1.2) +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.3, fill = "#2c7fb8") +
-  labs(
-    title = "Marginal Effect of GHMI",
-    x = "GHMI (Global Human Modification Index)",
-    y = "Predicted Species Richness"
-  ) +
-  theme_minimal()
-
-## plot dynamic world
-ggplot(dw_class_df,
-       aes(x = dominant_class, y = emmean)) +
-  geom_point(size = 4, color = "#2c7fb8") +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.3, color = "#2c7fb8") +
-  labs(
-    title = "Predicted Species Richness by Habitat Type (Dynamic World)",
-    x = "Dominant Habitat Class",
-    y = "Predicted Species Richness"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-ghmi_plot <- ggplot(ghmi_effect, aes(x = x, y = predicted)) +
-  geom_line(color = "#2c7fb8", size = 1.2) +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.3, fill = "#2c7fb8") +
-  labs(x = "GHMI", y = "Predicted Richness") +
-  theme_minimal()
-
-dw_plot <- ggplot(dw_class_df, aes(x = dominant_class, y = emmean)) +
-  geom_point(size = 4, color = "#2c7fb8") +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.3, color = "#2c7fb8") +
-  labs(x = "Habitat Type", y = "Predicted Richness") +
-  theme_minimal()
-
-ghmi_plot + dw_plot + plot_layout(ncol = 1)
-
-########
-# FIX THIS
-
 
 
 
