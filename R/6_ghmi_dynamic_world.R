@@ -119,34 +119,40 @@ ggplot(emm_ghmi_season_df,
   coord_flip() +
   theme(aspect.ratio = 0.5)
 
-# Create a response curve (predicted richness vs GHMI for each Season)
+# Create a response curve (predicted richness vs GHMI for each Season) with CIs
 ghmi_predicted_response <- emmip(
   nb_glmm_ghmi_season,
   Season ~ ghmi_mean,
   type = "response",
+  CIs = TRUE, 
   at = list(
     ghmi_mean = seq(
       quantile(gee_final_data_for_analysis$ghmi_mean, 0.05, na.rm = TRUE),
       quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
       length.out = 50
     ),
-    lists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
+    number_of_checklists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
   )
 ) +
   labs(
-    x = "GHMI (Human Modification Index)",
+    x = "GHMI (Global Human Modification Index)",
     y = "Predicted Species Richness",
     colour = "Season"
   ) +
   theme_minimal(base_size = 12) +
   theme(
-    panel.grid = element_blank(), 
-    legend.position = "bottom"
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_text(face = "bold", size = 14),
+    axis.text = element_text(color = "black", size = 12),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    legend.text = element_text(size = 12)
   )
-
 ghmi_predicted_response
 
 ggsave("Figures/ghmi_predicted_response.png", ghmi_predicted_response, bg = "transparent")
+
 
 #### Repeat above but add in Shape_Area as a variable in the model
 glmm_season_size_ghmi <- glmmTMB(species_richness ~ log10(Shape_Area) + Season * ghmi_mean * analysis
@@ -175,27 +181,6 @@ emm_size_ghmi <- emmeans(
 )
 
 emm_size_ghmi_df <- as.data.frame(emm_size_ghmi)
-
-# plot
-ggplot(emm_size_ghmi_df,
-       aes(x = Shape_Area / 10000, y = response, colour = ghmi_mean,
-           group = interaction(ghmi_mean, analysis))) +
-  geom_line(size = 1) +
-  facet_wrap(~Season) +
-  scale_x_log10() +
-  scale_colour_viridis_c(option = "plasma") +
-  labs(
-    x = "Park Area (hectares, log scale)",
-    y = "Predicted Species Richness",
-    colour = "GHMI",
-    linetype = "Analysis"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(
-    panel.grid = element_blank(),
-    panel.background = element_rect(fill = "transparent", colour = NA),
-    plot.background = element_rect(fill = "transparent", colour = NA)
-  )
 
 #########################################
 # NB GLMM: dominant_class × Season + log10(number_of_checklists)
@@ -240,27 +225,28 @@ plot_df <- emm_domclass_season %>%
   ) %>%
   drop_na() 
 
-# Plot with asymptotic CIs and separate curves by season
-ggplot(plot_df,
-       aes(x = dominant_label, y = response, colour = Season, group = Season, fill = Season
-       )) +
-  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.12, colour = NA) +
-  geom_line(size = 0.7) +
-  geom_point(size = 2) +
+# Publication-ready plot with asymptotic CIs
+ggplot(plot_df, aes(x = dominant_label, y = response, colour = Season, group = Season, fill = Season)) +
+  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.2, colour = NA) +
+  geom_line(size = 1) +
+  geom_point(size = 2.5) +
   labs(
     x = "Dynamic World Dominant Class",
     y = "Predicted Species Richness",
-    title = NULL,
     colour = "Season",
-    fill   = "Season"
+    fill = "Season"
   ) +
   theme_minimal(base_size = 12) +
   theme(
-    panel.grid = element_blank(),
-    axis.text.x = element_text(color = "black", angle = 45, hjust = 1),
-    axis.text.y = element_text(color = "black"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_text(face = "bold", size = 12),
+    axis.text.x = element_text(color = "black", angle = 45, hjust = 1, size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
     legend.position = "bottom",
-    plot.title = element_text(face = "bold", hjust = 0.5)
+    legend.title = element_text(face = "bold", size = 12),
+    legend.text = element_text(size = 12),
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 14)
   )
 
 ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent")
@@ -324,10 +310,15 @@ ggplot(plot_df,
   ) +
   theme_minimal(base_size = 12) +
   theme(
-    panel.grid = element_blank(),
-    axis.text.x = element_text(color = "black", angle = 45, hjust = 1),
-    axis.text.y = element_text(color = "black"),
-    legend.position = "bottom"
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_text(face = "bold", size = 12),
+    axis.text.x = element_text(color = "black", angle = 45, hjust = 1, size = 12),
+    axis.text.y = element_text(color = "black", size = 12),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold", size = 12),
+    legend.text = element_text(size = 12),
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 14)
   )
 
 ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent")
