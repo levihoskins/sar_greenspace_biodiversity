@@ -193,7 +193,7 @@ emm_distance_df <- as.data.frame(emm_distance)
 emm_distance_df <- emm_distance_df %>%
   mutate(analysis = fct_recode(analysis,
                                "Migratory" = "migratory_code",
-                               "Resident" = "resident_code")) # replace with your levels
+                               "Resident" = "resident_code"))
 
 # Plot marginal slopes
 ggplot(emm_distance_df, aes(x = analysis, y = `log1p(nearest_dist_m).trend`, color = analysis)) +
@@ -253,9 +253,13 @@ overwinter_model <- glmmTMB(
 )
 
 summary(spring_model)
+Anova(spring_model)
 summary(breeding_model)
+Anova(breeding_model)
 summary(fall_model)
+Anova(fall_model)
 summary(overwinter_model)
+Anova(overwinter_model)
 
 # Extract slopes from emtrends
 ## Spring
@@ -364,3 +368,34 @@ ggplot() +
   )
 
 ggsave("Figures/isolation_predicted_richness_season_analysis.PNG", bg = "transparent")
+
+# Compute 95% CI for each trend
+all_margins <- all_margins %>%
+  mutate(
+    asymp.LCL = `log1p(nearest_dist_m).trend` - 1.96 * SE,
+    asymp.UCL = `log1p(nearest_dist_m).trend` + 1.96 * SE
+  )
+
+### Marginal slopes
+# Plot marginal slopes of nearest neighbor distance on species richness
+ggplot(all_margins, aes(x = analysis, y = `log1p(nearest_dist_m).trend`, color = analysis)) +
+  geom_point(size = 4, position = position_dodge(width = 0.3)) +
+  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.2, position = position_dodge(width = 0.3)) +
+  facet_wrap(~Season, scales = "free_y") +
+  scale_color_brewer(palette = "Dark2") +
+  labs(
+    x = NULL,
+    y = "Marginal Slope of Nearest Neighbor Distance on Species Richness",
+    color = "Analysis"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(color = "black", linewidth = 1),
+    strip.background = element_rect(fill = "grey90", color = NA),
+    strip.text = element_text(face = "bold", size = 12),
+    axis.title = element_text(face = "bold", size = 14),
+    axis.text = element_text(color = "black", size = 12),
+    legend.position = "none"
+  )

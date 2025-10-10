@@ -17,45 +17,48 @@ library("patchwork")
 library("broom")
 library("car")
 library("tidyr")
+library("forcats")
+library("multcomp")
+library("multcompView")
+library("performance")
 
 # Read in files (ghmi and dynamic world as well)
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
 ghmi <- read_csv("Data/GHMI_Dynamic_World/mean_GHMI_parks.csv")
 dynamic_world <- read_csv("Data/GHMI_Dynamic_World/DynamicWorld.csv")
 
-# Clean GHMI
+# Cleaning up data and joining everything together
+# Clean GHMI: mean GHMI per park
 ghmi_clean <- ghmi %>%
   group_by(Park_Addre) %>%
   summarise(ghmi_mean = mean(mean, na.rm = TRUE), .groups = "drop")
 
-# Clean Dynamic World
-# Keep only the most common dominant_class per park -- aggregates the data
+# Clean Dynamic World: keep most common dominant_class per park
 dynamic_world_clean <- dynamic_world %>%
   group_by(Park_Addre, dominant_class) %>%
   tally() %>%
   slice_max(order_by = n, n = 1, with_ties = FALSE) %>%
   ungroup()
 
-# Join with final_avonet
+# Join cleaned GHMI & Dynamic World with main data
 gee_final_data_for_analysis <- final_data_for_analysis %>%
   left_join(dynamic_world_clean, by = "Park_Addre") %>%
   left_join(ghmi_clean, by = "Park_Addre")
 
 # Convert dominant_class to factor
-gee_final_data_for_analysis$dominant_class <- as.factor(gee_final_data_for_analysis$dominant_class)
+gee_final_data_for_analysis <- gee_final_data_for_analysis %>%
+  mutate(dominant_class = as.factor(dominant_class))
 
-# Reorder season categories so that they appear correct when plotted
-gee_final_data_for_analysis$Season <- factor(
-  gee_final_data_for_analysis$Season,
-  levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
-  ordered = TRUE
-)
-
-## do the same for analysis variables
-gee_final_data_for_analysis$analysis <- factor(
-  gee_final_data_for_analysis$analysis,
-  levels = c("residential", "migratory", "total")
-)
+# Reorder Season factor consistently for plotting
+gee_final_data_for_analysis <- gee_final_data_for_analysis %>%
+  mutate(
+    Season = factor(
+      Season,
+      levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
+      ordered = TRUE
+    ),
+    analysis = factor(analysis, levels = c("residential", "migratory", "total"))
+  )
 
 ##################
 ## Overdispersion
@@ -66,52 +69,45 @@ glm_model <- glm(species_richness ~ ghmi_mean + dominant_class + log(number_of_c
 
 # Summary of the model
 summary(glm_model)
-
+## check model and dispersion
 check_model(glm_model)
-
-# Calculate dispersion
 dispersion <- sum(residuals(glm_model, type = "pearson")^2) / df.residual(glm_model)
 print(paste("Dispersion:", dispersion)) #9.12868035444644
 
 #########################################
-# NB GLMM: GHMI × Season + log10(lists)
+# GHMI MODELS
 #########################################
+# NB GLMM: GHMI × Season + log10(number_of_checklists)
 nb_glmm_ghmi_season <- glmmTMB(
   species_richness ~ ghmi_mean * Season + log10(number_of_checklists),
-  data   = gee_final_data_for_analysis,
+  data = gee_final_data_for_analysis,
   family = nbinom2
 )
 
+# Summary
 summary(nb_glmm_ghmi_season)
-Anova(nb_glmm_ghmi_season, type = "III")  
+Anova(nb_glmm_ghmi_season, type = "III")
 
-# Get marginal means for plotting GHMI effects by season
-emm_ghmi_season <- emtrends(nb_glmm_ghmi_season,
-                            var = "ghmi_mean",
-                            specs = ~ Season,
-                            type = "response")
-
-print(emm_ghmi_season)
-
-# Convert emtrends object to data frame
+# Marginal slopes of GHMI per Season (emtrends)
+emm_ghmi_season <- emtrends(
+  nb_glmm_ghmi_season,
+  var = "ghmi_mean",
+  specs = ~ Season,
+  type = "response"
+)
 emm_ghmi_season_df <- as.data.frame(emm_ghmi_season)
+print(emm_ghmi_season_df)
 
-# Plot
-ggplot(emm_ghmi_season_df,
-       aes(x = Season, y = ghmi_mean.trend, group = Season)) +
+# Plot Marginal slope of GHMI
+ggplot(emm_ghmi_season_df, aes(x = Season, y = ghmi_mean.trend, group = Season)) +
   geom_point(size = 4, color = "forestgreen") +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
-                width = 0.6, color = "forestgreen") +
-  labs(
-    title = NULL,
-    y = "Marginal Slope of GHMI",
-    x = NULL
-  ) +
+  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.6, color = "forestgreen") +
+  labs(y = "Marginal Slope of GHMI", x = NULL) +
   theme_minimal() +
   theme(
     panel.grid.major.y = element_blank(),
     panel.grid.major.x = element_blank(),
-    axis.ticks = element_line(color = "grey30"),
+    axis.ticks = element_line(color = "black"),
     legend.position = "none",
     axis.title = element_text(face = "bold"),
     axis.text = element_text(color = "black")
@@ -119,18 +115,27 @@ ggplot(emm_ghmi_season_df,
   coord_flip() +
   theme(aspect.ratio = 0.5)
 
-# Create a response curve (predicted richness vs GHMI for each Season) with CIs
+ggsave("Figures/ghmi_marginal_slopes.png", width = 7, height = 4, bg = "transparent")
+
+
+#########################################
+# Predicted response curves by Season
+#########################################
+# Create prediction sequence for GHMI
+ghmi_seq <- seq(
+  quantile(gee_final_data_for_analysis$ghmi_mean, 0.05, na.rm = TRUE),
+  quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
+  length.out = 50
+)
+
+# Predicted response curves for each Season (type = response) with CIs
 ghmi_predicted_response <- emmip(
   nb_glmm_ghmi_season,
   Season ~ ghmi_mean,
   type = "response",
-  CIs = TRUE, 
+  CIs = TRUE,
   at = list(
-    ghmi_mean = seq(
-      quantile(gee_final_data_for_analysis$ghmi_mean, 0.05, na.rm = TRUE),
-      quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
-      length.out = 50
-    ),
+    ghmi_mean = ghmi_seq,
     number_of_checklists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
   )
 ) +
@@ -151,91 +156,192 @@ ghmi_predicted_response <- emmip(
   )
 ghmi_predicted_response
 
+# Save GHMI predicted response plot
 ggsave("Figures/ghmi_predicted_response.png", ghmi_predicted_response, bg = "transparent")
 
+#########################################
+# GHMI + AREA MODELS (include Shape_Area)
+#########################################
+# GLMM: log10(Shape_Area) + Season * ghmi_mean * analysis + log10(number_of_checklists)
+glmm_season_size_ghmi <- glmmTMB(
+  species_richness ~ log10(Shape_Area) + Season * ghmi_mean * analysis + log10(number_of_checklists),
+  data = gee_final_data_for_analysis,
+  family = nbinom2
+)
 
-#### Repeat above but add in Shape_Area as a variable in the model
-glmm_season_size_ghmi <- glmmTMB(species_richness ~ log10(Shape_Area) + Season * ghmi_mean * analysis
-                                 + log10(number_of_checklists), family = nbinom2, data = gee_final_data_for_analysis)
+# Summary & ANOVA
 summary(glmm_season_size_ghmi)
 Anova(glmm_season_size_ghmi, type = "III")
 
-# prediction grid: vary Shape_Area & ghmi_mean, hold checklists at median
-pred_grid <- with(gee_final_data_for_analysis,
-                  list(
-                    Shape_Area = seq(min(Shape_Area, na.rm = TRUE),
-                                     max(Shape_Area, na.rm = TRUE),
-                                     length.out = 40),
-                    ghmi_mean = seq(min(ghmi_mean, na.rm = TRUE),
-                                    max(ghmi_mean, na.rm = TRUE),
-                                    length.out = 4), # fewer steps to keep plot clean
-                    number_of_checklists = median(number_of_checklists, na.rm = TRUE)
-                  ))
+# Prediction grid for Shape_Area & GHMI (hold checklists at median)
+pred_grid <- with(gee_final_data_for_analysis, list(
+  Shape_Area = seq(min(Shape_Area, na.rm = TRUE), max(Shape_Area, na.rm = TRUE), length.out = 40),
+  ghmi_mean = seq(min(ghmi_mean, na.rm = TRUE), max(ghmi_mean, na.rm = TRUE), length.out = 4),
+  number_of_checklists = median(number_of_checklists, na.rm = TRUE)
+))
 
-# get predicted responses
 emm_size_ghmi <- emmeans(
   glmm_season_size_ghmi,
   ~ log10(Shape_Area) * ghmi_mean | Season * analysis,
   at = pred_grid,
   type = "response"
 )
-
 emm_size_ghmi_df <- as.data.frame(emm_size_ghmi)
 
+# Predicted response vs GHMI for the model with area
+ghmi_predicted_response_area <- emmip(
+  glmm_season_size_ghmi,
+  Season ~ ghmi_mean,
+  type = "response",
+  CIs = TRUE,
+  at = list(
+    ghmi_mean = ghmi_seq,
+    number_of_checklists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
+  )
+) +
+  labs(
+    x = "GHMI (Global Human Modification Index)",
+    y = "Predicted Species Richness",
+    colour = "Season"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title = element_text(face = "bold", size = 12),
+    axis.text = element_text(color = "black", size = 12),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    legend.text = element_text(size = 12)
+  )
+ghmi_predicted_response_area
+
+ggsave("Figures/ghmi_predicted_response_area.png", ghmi_predicted_response_area, bg = "transparent")
+
 #########################################
-# NB GLMM: dominant_class × Season + log10(number_of_checklists)
+# GHMI × SEASON × ANALYSIS 
 #########################################
-nb_glmm_domclass_season <- glmmTMB(
-  species_richness ~ dominant_class * Season + log10(number_of_checklists),
-  data   = gee_final_data_for_analysis,
+# Filter dataset to migratory & residential for analysis
+gee_filtered <- gee_final_data_for_analysis %>%
+  filter(analysis %in% c("migratory", "residential"))
+
+# NB GLMM: GHMI * Season * analysis + log10(number_of_checklists)
+nb_glmm_ghmi_season_analysis <- glmmTMB(
+  species_richness ~ ghmi_mean * Season * analysis + log10(number_of_checklists),
+  data = gee_filtered,
   family = nbinom2
 )
 
-summary(nb_glmm_domclass_season)
-Anova(nb_glmm_domclass_season, type = "III")  
+# Marginal slopes for GHMI by Season × analysis
+emm_ghmi_trends <- emtrends(
+  nb_glmm_ghmi_season_analysis,
+  var = "ghmi_mean",
+  specs = ~ Season * analysis,
+  type = "response"
+)
 
-# Get emmeans and convert to a data frame
+# Convert to data frame and add significance marker & y positions
+emm_ghmi_df <- as.data.frame(emm_ghmi_trends) %>%
+  mutate(
+    signif = ifelse(asymp.LCL > 0 | asymp.UCL < 0, "*", ""),
+    y_position = ghmi_mean.trend + 0.5
+  )
+
+# Create predicted response curve for plotting by analysis (use previously defined ghmi_seq)
+ghmi_predicted_response_analysis <- emmip(
+  nb_glmm_ghmi_season_analysis,
+  Season ~ ghmi_mean | analysis,
+  type = "response",
+  CIs = TRUE,
+  at = list(
+    ghmi_mean = ghmi_seq,
+    number_of_checklists = median(gee_filtered$number_of_checklists, na.rm = TRUE)
+  )
+)
+
+# Season color palette
+season_cols <- c(
+  "Spring Migration" = "#7FBF3F",
+  "Breeding" = "#3F8FD2",
+  "Fall Migration" = "#B51616",
+  "Overwintering" = "#6F42C1"
+)
+
+# GHMI × SEASON × ANALYSIS Plot (Figure 3)
+ghmi_plot <- ghmi_predicted_response_analysis +
+  labs(
+    x = "GHMI (Global Human Modification Index)",
+    y = "Predicted Species Richness",
+    colour = "Season",
+    linetype = "Analysis"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(color = "black", linewidth = 0.5),
+    axis.title = element_text(face = "bold", size = 14),
+    axis.text = element_text(color = "black", size = 12),
+    strip.text = element_text(face = "bold", size = 14),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold", size = 12),
+    legend.text = element_text(size = 12)
+  ) +
+  guides(
+    colour = guide_legend(override.aes = list(linetype = 1, shape = NA, alpha = 1)),
+    linetype = guide_legend(override.aes = list(size = 1))
+  )
+
+ghmi_plot
+
+# Save as png
+ggsave("Figures/ghmi_predicted_response_migratory_residential_sig.png", ghmi_plot, bg = "transparent", width = 8, height = 5)
+
+
+
+#########################################
+# DYNAMIC WORLD: dominant_class × Season 
+#########################################
+# NB GLMM: dominant_class * Season + log10(number_of_checklists)
+nb_glmm_domclass_season <- glmmTMB(
+  species_richness ~ dominant_class * Season + log10(number_of_checklists),
+  data = gee_final_data_for_analysis,
+  family = nbinom2
+)
+
+# Summary & ANOVA
+summary(nb_glmm_domclass_season)
+Anova(nb_glmm_domclass_season, type = "III")
+
+# Get emmeans for dominant_class by Season (predicted means)
 emm_domclass_season <- emmeans(
   nb_glmm_domclass_season,
   ~ dominant_class | Season,
   type = "response"
-) %>% 
-  as.data.frame()
+) %>% as.data.frame()
 
-# Recode numeric dominant_class to Dynamic World labels
-plot_df <- emm_domclass_season %>%
+# Recode numeric dominant_class to descriptive labels & reorder
+plot_df_dw <- emm_domclass_season %>%
   mutate(
     dominant_class = as.numeric(dominant_class),
     dominant_label = factor(
       dominant_class,
-      levels = c(0, 1, 2, 3, 4, 5, 6),
-      labels = c(
-        "Water",
-        "Trees",
-        "Grass",
-        "Flooded Vegetation",
-        "Crops",
-        "Shrub / Scrub",
-        "Built Area"
-      )
-    )
-  ) %>%
-  mutate(
+      levels = c(0,1,2,3,4,5,6),
+      labels = c("Water","Trees","Grass","Flooded Vegetation","Crops","Shrub / Scrub","Built Area")
+    ),
     dominant_label = forcats::fct_reorder(dominant_label, response, .fun = mean)
   ) %>%
-  drop_na() 
+  drop_na(dominant_label)
 
-# Publication-ready plot with asymptotic CIs
-ggplot(plot_df, aes(x = dominant_label, y = response, colour = Season, group = Season, fill = Season)) +
-  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.2, colour = NA) +
-  geom_line(size = 1) +
-  geom_point(size = 2.5) +
-  labs(
-    x = "Dynamic World Dominant Class",
-    y = "Predicted Species Richness",
-    colour = "Season",
-    fill = "Season"
-  ) +
+
+# Publication-ready bar plot of predicted richness by dominant class × Season
+ggplot(plot_df_dw, aes(x = dominant_label, y = response, colour = Season, fill = Season)) +
+  geom_col(position = position_dodge(width = 0.9), alpha = 1) +
+  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
+                position = position_dodge(width = 0.8),
+                width = 0.25,
+                colour = "black") +
+  labs(x = "Dynamic World Dominant Class", y = "Predicted Species Richness", colour = "Season", fill = "Season") +
   theme_minimal(base_size = 12) +
   theme(
     panel.grid.major = element_blank(),
@@ -245,94 +351,116 @@ ggplot(plot_df, aes(x = dominant_label, y = response, colour = Season, group = S
     axis.text.y = element_text(color = "black", size = 12),
     legend.position = "bottom",
     legend.title = element_text(face = "bold", size = 12),
-    legend.text = element_text(size = 12),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 14)
-  )
+    legend.text = element_text(size = 12)
+  ) +
+  scale_colour_manual(values = season_cols) +
+  scale_fill_manual(values = season_cols)
 
-ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent")
+#ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent", width = 9, height = 5)
 
 
-
-
-###Negative Binomial
-### dynamic world
-### with everythin else
-nb_model_dw <- glmmTMB(species_richness ~ log10(Shape_Area) + analysis * Season * dominant_class + log10(number_of_checklists),
-                         data = gee_final_data_for_analysis,
-                         family = nbinom2)
+#########################################
+# DYNAMIC WORLD: Full NB model with area, analysis, Season, dominant_class
+#########################################
+# NB GLMM: log10(Shape_Area) + analysis * Season * dominant_class + log10(number_of_checklists)
+nb_model_dw <- glmmTMB(
+  species_richness ~ log10(Shape_Area) + analysis * Season * dominant_class + log10(number_of_checklists),
+  data = gee_filtered,
+  family = nbinom2
+)
 summary(nb_model_dw)
 Anova(nb_model_dw, type = "III")
 
-# Get emmeans and convert to a data frame
-emm_domclass_season <- emmeans(
+# emmeans for dominant_class by Season * analysis (for plotting facets)
+emm_plot_obj <- emmeans(
   nb_model_dw,
-  ~ dominant_class | Season,
+  ~ dominant_class | Season * analysis,
   type = "response"
-) %>% 
-  as.data.frame()
+)
 
-# Recode numeric dominant_class to Dynamic World labels
-plot_df <- emm_domclass_season %>%
+plot_df <- as.data.frame(emm_plot_obj) %>%
+  tibble::as_tibble() %>%
   mutate(
-    dominant_class = as.numeric(dominant_class),
+    dominant_class = as.numeric(as.character(dominant_class)),
     dominant_label = factor(
       dominant_class,
-      levels = c(0, 1, 2, 3, 4, 5, 6),
-      labels = c(
-        "Water",
-        "Trees",
-        "Grass",
-        "Flooded Vegetation",
-        "Crops",
-        "Shrub / Scrub",
-        "Built Area"
-      )
-    )
-  ) %>%
-  mutate(
-    dominant_label = forcats::fct_reorder(dominant_label, response, .fun = mean)
-  ) %>%
-  drop_na()
+      levels = c(0,1,2,3,4,5,6),
+      labels = c("Water","Trees","Grass","Flooded Vegetation","Crops","Shrub / Scrub","Built Area")
+    ),
+    dominant_label = fct_reorder(dominant_label, response, .fun = mean)
+  )
 
-# Plot with asymptotic CIs and separate curves by season
-ggplot(plot_df,
-       aes(x = dominant_label, y = response, colour = Season, group = Season, fill = Season
-       )) +
-  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.12, colour = NA) +
-  geom_line(size = 0.7) +
-  geom_point(size = 2) +
-  labs(
-    x = "Dynamic World Dominant Class",
-    y = "Predicted Species Richness",
-    title = NULL,
-    colour = "Season",
-    fill   = "Season"
-  ) +
-  theme_minimal(base_size = 12) +
+# Pairwise contrasts for Seasons within each dominant_class × analysis (Tukey)
+emm_comp_obj <- emmeans(
+  nb_model_dw,
+  ~ Season | dominant_class * analysis,
+  type = "response"
+)
+emm_comp_pairs <- contrast(emm_comp_obj, method = "pairwise", adjust = "tukey")
+
+# Compute CLD letters for significance display
+cld_df <- cld(
+  emm_comp_obj,
+  alpha = 0.05,
+  adjust = "tukey",
+  Letters = letters,
+  sort = FALSE
+) %>%
+  as.data.frame() %>%
+  mutate(
+    .group = gsub(" ", "", .group),
+    dominant_class = as.numeric(as.character(dominant_class))
+  )
+
+# Merge CLD letters into plotting dataframe
+plot_df2 <- plot_df %>%
+  left_join(
+    cld_df %>% dplyr::select(Season, dominant_class, analysis, .group),
+    by = c("Season", "dominant_class", "analysis")
+  ) %>%
+  mutate(letter = ifelse(is.na(.group), "", .group)) %>%
+  drop_na(dominant_label)
+
+# Compute y-offsets for CLD text placement
+plot_df2 <- plot_df2 %>%
+  group_by(analysis, dominant_class) %>%
+  mutate(
+    y_offset = 0.05 * (max(asymp.UCL, na.rm = TRUE) - min(response, na.rm = TRUE)),
+    y_label = asymp.UCL + ifelse(is.finite(y_offset), y_offset, 0.5)
+  ) %>%
+  ungroup()
+
+# Ensure dominant_label factor is alphabetically sorted (as requested previously)
+plot_df2 <- plot_df2 %>%
+  mutate(dominant_label = factor(dominant_label, levels = sort(unique(dominant_label))))
+
+# Final faceted plot: dominant class × Season, faceted by analysis, with CLD letters
+ggplot(plot_df2, aes(x = dominant_label, y = response, fill = Season, colour = Season)) +
+  geom_col(position = position_dodge(width = 0.9), alpha = 1) +
+  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
+                position = position_dodge(width = 0.9),
+                width = 0.25,
+                colour = "black") +
+  geom_text(aes(label = letter, y = y_label, group = Season),
+            position = position_dodge(width = 0.9),
+            vjust = 0,
+            size = 4,
+            fontface = "bold",
+            color = "black") +
+  facet_wrap(~ analysis, ncol = 1, scales = "free_y") +
+  labs(x = NULL, y = "Predicted Species Richness", fill = "Season", colour = "Season") +
+  theme_minimal(base_size = 14) +
   theme(
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    axis.title = element_text(face = "bold", size = 12),
-    axis.text.x = element_text(color = "black", angle = 45, hjust = 1, size = 12),
-    axis.text.y = element_text(color = "black", size = 12),
+    axis.title = element_text(face = "bold", size = 13),
+    axis.text.x = element_text(color = "black", face = "bold", angle = 45, hjust = 1, size = 12),
+    axis.text.y = element_text(color = "black", size = 11),
+    strip.text = element_text(face = "bold", size = 13),
     legend.position = "bottom",
     legend.title = element_text(face = "bold", size = 12),
-    legend.text = element_text(size = 12),
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 14)
+    legend.text = element_text(size = 12)
   )
 
-ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent")
-
-
-
-#visualize ghmi mean vs species richness
-ggplot(gee_final_data_for_analysis, aes(x = ghmi_mean, y = species_richness)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", method.args = list(family = "poisson"), se = TRUE) +
-  theme_minimal() +
-  labs(title = "Species Richness vs GHMI", x = "GHMI (Human Modification Index)", y = "Species Richness")
-
-
-
-
+ggsave("Figures/dominant_class_significance_analysis.png", bg = "transparent", width = 10, height = 8)
 

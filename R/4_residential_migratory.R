@@ -54,12 +54,16 @@ final_data_points <- final_data_with_geometry %>%
 # ggplot of study area with species richness, number of checklists per greenspace, and number of greenspaces
 study_area <- ggplot() +
   geom_sf(data = south_florida_counties, fill = "white", color = "black") +
-  geom_sf(data = final_data_points, aes(size = number_of_checklists, fill = species_richness),
-        shape = 21, color = "black", alpha = 0.7) +
+  geom_sf(
+    data = final_data_points,
+    aes(size = number_of_checklists, fill = species_richness),
+    shape = 21, color = "black", alpha = 0.7
+  ) +
   scale_fill_gradient(
     name = "Species Richness",
-    low = "#e5f5e0",  
-    high = "#006d2c"
+    low = "white",
+    high = "#00441b",
+    limits = range(final_data_points$species_richness, na.rm = TRUE)
   ) +
   scale_size_continuous(name = "Checklists", range = c(2, 7)) +
   theme_minimal() +
