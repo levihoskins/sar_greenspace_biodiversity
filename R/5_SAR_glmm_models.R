@@ -164,12 +164,12 @@ ggplot(season_status_df,
   theme_minimal() +
   theme(
     panel.grid = element_blank(),
-    panel.background = element_rect(color = "black", linewidth = 1),
+    panel.background = element_rect(color = "black", linewidth = 0.5),
     axis.ticks = element_line(color = "grey30"),
     legend.position = "bottom",
     axis.text = element_text(color = "black", size = 11),
-    axis.title = element_text(size = 12, face = "bold"),
-    legend.title = element_text(size = 11, face = "bold"),
+    axis.title = element_text(size = 12),
+    legend.title = element_text(size = 11),
     legend.text = element_text(size = 11)
   ) +
   coord_flip()

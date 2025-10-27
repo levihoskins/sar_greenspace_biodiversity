@@ -56,7 +56,7 @@ pb_sf_filtered <- st_intersection(pb_sf, filtered_shapefile)
 
 ## Merge all point datasets
 all_points <- bind_rows(br_sf_filtered, md_sf_filtered, pb_sf_filtered)
-saveRDS(all_points, "Data/eBird/all_points.rds")
+#saveRDS(all_points, "Data/eBird/all_points.rds")
 
 ### Read in RDS for the ### out script
 all_points <- readRDS("Data/eBird/all_points.RDS")
@@ -97,10 +97,41 @@ valid_ids_season <- valid_ids_season %>%
 # Keep all data for qualifying LOCALITY.IDs
 park_counts <- all_points %>%
   filter(Park_Addre %in% valid_ids_season$Park_Addre) %>%
-  left_join(valid_ids_season %>% dplyr::select(Park_Addre, Season, lists), 
-            by = c("Park_Addre"))
+  left_join(valid_ids_season %>% dplyr::select(Park_Addre, Season, lists),
+            by = "Park_Addre") %>%
+  group_by(Park_Addre) %>%
+  ungroup()
 
 length(unique(park_counts$Park_Addre)) #89
+
+# Get unique species
+unique_species <- unique(park_counts[, c("SCIENTIFIC.NAME", "COMMON.NAME")])
+
+# Keep only one row per species
+unique_species <- unique_species[!duplicated(unique_species$SCIENTIFIC.NAME), ]
+
+# Sort by scientific name
+unique_species <- unique_species[order(unique_species$SCIENTIFIC.NAME), ]
+unique_species
+# Remove geometry
+unique_species_null <- st_set_geometry(unique_species, NULL)
+
+# Export table
+species_table <- as.data.frame(unique_species_null)
+write.csv(species_table, "Figures/unique_species.csv", row.names = FALSE)
+
+########
+### Maybe remake this with migratory status, but that makes things a little difficult.
+
+### see species richness per park
+species_richness_df <- all_points %>%
+  filter(Park_Addre %in% valid_ids_season$Park_Addre) %>%
+  group_by(Park_Addre) %>%
+  summarize(species_richness = n_distinct(SCIENTIFIC.NAME)) %>%
+  arrange(desc(species_richness))
+
+mean(species_richness_df$species_richness)
+sd(species_richness_df$species_richness)
 
 # Restore geometry (if lost)
 final_shapefile_clean <- st_as_sf(park_counts, 

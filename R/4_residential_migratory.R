@@ -1,3 +1,5 @@
+# looking at effects of SAR and marginal effects
+
 # Load packages
 library("ggplot2")
 library("tigris")
@@ -103,16 +105,17 @@ nb_richness_plot_status <- ggplot(final_data_with_geometry, aes(x = Shape_Area /
                                       y = predicted_richness, color = analysis)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
+  scale_color_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
+  scale_fill_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(
-    x = "Park Area (hectares)",   # updated axis label
+    x = "Park Area (hectares)",
     y = "Predicted Species Richness", 
     color = "Analysis"
   ) +
   theme_minimal() +
   theme(
     panel.grid = element_blank(),
-    panel.background = element_rect(color = "black", linewidth = 1),
     legend.position = "bottom",
     legend.box.margin = margin(t = 5, b = 5),
     plot.title = element_text(hjust = 0.5, face = "bold")
@@ -148,6 +151,8 @@ nb_richness_plot_season <- ggplot(final_data_with_geometry,aes(x = Shape_Area / 
                                     y = predicted_richness, color = analysis)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
+  scale_color_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
+  scale_fill_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(
     x = "Park Area (hectares)",
@@ -158,7 +163,7 @@ nb_richness_plot_season <- ggplot(final_data_with_geometry,aes(x = Shape_Area / 
   theme_minimal(base_size = 14) +
   theme(
     panel.grid = element_blank(),
-    panel.background = element_rect(color = "black", linewidth = 1),
+    panel.background = element_rect(color = "black", linewidth = 0.5),
     legend.position = "bottom",
     legend.box.margin = margin(t = 5, b = 5),
     plot.title = element_text(hjust = 0.5, face = "bold")
@@ -167,5 +172,15 @@ nb_richness_plot_season <- ggplot(final_data_with_geometry,aes(x = Shape_Area / 
 nb_richness_plot_season
 
 ggsave("Figures/nb_richness_plot_season.png", plot = nb_richness_plot_season, bg = "transparent")
+
+# Calculate slopes for each Analysis x Season combination
+slopes_by_group <- final_data_with_geometry %>%
+  mutate(log_area = log10(Shape_Area / 10000)) %>%
+  group_by(analysis, Season) %>%
+  do(tidy(lm(predicted_richness ~ log_area, data = .))) %>%
+  filter(term == "log_area") %>%
+  select(analysis, Season, slope = estimate, std_error = std.error, p_value = p.value)
+
+slopes_by_group
 
 

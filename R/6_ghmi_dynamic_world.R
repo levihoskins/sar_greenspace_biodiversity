@@ -100,8 +100,8 @@ print(emm_ghmi_season_df)
 
 # Plot Marginal slope of GHMI
 ggplot(emm_ghmi_season_df, aes(x = Season, y = ghmi_mean.trend, group = Season)) +
-  geom_point(size = 4, color = "forestgreen") +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.6, color = "forestgreen") +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.6) +
   labs(y = "Marginal Slope of GHMI", x = NULL) +
   theme_minimal() +
   theme(
@@ -139,6 +139,12 @@ ghmi_predicted_response <- emmip(
     number_of_checklists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
   )
 ) +
+  scale_color_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"  
+  )) +
   labs(
     x = "GHMI (Global Human Modification Index)",
     y = "Predicted Species Richness",
@@ -199,6 +205,12 @@ ghmi_predicted_response_area <- emmip(
     number_of_checklists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
   )
 ) +
+  scale_color_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"  
+  )) +
   labs(
     x = "GHMI (Global Human Modification Index)",
     y = "Predicted Species Richness",
@@ -259,14 +271,6 @@ ghmi_predicted_response_analysis <- emmip(
   )
 )
 
-# Season color palette
-season_cols <- c(
-  "Spring Migration" = "#7FBF3F",
-  "Breeding" = "#3F8FD2",
-  "Fall Migration" = "#B51616",
-  "Overwintering" = "#6F42C1"
-)
-
 # GHMI × SEASON × ANALYSIS Plot (Figure 3)
 ghmi_plot <- ghmi_predicted_response_analysis +
   labs(
@@ -275,6 +279,12 @@ ghmi_plot <- ghmi_predicted_response_analysis +
     colour = "Season",
     linetype = "Analysis"
   ) +
+  scale_color_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"  
+  )) +
   theme_minimal(base_size = 12) +
   theme(
     panel.grid.major = element_blank(),
@@ -297,6 +307,24 @@ ghmi_plot
 # Save as png
 ggsave("Figures/ghmi_predicted_response_migratory_residential_sig.png", ghmi_plot, bg = "transparent", width = 8, height = 5)
 
+# Get slopes and p values
+ghmi_slopes_analysis <- emtrends(
+  nb_glmm_ghmi_season_analysis,
+  specs = c("analysis", "Season"),
+  var = "ghmi_mean",
+  type = "response"
+)
+
+# Convert to data frame for easier reading
+ghmi_slopes_df <- as.data.frame(ghmi_slopes_analysis) %>%
+  rename(slope = ghmi_mean.trend) %>%
+  dplyr::select(any_of(c("analysis", "Season", "slope", "SE", "df", "t.ratio", "p.value")))
+
+# View slopes and p-values
+ghmi_slopes_df
+
+# Pairwise comparisons of slopes
+pairs(ghmi_slopes_analysis)
 
 
 #########################################
@@ -353,8 +381,18 @@ ggplot(plot_df_dw, aes(x = dominant_label, y = response, colour = Season, fill =
     legend.title = element_text(face = "bold", size = 12),
     legend.text = element_text(size = 12)
   ) +
-  scale_colour_manual(values = season_cols) +
-  scale_fill_manual(values = season_cols)
+  scale_color_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"  
+  )) +
+  scale_fill_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"  
+  ))
 
 #ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent", width = 9, height = 5)
 
@@ -460,7 +498,32 @@ ggplot(plot_df2, aes(x = dominant_label, y = response, fill = Season, colour = S
     legend.position = "bottom",
     legend.title = element_text(face = "bold", size = 12),
     legend.text = element_text(size = 12)
-  )
+  ) +
+  scale_color_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"  
+  )) +
+  scale_fill_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"  
+  ))
 
 ggsave("Figures/dominant_class_significance_analysis.png", bg = "transparent", width = 10, height = 8)
+
+# Summarize mean predicted richness and group letters
+richness_summary <- plot_df2 %>%
+  group_by(analysis, dominant_class, Season, letter) %>%
+  summarise(
+    mean_predicted = mean(response, na.rm = TRUE),
+    lower_CI = mean(asymp.LCL, na.rm = TRUE),
+    upper_CI = mean(asymp.UCL, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(analysis, dominant_class, Season)
+
+richness_summary
 
