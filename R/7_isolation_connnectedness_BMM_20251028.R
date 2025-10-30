@@ -11,6 +11,9 @@ library("gt")
 library("RColorBrewer")
 library("stringr")
 library("forcats")
+library("DHARMa")
+library("readr")
+library("patchwork")
 
 # Read files
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
@@ -104,9 +107,7 @@ greenspaces <- gee_final_data_for_analysis %>%
 summary(greenspaces$nearest_dist_m)
 
 greenspaces$dominant_class <- as.numeric(as.character(greenspaces$dominant_class))
-
 #saveRDS(greenspaces, "Data/final_data_for_big_script.RDS")
-
 
 # play with the data
 ggplot(greenspaces, aes(x = log10(nearest_dist_m), y = species_richness, color = analysis)) +
@@ -162,8 +163,6 @@ summary(m_linear)
 # check for overdispersion
 performance::check_overdispersion(m_linear)
 
-library(DHARMa)
-
 # Simulate residuals
 sim_res <- simulateResiduals(fittedModel = m_linear, n = 1000)
 
@@ -188,27 +187,170 @@ emm_poly <- emmeans(m_linear,
 emm_poly_df <- as.data.frame(emm_poly)
 
 # Update the ggplot
-ggplot(emm_poly_df, aes(x = nearest_dist_m, y = response, color = analysis, fill = analysis)) +
+## matching ghmi style
+nn_distance_plot <- ggplot(emm_poly_df %>% filter(analysis %in% c("residential", "migratory")),
+                           aes(x = nearest_dist_m, y = response, color = Season, fill = Season)) +
   geom_line(size = 1) +
-  geom_smooth(family = poly) +
   geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.2, color = NA) +
-  facet_wrap(~Season) +
+  facet_wrap(~analysis) +  # two panels: residential vs migratory
   scale_x_log10() +
-  scale_color_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
-  scale_fill_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
+  scale_color_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"
+  )) +
+  scale_fill_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"
+  )) +
   labs(
     x = "Nearest Neighbor Distance (m)",
     y = "Predicted Species Richness",
-    color = "Analysis",
-    fill = "Analysis"
+    color = "Season",
+    fill = "Season"
   ) +
   theme_minimal(base_size = 12) +
   theme(
-    panel.grid = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(color = "black", linewidth = 0.5),
+    axis.title = element_text(face = "bold", size = 14),
+    axis.text = element_text(color = "black", size = 12),
+    strip.text = element_text(face = "bold", size = 14),
     legend.position = "bottom",
-    panel.background = element_rect(color = "black", linewidth = 0.5)
+    legend.title = element_text(face = "bold", size = 12),
+    legend.text = element_text(size = 12)
+  ) +
+  guides(
+    colour = guide_legend(override.aes = list(linetype = 1, shape = NA, alpha = 1)),
+    linetype = guide_legend(override.aes = list(size = 1))
   )
 
-ggsave("Figures/predicted_richness_nearest_neighbor.PNG", bg = "transparent")
+nn_distance_plot
+
+ggsave("Figures/predicted_richness_nearest_neighbor.PNG", plot = nn_distance_plot, bg = "transparent")
+
+#########################################
+# GHMI × SEASON × ANALYSIS 
+#########################################
+# Filter dataset to migratory & residential for analysis
+gee_filtered <- gee_final_data_for_analysis %>%
+  filter(analysis %in% c("migratory", "residential"))
+
+# NB GLMM: GHMI * Season * analysis + log10(number_of_checklists)
+nb_glmm_ghmi_season_analysis <- glmmTMB(
+  species_richness ~ ghmi_mean * Season * analysis + log10(number_of_checklists),
+  data = gee_filtered,
+  family = nbinom2
+)
+
+# Marginal slopes for GHMI by Season × analysis
+emm_ghmi_trends <- emtrends(
+  nb_glmm_ghmi_season_analysis,
+  var = "ghmi_mean",
+  specs = ~ Season * analysis,
+  type = "response"
+)
+
+# Convert to data frame and add significance marker & y positions
+emm_ghmi_df <- as.data.frame(emm_ghmi_trends) %>%
+  mutate(
+    signif = ifelse(asymp.LCL > 0 | asymp.UCL < 0, "*", ""),
+    y_position = ghmi_mean.trend + 0.5
+  )
+
+# Create prediction sequence for GHMI
+ghmi_seq <- seq(
+  quantile(gee_final_data_for_analysis$ghmi_mean, 0.05, na.rm = TRUE),
+  quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
+  length.out = 50
+)
+
+# Create predicted response curve for plotting by analysis (use previously defined ghmi_seq)
+ghmi_predicted_response_analysis <- emmip(
+  nb_glmm_ghmi_season_analysis,
+  Season ~ ghmi_mean | analysis,
+  type = "response",
+  CIs = TRUE,
+  at = list(
+    ghmi_mean = ghmi_seq,
+    number_of_checklists = median(gee_filtered$number_of_checklists, na.rm = TRUE)
+  )
+)
+
+# GHMI × SEASON × ANALYSIS Plot (Figure 3)
+ghmi_plot <- ghmi_predicted_response_analysis +
+  labs(
+    x = "GHMI (Global Human Modification Index)",
+    y = "Predicted Species Richness",
+    colour = "Season",
+    linetype = "Analysis"
+  ) +
+  scale_color_manual(values = c(
+    "Overwintering"    = "#006400", 
+    "Spring Migration" = "#FF8C00",
+    "Breeding"         = "#1E90FF", 
+    "Fall Migration"   = "#800080"  
+  )) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(color = "black", linewidth = 0.5),
+    axis.title = element_text(face = "bold", size = 14),
+    axis.text = element_text(color = "black", size = 12),
+    strip.text = element_text(face = "bold", size = 14),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold", size = 12),
+    legend.text = element_text(size = 12)
+  ) +
+  guides(
+    colour = guide_legend(override.aes = list(linetype = 1, shape = NA, alpha = 1)),
+    linetype = guide_legend(override.aes = list(size = 1))
+  )
+
+ghmi_plot
+
+# Save as png
+ggsave("Figures/figure_3_ghmi_predicted_response_migratory_residential_sig.png", ghmi_plot, bg = "transparent", width = 8, height = 5)
+
+# Hide legend in nn_distance_plot
+nn_distance_plot_noleg <- nn_distance_plot + theme(legend.position = "none")
+
+# Combine the plots vertically
+combined_plot <- nn_distance_plot_noleg / ghmi_plot 
+
+combined_plot
+
+ggsave("Figures/figure_3_combined_ghmi_isolation.png", combined_plot, bg = "transparent", width = 7, height = 8)
+
+
+##################
+## get slopes of everything
+###################
+
+# Get slopes and p values
+ghmi_slopes_analysis <- emtrends(
+  nb_glmm_ghmi_season_analysis,
+  specs = c("analysis", "Season"),
+  var = "ghmi_mean",
+  type = "response"
+)
+
+# Convert to data frame for easier reading
+ghmi_slopes_df <- as.data.frame(ghmi_slopes_analysis) %>%
+  rename(slope = ghmi_mean.trend) %>%
+  dplyr::select(any_of(c("analysis", "Season", "slope", "SE", "df", "t.ratio", "p.value")))
+
+# View slopes and p-values
+ghmi_slopes_df
+
+# Pairwise comparisons of slopes
+pairs(ghmi_slopes_analysis)
+
+######## Contiue this for isolation
 
 

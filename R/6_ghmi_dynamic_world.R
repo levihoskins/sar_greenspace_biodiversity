@@ -305,7 +305,7 @@ ghmi_plot <- ghmi_predicted_response_analysis +
 ghmi_plot
 
 # Save as png
-ggsave("Figures/ghmi_predicted_response_migratory_residential_sig.png", ghmi_plot, bg = "transparent", width = 8, height = 5)
+ggsave("Figures/figure_3_ghmi_predicted_response_migratory_residential_sig.png", ghmi_plot, bg = "transparent", width = 8, height = 5)
 
 # Get slopes and p values
 ghmi_slopes_analysis <- emtrends(
@@ -479,12 +479,6 @@ ggplot(plot_df2, aes(x = dominant_label, y = response, fill = Season, colour = S
                 position = position_dodge(width = 0.9),
                 width = 0.25,
                 colour = "black") +
-  geom_text(aes(label = letter, y = y_label, group = Season),
-            position = position_dodge(width = 0.9),
-            vjust = 0,
-            size = 4,
-            fontface = "bold",
-            color = "black") +
   facet_wrap(~ analysis, ncol = 1, scales = "free_y") +
   labs(x = NULL, y = "Predicted Species Richness", fill = "Season", colour = "Season") +
   theme_minimal(base_size = 14) +

@@ -9,6 +9,7 @@ library("rnaturalearth")
 library("rnaturalearthdata")
 library("glmmTMB")
 library("broom")
+library("viridis")
 
 # Read files
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
@@ -65,7 +66,8 @@ study_area <- ggplot() +
     name = "Species Richness",
     low = "white",
     high = "#00441b",
-    limits = range(final_data_points$species_richness, na.rm = TRUE)
+    limits = range(final_data_points$species_richness, na.rm = TRUE),
+    trans = "log"
   ) +
   scale_size_continuous(name = "Checklists", range = c(2, 7)) +
   theme_minimal() +
@@ -79,6 +81,33 @@ study_area <- ggplot() +
   )
 
 study_area
+
+study_area_viridis <- ggplot() +
+  geom_sf(data = south_florida_counties, fill = "white", color = "black") +
+  geom_sf(
+    data = final_data_points,
+    aes(size = number_of_checklists, fill = species_richness),
+    shape = 21, color = "black", alpha = 0.7
+  ) +
+  scale_fill_viridis_c(
+    name = "Species Richness",
+    option = "C", 
+    limits = range(final_data_points$species_richness, na.rm = TRUE),
+    trans = "log"
+  ) +
+  scale_size_continuous(name = "Checklists", range = c(2, 7)) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+study_area_viridis
+
 
 # save with transparent background
 ggsave('Figures/Study_Area_Figure_1.png', bg = 'transparent', plot = study_area)
@@ -100,6 +129,9 @@ summary(glmm_analysis)
 final_data_with_geometry <- final_data_with_geometry %>%
   mutate(predicted_richness = predict(glmm_analysis, newdata = ., type = "response"))
 
+#############
+# creating supplementary figure
+#############
 # plot predicted richness by analysis
 nb_richness_plot_status <- ggplot(final_data_with_geometry, aes(x = Shape_Area / 10000, 
                                       y = predicted_richness, color = analysis)) +
@@ -122,7 +154,7 @@ nb_richness_plot_status <- ggplot(final_data_with_geometry, aes(x = Shape_Area /
   )
 nb_richness_plot_status
 
-ggsave("Figures/nb_richness_plot_status.png", plot = nb_richness_plot_status, bg = "transparent")
+ggsave("Figures/supp_figure_nb_richness_plot_status.png", plot = nb_richness_plot_status, bg = "transparent")
 
 # fit linear models separately by analysis group to show slope (estimate)
 final_data_with_geometry %>%
@@ -133,6 +165,7 @@ final_data_with_geometry %>%
 ##############################
 ## Add in season as a variable 
 ## and number_of_checklists
+###### this is code for figure 2 -- SAR across seasons
 ##############################
 glmm_analysis_season <- glmmTMB(
   species_richness ~ log10(Shape_Area) + analysis * Season + log10(number_of_checklists),
@@ -171,7 +204,7 @@ nb_richness_plot_season <- ggplot(final_data_with_geometry,aes(x = Shape_Area / 
 
 nb_richness_plot_season
 
-ggsave("Figures/nb_richness_plot_season.png", plot = nb_richness_plot_season, bg = "transparent")
+ggsave("Figures/figure_2_nb_richness_plot_season.png", plot = nb_richness_plot_season, bg = "transparent")
 
 # Calculate slopes for each Analysis x Season combination
 slopes_by_group <- final_data_with_geometry %>%

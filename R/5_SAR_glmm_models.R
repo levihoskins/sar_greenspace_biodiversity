@@ -28,12 +28,12 @@ final_data_for_analysis$Season <- factor(
 ### Exploratory data
 ####################
 # Number of Greenspaces
-length(unique(final_data_for_analysis$Park_Addre)) #89
+length(unique(final_data_for_analysis$Park_Addre)) #76
 
 ## size of greensapces
-median(final_data_for_analysis$Shape_Area/10000) # 19.80487
+mean(final_data_for_analysis$Shape_Area/10000) # 22.48431
 range(final_data_for_analysis$Shape_Area/10000) # 2.259142 # 147.541308
-sd(final_data_for_analysis$Shape_Area/10000) # 35.13553
+sd(final_data_for_analysis$Shape_Area/10000) # 36.76028
 
 ### quick visualization of park size median (in red)
 ggplot(final_data_for_analysis, aes(x=Shape_Area/10000))+
@@ -43,8 +43,8 @@ ggplot(final_data_for_analysis, aes(x=Shape_Area/10000))+
   scale_x_log10()
 
 ### Find Mean, SD, Highest, and Lowest SR
-mean(final_data_for_analysis$species_richness) #42.17094
-sd(final_data_for_analysis$species_richness) #30.69588
+mean(final_data_for_analysis$species_richness) #43.4485
+sd(final_data_for_analysis$species_richness) #30.84281
 
 # Quick visualization to show lists and richness 
 # Histogram of 'lists'
@@ -70,6 +70,7 @@ summary(poisson_glmm)
 check_model(poisson_glmm)
 ###### overdispersed so go with negative binomial
 
+### try negaitve binomial
 SAR_nb_glmm <- glmmTMB(species_richness ~ log10(Shape_Area) + log10(number_of_checklists), 
                 family=nbinom2, 
                 data = final_data_for_analysis)

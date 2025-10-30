@@ -8,30 +8,60 @@ filtered_br <- readRDS("Data/eBird/RDS/filtered_br.rds")
 filtered_md <- readRDS("Data/eBird/RDS/filtered_md.rds")
 filtered_pb <- readRDS("Data/eBird/RDS/filtered_pb.rds")
 
-# get rid of any checklists that are not complete
+# get rid of any checklists that are not complete and anything greater than 120 minutes
+# BR
 x_filtered_br <- filtered_br %>%
-  dplyr::filter(OBSERVATION.COUNT=="X") %>%
+  dplyr::filter(OBSERVATION.COUNT == "X") %>%
   dplyr::select(SAMPLING.EVENT.IDENTIFIER) %>%
   distinct()
 
+# Convert DURATION.MINUTES to numeric
+filtered_br <- filtered_br %>%
+  dplyr::mutate(
+    DURATION.MINUTES = as.numeric(ifelse(DURATION.MINUTES == "", NA, DURATION.MINUTES))
+  )
+
+# remove incomplete checklists
 dat_br <- filtered_br %>%
-  dplyr::filter(!SAMPLING.EVENT.IDENTIFIER %in% x_filtered_br$SAMPLING.EVENT.IDENTIFIER)
+  dplyr::filter(!SAMPLING.EVENT.IDENTIFIER %in% x_filtered_br$SAMPLING.EVENT.IDENTIFIER) %>%
+  dplyr::filter(!is.na(DURATION.MINUTES) & DURATION.MINUTES > 5 & DURATION.MINUTES < 240) %>%
+  dplyr::filter(!is.na(EFFORT.DISTANCE.KM) & EFFORT.DISTANCE.KM < 5)
 
+# MD
 x_filtered_md <- filtered_md %>%
-  dplyr::filter(OBSERVATION.COUNT=="X") %>%
+  dplyr::filter(OBSERVATION.COUNT == "X") %>%
   dplyr::select(SAMPLING.EVENT.IDENTIFIER) %>%
   distinct()
 
+# Convert DURATION.MINUTES to numeric
+filtered_md <- filtered_md %>%
+  dplyr::mutate(
+    DURATION.MINUTES = as.numeric(ifelse(DURATION.MINUTES == "", NA, DURATION.MINUTES))
+  )
+
+# remove incomplete checklists
 dat_md <- filtered_md %>%
-  dplyr::filter(!SAMPLING.EVENT.IDENTIFIER %in% x_filtered_md$SAMPLING.EVENT.IDENTIFIER)
+  dplyr::filter(!SAMPLING.EVENT.IDENTIFIER %in% x_filtered_md$SAMPLING.EVENT.IDENTIFIER) %>%
+  dplyr::filter(!is.na(DURATION.MINUTES) & DURATION.MINUTES > 5 & DURATION.MINUTES < 240) %>%
+  dplyr::filter(!is.na(EFFORT.DISTANCE.KM) & EFFORT.DISTANCE.KM < 5)
 
+# PB
 x_filtered_pb <- filtered_pb %>%
-  dplyr::filter(OBSERVATION.COUNT=="X") %>%
+  dplyr::filter(OBSERVATION.COUNT == "X") %>%
   dplyr::select(SAMPLING.EVENT.IDENTIFIER) %>%
   distinct()
 
+# Convert DURATION.MINUTES to numeric
+filtered_pb <- filtered_pb %>%
+  dplyr::mutate(
+    DURATION.MINUTES = as.numeric(ifelse(DURATION.MINUTES == "", NA, DURATION.MINUTES))
+  )
+
+# remove incomplete checklists
 dat_pb <- filtered_pb %>%
-  dplyr::filter(!SAMPLING.EVENT.IDENTIFIER %in% x_filtered_pb$SAMPLING.EVENT.IDENTIFIER)
+  dplyr::filter(!SAMPLING.EVENT.IDENTIFIER %in% x_filtered_pb$SAMPLING.EVENT.IDENTIFIER) %>%
+  dplyr::filter(!is.na(DURATION.MINUTES) & DURATION.MINUTES > 5 & DURATION.MINUTES < 240) %>%
+  dplyr::filter(!is.na(EFFORT.DISTANCE.KM) & EFFORT.DISTANCE.KM < 5)
 
 # add in a month column - month function
 dat_br <- dat_br %>%

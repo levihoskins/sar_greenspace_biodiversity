@@ -102,7 +102,7 @@ park_counts <- all_points %>%
   group_by(Park_Addre) %>%
   ungroup()
 
-length(unique(park_counts$Park_Addre)) #89
+length(unique(park_counts$Park_Addre)) #76
 
 # Get unique species
 unique_species <- unique(park_counts[, c("SCIENTIFIC.NAME", "COMMON.NAME")])
@@ -124,7 +124,7 @@ write.csv(species_table, "Figures/unique_species.csv", row.names = FALSE)
 ### Maybe remake this with migratory status, but that makes things a little difficult.
 
 ### see species richness per park
-species_richness_df <- all_points %>%
+species_richness_df <- park_counts %>%
   filter(Park_Addre %in% valid_ids_season$Park_Addre) %>%
   group_by(Park_Addre) %>%
   summarize(species_richness = n_distinct(SCIENTIFIC.NAME)) %>%
@@ -135,8 +135,8 @@ sd(species_richness_df$species_richness)
 
 # Restore geometry (if lost)
 final_shapefile_clean <- st_as_sf(park_counts, 
-                                  geometry = st_geometry(all_points), 
-                                  crs = st_crs(all_points))
+                                  geometry = st_geometry(park_counts), 
+                                  crs = st_crs(park_counts))
 
 # Save as RDS
 saveRDS(final_shapefile_clean, "Data/Intermediate_Data/final_shapefile_clean.RDS")
