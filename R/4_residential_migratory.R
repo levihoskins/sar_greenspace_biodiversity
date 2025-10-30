@@ -17,9 +17,14 @@ final_shapefile_clean <- readRDS("Data/Intermediate_Data/final_shapefile_clean.R
 
 ## Clean up shapefile so that i can combine geometry back into final data frame
 final_shapefile_clean <- final_shapefile_clean %>%
-  dplyr::select(Park_Addre, geometry) %>%
+  dplyr::select(Park_Addre, SCIENTIFIC.NAME, SAMPLING.EVENT.IDENTIFIER, geometry) %>%
   group_by(Park_Addre) %>%
-  summarise(geometry = st_union(geometry), .groups = "drop")
+  summarise(species_richness = n_distinct(SCIENTIFIC.NAME),
+            number_of_checklists = n_distinct(SAMPLING.EVENT.IDENTIFIER),
+            geometry = st_union(geometry), .groups = "drop")
+
+final_data_fig1 <- final_shapefile_clean %>%
+  filter(Park_Addre %in% final_data_for_analysis$Park_Addre)
 
 final_data_with_geometry <- final_data_for_analysis %>%
   left_join(final_shapefile_clean, by = "Park_Addre") %>%
@@ -54,22 +59,30 @@ final_data_points <- final_data_with_geometry %>%
   st_centroid(of_largest_polygon = TRUE) %>%
   cbind(st_coordinates(.))
 
+final_data_fig1 <- final_data_fig1 %>%
+  st_centroid(of_largest_polygon = TRUE) %>%
+  cbind(st_coordinates(.))
+
 # ggplot of study area with species richness, number of checklists per greenspace, and number of greenspaces
 study_area <- ggplot() +
   geom_sf(data = south_florida_counties, fill = "white", color = "black") +
+  scale_size_continuous(name = "Checklists", range = c(2, 7)) +
   geom_sf(
-    data = final_data_points,
+    data = final_data_fig1,
     aes(size = number_of_checklists, fill = species_richness),
-    shape = 21, color = "black", alpha = 0.7
+    shape = 21, color = "black"
   ) +
   scale_fill_gradient(
     name = "Species Richness",
     low = "white",
     high = "#00441b",
+<<<<<<< HEAD
+    limits = range(final_data_fig1$species_richness, na.rm = TRUE)
+=======
     limits = range(final_data_points$species_richness, na.rm = TRUE),
     trans = "log"
+>>>>>>> b9ce3e6d159add7c99ae5207d54cc3f1991e02bc
   ) +
-  scale_size_continuous(name = "Checklists", range = c(2, 7)) +
   theme_minimal() +
   theme(
     panel.grid = element_blank(),
