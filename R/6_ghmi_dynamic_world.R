@@ -99,6 +99,7 @@ emm_ghmi_season_df <- as.data.frame(emm_ghmi_season)
 print(emm_ghmi_season_df)
 
 # Plot Marginal slope of GHMI
+## quick visualization for slopes
 ggplot(emm_ghmi_season_df, aes(x = Season, y = ghmi_mean.trend, group = Season)) +
   geom_point(size = 4) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.6) +
@@ -114,9 +115,6 @@ ggplot(emm_ghmi_season_df, aes(x = Season, y = ghmi_mean.trend, group = Season))
   ) +
   coord_flip() +
   theme(aspect.ratio = 0.5)
-
-ggsave("Figures/ghmi_marginal_slopes.png", width = 7, height = 4, bg = "transparent")
-
 
 #########################################
 # Predicted response curves by Season
@@ -161,9 +159,6 @@ ghmi_predicted_response <- emmip(
     legend.text = element_text(size = 12)
   )
 ghmi_predicted_response
-
-# Save GHMI predicted response plot
-ggsave("Figures/ghmi_predicted_response.png", ghmi_predicted_response, bg = "transparent")
 
 #########################################
 # GHMI + AREA MODELS (include Shape_Area)
@@ -394,8 +389,6 @@ ggplot(plot_df_dw, aes(x = dominant_label, y = response, colour = Season, fill =
     "Fall Migration"   = "#800080"  
   ))
 
-#ggsave("Figures/dominant_class_predicted_richness_emmeans.png", bg = "transparent", width = 9, height = 5)
-
 
 #########################################
 # DYNAMIC WORLD: Full NB model with area, analysis, Season, dominant_class
@@ -506,7 +499,7 @@ ggplot(plot_df2, aes(x = dominant_label, y = response, fill = Season, colour = S
     "Fall Migration"   = "#800080"  
   ))
 
-ggsave("Figures/dominant_class_significance_analysis.png", bg = "transparent", width = 10, height = 8)
+#ggsave("Figures/dominant_class_significance_analysis.png", bg = "transparent", width = 10, height = 8)
 
 # Summarize mean predicted richness and group letters
 richness_summary <- plot_df2 %>%

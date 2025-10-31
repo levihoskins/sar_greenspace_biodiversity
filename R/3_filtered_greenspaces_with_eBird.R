@@ -10,52 +10,55 @@
 library("tidyverse")
 library("sf")
 
-# Read in shapefiles + add attributes
-fl_shapefile <-st_read("Data/Polygons/filtered_shapefile.shp")
-fl_shapefile <-st_cast(fl_shapefile, "POLYGON")
+#### All of this is coded out because you can just read in all_points which saves time
+### pero you can check the data by simply removing the pounds and running the script
 
-fl_shapefile$geometry <- st_geometry(fl_shapefile)
-fl_shapefile$area <- st_area(fl_shapefile$geometry)
+# Read in shapefiles + add attributes
+#fl_shapefile <-st_read("Data/Polygons/filtered_shapefile.shp")
+#fl_shapefile <-st_cast(fl_shapefile, "POLYGON")
+
+#fl_shapefile$geometry <- st_geometry(fl_shapefile)
+#fl_shapefile$area <- st_area(fl_shapefile$geometry)
 
 # Filter based on Park_Size_ for determining greenspaces that are okay (m^2)
-filtered_shapefile <- fl_shapefile %>%
-  dplyr::filter(Park_Siz_1 >=5) %>%
-  dplyr::filter(Park_Siz_1 <= 1500000)
+#filtered_shapefile <- fl_shapefile %>%
+#  dplyr::filter(Park_Siz_1 >=5) %>%
+#  dplyr::filter(Park_Siz_1 <= 1500000)
 
-length(unique(filtered_shapefile$Park_Addre))
-length(unique(fl_shapefile$Park_Addre))
+#length(unique(filtered_shapefile$Park_Addre))
+#length(unique(fl_shapefile$Park_Addre))
 
 # Read in eBird data
-dat_br <- readRDS("Data/eBird/RDS/dat_br")
-dat_md <- readRDS("Data/eBird/RDS/dat_md")
-dat_pb <- readRDS("Data/eBird/RDS/dat_pb")
+#dat_br <- readRDS("Data/eBird/RDS/dat_br")
+#dat_md <- readRDS("Data/eBird/RDS/dat_md")
+#dat_pb <- readRDS("Data/eBird/RDS/dat_pb")
 
 # Convert to sf objects
-br_sf <- dat_br %>%
-  st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
-md_sf <- dat_md %>%
-  st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
-pb_sf <- dat_pb %>%
-  st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
+#br_sf <- dat_br %>%
+#  st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
+#md_sf <- dat_md %>%
+#  st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
+#pb_sf <- dat_pb %>%
+#  st_as_sf(coords=c("LONGITUDE", "LATITUDE"), crs=4326, remove = F)
 
 # Overlay the eBird data with greenspaces
 ## Check crs
-st_crs(br_sf)
-st_crs(md_sf)
-st_crs(pb_sf)
-st_crs(filtered_shapefile)
+#st_crs(br_sf)
+#st_crs(md_sf)
+#st_crs(pb_sf)
+#st_crs(filtered_shapefile)
 
-br_sf <- st_transform(br_sf, st_crs(filtered_shapefile))
-md_sf <- st_transform(md_sf, st_crs(filtered_shapefile))
-pb_sf <- st_transform(pb_sf, st_crs(filtered_shapefile))
+#br_sf <- st_transform(br_sf, st_crs(filtered_shapefile))
+#md_sf <- st_transform(md_sf, st_crs(filtered_shapefile))
+#pb_sf <- st_transform(pb_sf, st_crs(filtered_shapefile))
 
 # Filter points that are within the filtered_shapefile
-br_sf_filtered <- st_intersection(br_sf, filtered_shapefile)
-md_sf_filtered <- st_intersection(md_sf, filtered_shapefile)
-pb_sf_filtered <- st_intersection(pb_sf, filtered_shapefile)
+#br_sf_filtered <- st_intersection(br_sf, filtered_shapefile)
+#md_sf_filtered <- st_intersection(md_sf, filtered_shapefile)
+#pb_sf_filtered <- st_intersection(pb_sf, filtered_shapefile)
 
 ## Merge all point datasets
-all_points <- bind_rows(br_sf_filtered, md_sf_filtered, pb_sf_filtered)
+#all_points <- bind_rows(br_sf_filtered, md_sf_filtered, pb_sf_filtered)
 #saveRDS(all_points, "Data/eBird/all_points.rds")
 
 ### Read in RDS for the ### out script
@@ -69,7 +72,7 @@ all_points <- all_points %>%
   filter(!grepl("sp\\.", SCIENTIFIC.NAME, ignore.case = TRUE) &
            !grepl(" x ", SCIENTIFIC.NAME, ignore.case = TRUE) &
            !grepl("/", SCIENTIFIC.NAME))
-length(unique(all_points$Park_Addre))
+length(unique(all_points$Park_Addre)) #498
 
 #############################################
 ### Greenspaces with 10 checklists per season
@@ -104,24 +107,8 @@ park_counts <- all_points %>%
 
 length(unique(park_counts$Park_Addre)) #76
 
-# Get unique species
-unique_species <- unique(park_counts[, c("SCIENTIFIC.NAME", "COMMON.NAME")])
-
-# Keep only one row per species
-unique_species <- unique_species[!duplicated(unique_species$SCIENTIFIC.NAME), ]
-
-# Sort by scientific name
-unique_species <- unique_species[order(unique_species$SCIENTIFIC.NAME), ]
-unique_species
-# Remove geometry
-unique_species_null <- st_set_geometry(unique_species, NULL)
-
-# Export table
-species_table <- as.data.frame(unique_species_null)
-write.csv(species_table, "Figures/unique_species.csv", row.names = FALSE)
-
-########
-### Maybe remake this with migratory status, but that makes things a little difficult.
+### save intermediate script to run analysis for supplementary figure with species richness
+#saveRDS(park_counts, "Data/Intermediate_Data/park_counts.rds")
 
 ### see species richness per park
 species_richness_df <- park_counts %>%

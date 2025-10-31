@@ -15,6 +15,18 @@ library("viridis")
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
 final_shapefile_clean <- readRDS("Data/Intermediate_Data/final_shapefile_clean.RDS")
 
+# Reorder season and analysis for figures
+final_data_for_analysis$analysis <- factor(
+  final_data_for_analysis$analysis,
+  levels = c("residential", "migratory", "total")
+)
+
+final_data_for_analysis$Season <- factor(
+  final_data_for_analysis$Season,
+  levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
+  ordered = TRUE
+)
+
 ## Clean up shapefile so that i can combine geometry back into final data frame
 final_shapefile_clean <- final_shapefile_clean %>%
   dplyr::select(Park_Addre, SCIENTIFIC.NAME, SAMPLING.EVENT.IDENTIFIER, geometry) %>%
@@ -95,33 +107,6 @@ study_area <- ggplot() +
 
 study_area
 
-study_area_viridis <- ggplot() +
-  geom_sf(data = south_florida_counties, fill = "white", color = "black") +
-  geom_sf(
-    data = final_data_points,
-    aes(size = number_of_checklists, fill = species_richness),
-    shape = 21, color = "black", alpha = 0.7
-  ) +
-  scale_fill_viridis_c(
-    name = "Species Richness",
-    option = "C", 
-    limits = range(final_data_points$species_richness, na.rm = TRUE),
-    trans = "log"
-  ) +
-  scale_size_continuous(name = "Checklists", range = c(2, 7)) +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5, face = "bold"),
-    axis.title = element_blank(),
-    axis.text = element_blank(),
-    axis.ticks = element_blank()
-  )
-
-study_area_viridis
-
-
 # save with transparent background
 ggsave('Figures/Study_Area_Figure_1.png', bg = 'transparent', plot = study_area)
 
@@ -132,21 +117,21 @@ ggsave('Figures/Study_Area_Figure_1.png', bg = 'transparent', plot = study_area)
 # GLMM with analysis as a fixed effect
 glmm_analysis <- glmmTMB(
   species_richness ~ log10(Shape_Area) + analysis,
-  data = final_data_with_geometry,
+  data = final_data_for_analysis,
   family = nbinom2
 )
 
 summary(glmm_analysis)
 
 # Add predicted richness to the dataframe
-final_data_with_geometry <- final_data_with_geometry %>%
+final_data_for_analysis <- final_data_for_analysis %>%
   mutate(predicted_richness = predict(glmm_analysis, newdata = ., type = "response"))
 
 #############
 # creating supplementary figure
 #############
 # plot predicted richness by analysis
-nb_richness_plot_status <- ggplot(final_data_with_geometry, aes(x = Shape_Area / 10000, 
+nb_richness_plot_status <- ggplot(final_data_for_analysis, aes(x = Shape_Area / 10000, 
                                       y = predicted_richness, color = analysis)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
@@ -167,10 +152,10 @@ nb_richness_plot_status <- ggplot(final_data_with_geometry, aes(x = Shape_Area /
   )
 nb_richness_plot_status
 
-ggsave("Figures/supp_figure_nb_richness_plot_status.png", plot = nb_richness_plot_status, bg = "transparent")
+#ggsave("Figures/supp_figure_nb_richness_plot_status.png", plot = nb_richness_plot_status, bg = "transparent")
 
 # fit linear models separately by analysis group to show slope (estimate)
-final_data_with_geometry %>%
+final_data_for_analysis %>%
   group_by(analysis) %>%
   do(tidy(lm(predicted_richness ~ log10(Park_Siz_1), data = .))) %>%
   filter(term == "log10(Park_Siz_1)")
@@ -182,28 +167,37 @@ final_data_with_geometry %>%
 ##############################
 glmm_analysis_season <- glmmTMB(
   species_richness ~ log10(Shape_Area) + analysis * Season + log10(number_of_checklists),
-  data = final_data_with_geometry,
+  data = final_data_for_analysis,
   family = nbinom2
 )
 
 summary(glmm_analysis_season)
 
 # Add predicted richness from the season model
-final_data_with_geometry <- final_data_with_geometry %>%
+final_data_for_analysis <- final_data_for_analysis %>%
   mutate(predicted_richness = predict(glmm_analysis_season, newdata = ., type = "response"))
 
 # Plot predicted richness by analysis and season
-nb_richness_plot_season <- ggplot(final_data_with_geometry,aes(x = Shape_Area / 10000, 
-                                    y = predicted_richness, color = analysis)) +
+# Plot predicted richness by analysis and season with SE ribbons
+nb_richness_plot_season <- ggplot(final_data_for_analysis, 
+                                  aes(x = Shape_Area / 10000, 
+                                      y = predicted_richness, 
+                                      color = analysis, 
+                                      fill = analysis)) +
   geom_point(alpha = 0.5) +
   scale_x_log10() +
-  scale_color_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
-  scale_fill_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
-  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("residential" = "#006400", 
+                                "migratory" = "#800080", 
+                                "total" = "#1E90FF")) +
+  scale_fill_manual(values = c("residential" = "#006400", 
+                               "migratory" = "#800080", 
+                               "total" = "#1E90FF")) +
+  geom_smooth(method = "lm", se = TRUE, alpha = 0.2, linewidth = 1) +
   labs(
     x = "Park Area (hectares)",
     y = "Predicted Species Richness",
-    color = "Analysis"
+    color = "Analysis",
+    fill = "Analysis"
   ) +
   facet_wrap(~Season) +
   theme_minimal(base_size = 14) +
@@ -217,15 +211,16 @@ nb_richness_plot_season <- ggplot(final_data_with_geometry,aes(x = Shape_Area / 
 
 nb_richness_plot_season
 
-ggsave("Figures/figure_2_nb_richness_plot_season.png", plot = nb_richness_plot_season, bg = "transparent")
+ggsave("Figures/figure_2_nb_richness_plot_season.png", plot = nb_richness_plot_season, bg = "transparent", 
+       height = 7, width = 8)
 
 # Calculate slopes for each Analysis x Season combination
-slopes_by_group <- final_data_with_geometry %>%
+slopes_by_group <- final_data_for_analysis %>%
   mutate(log_area = log10(Shape_Area / 10000)) %>%
   group_by(analysis, Season) %>%
   do(tidy(lm(predicted_richness ~ log_area, data = .))) %>%
   filter(term == "log_area") %>%
-  select(analysis, Season, slope = estimate, std_error = std.error, p_value = p.value)
+  dplyr::select(analysis, Season, slope = estimate, std_error = std.error, p_value = p.value)
 
 slopes_by_group
 

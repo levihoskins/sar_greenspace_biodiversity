@@ -1,3 +1,7 @@
+### Basically just looking at the data and doing quick visualization to see which model
+## only using SAR and nothing else here
+
+
 # Load packages
 library("sf")
 library("dplyr")
