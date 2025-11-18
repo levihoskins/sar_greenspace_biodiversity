@@ -26,8 +26,8 @@ greenspaces <- readRDS("Data/final_data_for_big_script.RDS")
 ##############
 # nb glmm
 m_linear <- glmmTMB(
-  species_richness ~ log10(nearest_dist_m) * analysis +
-    Season + log10(number_of_checklists),
+  species_richness ~ log10(nearest_dist_m) * analysis * Season + 
+    log10(number_of_checklists) + log10(Shape_Area),
   data = greenspaces,
   family = nbinom2
 )
@@ -98,39 +98,6 @@ nn_distance_plot_log <- ggplot(
     linetype = guide_legend(override.aes = list(size = 1))
   )
 nn_distance_plot_log
-
-
-# Ensure there are no zeros or NAs in nearest_dist_m
-greenspaces_clean <- greenspaces %>%
-  filter(!is.na(nearest_dist_m) & nearest_dist_m > 0)
-
-# Refit the model on cleaned data
-m_linear_clean <- glmmTMB(
-  species_richness ~ log10(nearest_dist_m) * analysis +
-    Season + log10(number_of_checklists),
-  data = greenspaces_clean,
-  family = nbinom2
-)
-
-# Calculate slopes of log10(nearest_dist_m) by analysis and Season
-nn_slopes_analysis <- emtrends(
-  m_linear_clean,
-  specs = c("analysis", "Season"),
-  var = "log10(nearest_dist_m)",
-  type = "response"
-)
-# Check the column names
-colnames(as.data.frame(nn_slopes_analysis))
-
-# Convert to data frame for easier reading, GHMI-style
-nn_slopes_df <- as.data.frame(nn_slopes_analysis) %>%
-  rename(slope = `log10(nearest_dist_m).trend`) %>%
-  dplyr::select(analysis, Season, slope, SE, df)
-
-# View slopes and p-values
-nn_slopes_df
-
-
 
 #######################
 # GHMI

@@ -46,10 +46,6 @@ ggplot(final_data_for_analysis, aes(x=Shape_Area/10000))+
   theme_bw()+
   scale_x_log10()
 
-### Find Mean, SD, Highest, and Lowest SR
-mean(final_data_for_analysis$species_richness)
-sd(final_data_for_analysis$species_richness)
-
 # Quick visualization to show lists and richness 
 # Histogram of 'lists'
 hist(final_data_for_analysis$number_of_checklists,
@@ -117,32 +113,7 @@ print(pairs_season_status)
 # Convert to df for plotting
 season_status_df <- as.data.frame(emm_season_status)
 
-# Plot (Poster)
-ggplot(season_status_df,
-       aes(x = Season, y = emmean, color = analysis, group = analysis)) +
-  geom_point(position = position_dodge(width = 0.3), size = 4) +
-  geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL),
-                position = position_dodge(width = 0.3), width = 0.3) +
-  labs(
-    title = "Predicted Species Richness by Season & Migration Status",
-    y = "Predicted Species Richness",
-    x = NULL,
-    color = "Migration Status"
-  ) +
-  scale_color_manual(values = c("migratory" = "#b1d8b7", "residential" = "#2a4c09", "total" = "#467010")) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.y = element_blank(),
-    panel.grid.major.x = element_blank(),
-    axis.ticks = element_line(color = "grey30"),
-    legend.position = "top",
-    legend.title = element_text(face = "bold"),
-    axis.title = element_text(face = "bold"),
-    axis.text = element_text(color = "black")
-    ) +
-  coord_flip()
-
-# If your emmeans are on the log scale, exponentiate to get response scale
+# change to response scale (exponential)
 season_status_df <- season_status_df %>%
   mutate(
     emmean_resp = exp(emmean),
@@ -168,8 +139,8 @@ ggplot(season_status_df,
   theme_minimal() +
   theme(
     panel.grid = element_blank(),
-    panel.background = element_rect(color = "black", linewidth = 0.5),
-    axis.ticks = element_line(color = "grey30"),
+    panel.background = element_rect(color = "black", linewidth = 0.7),
+    axis.ticks = element_line(color = "black"),
     legend.position = "bottom",
     axis.text = element_text(color = "black", size = 11),
     axis.title = element_text(size = 12),

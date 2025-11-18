@@ -13,47 +13,18 @@ library("ggpmisc")
 park_counts <- readRDS("Data/Intermediate_Data/park_counts.rds")
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
 
-### calculate data for species richness per park and unique species
-#### code to calucalte richness for parks
-species_summary <- park_counts %>%
-  group_by(Park_Addre) %>%
-  summarise(unique_species = n_distinct(SCIENTIFIC.NAME, na.rm = TRUE)) %>%
-  arrange(desc(unique_species))
-
-# calculate species richness per checklist
-checklist_richness <- park_counts %>%
-  group_by(Park_Addre, SAMPLING.EVENT.IDENTIFIER) %>%
-  summarise(richness = n_distinct(SCIENTIFIC.NAME, na.rm = TRUE), .groups = "drop")
-
-# calculate mean and SE of species richness per park
-species_summary <- checklist_richness %>%
-  group_by(Park_Addre) %>%
-  summarise(
-    mean_richness = mean(richness, na.rm = TRUE),
-    se_richness = sd(richness, na.rm = TRUE) / sqrt(n()),
-    unique_species = n_distinct(park_counts$SCIENTIFIC.NAME[park_counts$Park_Addre == first(Park_Addre)]),
-    .groups = "drop"
-  ) %>%
-  arrange(desc(mean_richness))
-
 # Get unique species
 unique_species <- unique(park_counts[, c("SCIENTIFIC.NAME", "COMMON.NAME")])
-
 # Keep only one row per species
 unique_species <- unique_species[!duplicated(unique_species$SCIENTIFIC.NAME), ]
-
 # Sort by scientific name
 unique_species <- unique_species[order(unique_species$SCIENTIFIC.NAME), ]
-unique_species
 # Remove geometry
 unique_species_null <- st_set_geometry(unique_species, NULL)
 
 # Export table
 species_table <- as.data.frame(unique_species_null)
 write.csv(species_table, "Figures/unique_species.csv", row.names = FALSE)
-
-########
-### Maybe remake this with migratory status, but that makes things a little difficult.
 
 ######################################
 ### Preliminary Graphs to explore data

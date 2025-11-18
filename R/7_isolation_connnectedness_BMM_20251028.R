@@ -138,17 +138,16 @@ hist(greenspaces$nearest_dist_m)
 # polynomial or linear?
 # Linear
 m_linear <- glmmTMB(
-  species_richness ~ log10(nearest_dist_m) * analysis +
-    Season + log10(number_of_checklists),
+  species_richness ~ log10(nearest_dist_m) * analysis * Season + 
+    log10(number_of_checklists) + log10(Shape_Area),
   data = greenspaces,
   family = nbinom2
 )
 
 # Fit polynomial GLMM (quadratic term for nearest distance)
 poly_glmm <- glmmTMB(
-  species_richness ~ poly(log10(nearest_dist_m), 2, raw = TRUE) * analysis +
-    Season +
-    log10(number_of_checklists),
+  species_richness ~ poly(log10(nearest_dist_m), 2, raw = TRUE) * analysis * Season + 
+    log10(number_of_checklists) + log10(Shape_Area),
   data = greenspaces,
   family = nbinom2
 )
@@ -159,6 +158,7 @@ anova(m_linear, poly_glmm, test = "Chisq")
 
 # check model results
 summary(m_linear)
+Anova(m_linear, type = "III")
 
 # check for overdispersion
 performance::check_overdispersion(m_linear)
@@ -233,3 +233,21 @@ nn_distance_plot
 
 ggsave("Figures/predicted_richness_nearest_neighbor.PNG", plot = nn_distance_plot, bg = "transparent")
 
+# Get slopes and p values
+ghmi_slopes_distance <- emtrends(
+  m_linear,
+  specs = c("analysis", "Season"),
+  var = "nearest_dist_m",
+  type = "response"
+)
+
+# Convert to data frame for easier reading
+ghmi_slopes_df <- as.data.frame(ghmi_slopes_distance) %>%
+  rename(slope = nearest_dist_m.trend) %>%
+  dplyr::select(any_of(c("analysis", "Season", "slope", "SE", "df", "t.ratio", "p.value")))
+
+# View slopes and p-values
+ghmi_slopes_df
+
+# Pairwise comparisons of slopes
+pairs(ghmi_slopes_distance)

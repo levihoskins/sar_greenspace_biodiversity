@@ -100,7 +100,7 @@ print(emm_ghmi_season_df)
 
 # Plot Marginal slope of GHMI
 ## quick visualization for slopes
-ggplot(emm_ghmi_season_df, aes(x = Season, y = ghmi_mean.trend, group = Season)) +
+ggplot(emm_ghmi_season_df, aes(x = Season, y = ghmi_mean.trend, group = Season, colour = "#006400")) +
   geom_point(size = 4) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.6) +
   labs(y = "Marginal Slope of GHMI", x = NULL) +
@@ -115,50 +115,6 @@ ggplot(emm_ghmi_season_df, aes(x = Season, y = ghmi_mean.trend, group = Season))
   ) +
   coord_flip() +
   theme(aspect.ratio = 0.5)
-
-#########################################
-# Predicted response curves by Season
-#########################################
-# Create prediction sequence for GHMI
-ghmi_seq <- seq(
-  quantile(gee_final_data_for_analysis$ghmi_mean, 0.05, na.rm = TRUE),
-  quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
-  length.out = 50
-)
-
-# Predicted response curves for each Season (type = response) with CIs
-ghmi_predicted_response <- emmip(
-  nb_glmm_ghmi_season,
-  Season ~ ghmi_mean,
-  type = "response",
-  CIs = TRUE,
-  at = list(
-    ghmi_mean = ghmi_seq,
-    number_of_checklists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
-  )
-) +
-  scale_color_manual(values = c(
-    "Overwintering"    = "#006400", 
-    "Spring Migration" = "#FF8C00",
-    "Breeding"         = "#1E90FF", 
-    "Fall Migration"   = "#800080"  
-  )) +
-  labs(
-    x = "GHMI (Global Human Modification Index)",
-    y = "Predicted Species Richness",
-    colour = "Season"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.title = element_text(face = "bold", size = 14),
-    axis.text = element_text(color = "black", size = 12),
-    legend.position = "bottom",
-    legend.title = element_text(face = "bold"),
-    legend.text = element_text(size = 12)
-  )
-ghmi_predicted_response
 
 #########################################
 # GHMI + AREA MODELS (include Shape_Area)
@@ -232,12 +188,22 @@ ggsave("Figures/ghmi_predicted_response_area.png", ghmi_predicted_response_area,
 gee_filtered <- gee_final_data_for_analysis %>%
   filter(analysis %in% c("migratory", "residential"))
 
-# NB GLMM: GHMI * Season * analysis + log10(number_of_checklists)
+####### Note for Brittany
+### Do you think shape_area should be included here or not? It changes the results significantly.
+### I don't think this is an interactive variable here, but I do also want to show the association
+### That size also has this impact on the system.
+#######
+
+# NB GLMM: GHMI * Season * analysis + log10(number_of_checklists) + log10(Shape_Area)
 nb_glmm_ghmi_season_analysis <- glmmTMB(
-  species_richness ~ ghmi_mean * Season * analysis + log10(number_of_checklists),
+  species_richness ~ ghmi_mean * Season * analysis + log10(number_of_checklists) + log10(Shape_Area),
   data = gee_filtered,
   family = nbinom2
 )
+
+# Summary & ANOVA
+summary(nb_glmm_ghmi_season_analysis)
+Anova(nb_glmm_ghmi_season_analysis, type = "III")
 
 # Marginal slopes for GHMI by Season × analysis
 emm_ghmi_trends <- emtrends(
@@ -325,9 +291,9 @@ pairs(ghmi_slopes_analysis)
 #########################################
 # DYNAMIC WORLD: dominant_class × Season 
 #########################################
-# NB GLMM: dominant_class * Season + log10(number_of_checklists)
+# NB GLMM: dominant_class * Season + log10(number_of_checklists) + log10(Shape_Area)
 nb_glmm_domclass_season <- glmmTMB(
-  species_richness ~ dominant_class * Season + log10(number_of_checklists),
+  species_richness ~ dominant_class * Season + log10(number_of_checklists) + log10(Shape_Area),
   data = gee_final_data_for_analysis,
   family = nbinom2
 )
@@ -478,12 +444,12 @@ ggplot(plot_df2, aes(x = dominant_label, y = response, fill = Season, colour = S
   theme(
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    axis.title = element_text(face = "bold", size = 13),
-    axis.text.x = element_text(color = "black", face = "bold", angle = 45, hjust = 1, size = 12),
+    axis.title = element_text(size = 13),
+    axis.text.x = element_text(color = "black", angle = 45, hjust = 1, size = 12),
     axis.text.y = element_text(color = "black", size = 11),
-    strip.text = element_text(face = "bold", size = 13),
+    strip.text = element_text(size = 13),
     legend.position = "bottom",
-    legend.title = element_text(face = "bold", size = 12),
+    legend.title = element_text(size = 12),
     legend.text = element_text(size = 12)
   ) +
   scale_color_manual(values = c(
@@ -499,11 +465,11 @@ ggplot(plot_df2, aes(x = dominant_label, y = response, fill = Season, colour = S
     "Fall Migration"   = "#800080"  
   ))
 
-#ggsave("Figures/dominant_class_significance_analysis.png", bg = "transparent", width = 10, height = 8)
+ggsave("Figures/dominant_class_significance_analysis.png", bg = "transparent", width = 10, height = 8)
 
 # Summarize mean predicted richness and group letters
 richness_summary <- plot_df2 %>%
-  group_by(analysis, dominant_class, Season, letter) %>%
+  group_by(analysis, dominant_class, Season) %>%
   summarise(
     mean_predicted = mean(response, na.rm = TRUE),
     lower_CI = mean(asymp.LCL, na.rm = TRUE),

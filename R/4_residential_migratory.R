@@ -114,7 +114,8 @@ ggsave('Figures/Study_Area_Figure_1.png', bg = 'transparent', plot = study_area)
 ### RESUME Residential vs. Migratory
 ####################################
 
-# GLMM with analysis as a fixed effect
+# GLMM with analysis as a fixed effect 
+### Analysis represents migratory status
 glmm_analysis <- glmmTMB(
   species_richness ~ log10(Shape_Area) + analysis,
   data = final_data_for_analysis,
@@ -137,7 +138,7 @@ nb_richness_plot_status <- ggplot(final_data_for_analysis, aes(x = Shape_Area / 
   scale_x_log10() +
   scale_color_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
   scale_fill_manual(values = c("residential" = "#006400", "migratory" = "#800080", "total" = "#1E90FF")) +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(method = "lm", se = TRUE, alpha = 0.2, linewidth = 1) +
   labs(
     x = "Park Area (hectares)",
     y = "Predicted Species Richness", 
