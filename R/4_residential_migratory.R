@@ -88,12 +88,12 @@ study_area <- ggplot() +
     name = "Species Richness",
     low = "white",
     high = "#00441b",
-<<<<<<< HEAD
-    limits = range(final_data_fig1$species_richness, na.rm = TRUE)
-=======
-    limits = range(final_data_points$species_richness, na.rm = TRUE),
-    trans = "log"
->>>>>>> b9ce3e6d159add7c99ae5207d54cc3f1991e02bc
+    limits = range(final_data_fig1$species_richness, na.rm = TRUE),
+    trans = "log",
+    guide = guide_colorbar(
+      label = TRUE,
+      title = "Species Richness"
+    )
   ) +
   theme_minimal() +
   theme(

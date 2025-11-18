@@ -106,6 +106,26 @@ park_counts <- all_points %>%
   ungroup()
 
 length(unique(park_counts$Park_Addre)) #76
+unique(park_counts$Park_Addre)
+
+####### Filter out parks that are not urban greenspaces
+park_counts <- park_counts %>%
+  filter(!Park_Addre %in% c(
+    "400 N State Road A1A",
+    "Hillsboro Blvd",
+    "Fort Laud Beach Park to Oakl*",
+    "SW 360TH ST / SW 192ND AVE",
+    "Juno Beach Ocean Park",
+    "Boynton Beach Oceanfront Park",
+    "190 N LAKE AVE"
+  )) 
+
+park_counts <- park_counts %>%
+  mutate(Park_Addre = ifelse(Park_Addre %in% c("Enchanted Forest Elaine Gordon Park", "Arch Creelk Park"),
+                             "Enchanted Forest / Arch Creek Park",
+                             Park_Addre))
+
+length(unique(park_counts$Park_Addre)) #69
 
 ### save intermediate script to run analysis for supplementary figure with species richness
 #saveRDS(park_counts, "Data/Intermediate_Data/park_counts.rds")

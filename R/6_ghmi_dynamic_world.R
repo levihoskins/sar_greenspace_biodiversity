@@ -72,7 +72,7 @@ summary(glm_model)
 ## check model and dispersion
 check_model(glm_model)
 dispersion <- sum(residuals(glm_model, type = "pearson")^2) / df.residual(glm_model)
-print(paste("Dispersion:", dispersion)) #9.12868035444644
+print(paste("Dispersion:", dispersion)) #9.65331189171402
 
 #########################################
 # GHMI MODELS
