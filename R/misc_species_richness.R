@@ -26,6 +26,16 @@ unique_species_null <- st_set_geometry(unique_species, NULL)
 species_table <- as.data.frame(unique_species_null)
 write.csv(species_table, "Figures/unique_species.csv", row.names = FALSE)
 
+## Species Richness
+# Calculate species richness per park
+species_richness_per_park <- park_counts %>%
+  group_by(Park_Addre) %>%
+  summarise(species_richness = n_distinct(SCIENTIFIC.NAME)) %>%
+  arrange(desc(species_richness))
+
+mean(species_richness_per_park$species_richness)
+sd(species_richness_per_park$species_richness)
+
 ######################################
 ### Preliminary Graphs to explore data
 ######################################

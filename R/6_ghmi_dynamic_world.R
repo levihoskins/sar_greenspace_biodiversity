@@ -126,17 +126,59 @@ glmm_season_size_ghmi <- glmmTMB(
   family = nbinom2
 )
 
+# Filter dataset to migratory & residential for analysis
+gee_filtered <- gee_final_data_for_analysis %>%
+  filter(analysis %in% c("migratory", "residential"))
+
+# NB GLMM: GHMI * Season * analysis + log10(number_of_checklists)
+nb_glmm_ghmi_season_analysis <- glmmTMB(
+  species_richness ~ ghmi_mean * Season * analysis + log10(number_of_checklists),
+  data = gee_filtered,
+  family = nbinom2
+)
+
 # Summary & ANOVA
 summary(glmm_season_size_ghmi)
 Anova(glmm_season_size_ghmi, type = "III")
 
-# Prediction grid for Shape_Area & GHMI (hold checklists at median)
-pred_grid <- with(gee_final_data_for_analysis, list(
-  Shape_Area = seq(min(Shape_Area, na.rm = TRUE), max(Shape_Area, na.rm = TRUE), length.out = 40),
-  ghmi_mean = seq(min(ghmi_mean, na.rm = TRUE), max(ghmi_mean, na.rm = TRUE), length.out = 4),
-  number_of_checklists = median(number_of_checklists, na.rm = TRUE)
-))
+# Marginal slopes for GHMI by Season × analysis
+emm_ghmi_trends <- emtrends(
+  nb_glmm_ghmi_season_analysis,
+  var = "ghmi_mean",
+  specs = ~ Season * analysis,
+  type = "response"
+)
 
+# Convert to data frame, add significance marker & y positions
+emm_ghmi_df <- as.data.frame(emm_ghmi_trends) %>%
+  mutate(
+    signif = ifelse(asymp.LCL > 0 | asymp.UCL < 0, "*", ""),
+    y_position = ghmi_mean.trend + 0.5
+  )
+
+# GHMI prediction sequence
+ghmi_seq <- seq(
+  quantile(gee_final_data_for_analysis$ghmi_mean, 0.05, na.rm = TRUE),
+  quantile(gee_final_data_for_analysis$ghmi_mean, 0.95, na.rm = TRUE),
+  length.out = 50
+)
+
+# Prediction grid for Size × GHMI (hold checklists at median)
+pred_grid <- list(
+  Shape_Area = seq(
+    min(gee_final_data_for_analysis$Shape_Area, na.rm = TRUE),
+    max(gee_final_data_for_analysis$Shape_Area, na.rm = TRUE),
+    length.out = 40
+  ),
+  ghmi_mean = seq(
+    min(gee_final_data_for_analysis$ghmi_mean, na.rm = TRUE),
+    max(gee_final_data_for_analysis$ghmi_mean, na.rm = TRUE),
+    length.out = 4
+  ),
+  number_of_checklists = median(gee_final_data_for_analysis$number_of_checklists, na.rm = TRUE)
+)
+
+# Predicted response surface for the Area + GHMI model
 emm_size_ghmi <- emmeans(
   glmm_season_size_ghmi,
   ~ log10(Shape_Area) * ghmi_mean | Season * analysis,
@@ -145,7 +187,7 @@ emm_size_ghmi <- emmeans(
 )
 emm_size_ghmi_df <- as.data.frame(emm_size_ghmi)
 
-# Predicted response vs GHMI for the model with area
+# GHMI response curves (holding checklists at median)
 ghmi_predicted_response_area <- emmip(
   glmm_season_size_ghmi,
   Season ~ ghmi_mean,
@@ -160,7 +202,7 @@ ghmi_predicted_response_area <- emmip(
     "Overwintering"    = "#006400", 
     "Spring Migration" = "#FF8C00",
     "Breeding"         = "#1E90FF", 
-    "Fall Migration"   = "#800080"  
+    "Fall Migration"   = "#800080"
   )) +
   labs(
     x = "GHMI (Global Human Modification Index)",
@@ -177,6 +219,7 @@ ghmi_predicted_response_area <- emmip(
     legend.title = element_text(face = "bold"),
     legend.text = element_text(size = 12)
   )
+
 ghmi_predicted_response_area
 
 ggsave("Figures/ghmi_predicted_response_area.png", ghmi_predicted_response_area, bg = "transparent")
@@ -187,12 +230,6 @@ ggsave("Figures/ghmi_predicted_response_area.png", ghmi_predicted_response_area,
 # Filter dataset to migratory & residential for analysis
 gee_filtered <- gee_final_data_for_analysis %>%
   filter(analysis %in% c("migratory", "residential"))
-
-####### Note for Brittany
-### Do you think shape_area should be included here or not? It changes the results significantly.
-### I don't think this is an interactive variable here, but I do also want to show the association
-### That size also has this impact on the system.
-#######
 
 # NB GLMM: GHMI * Season * analysis + log10(number_of_checklists) + log10(Shape_Area)
 nb_glmm_ghmi_season_analysis <- glmmTMB(
@@ -415,7 +452,13 @@ plot_df2 <- plot_df %>%
     cld_df %>% dplyr::select(Season, dominant_class, analysis, .group),
     by = c("Season", "dominant_class", "analysis")
   ) %>%
-  mutate(letter = ifelse(is.na(.group), "", .group)) %>%
+  mutate(
+    analysis = as.character(analysis),
+    analysis = dplyr::recode(analysis,
+                      "migratory" = "Migratory",
+                      "residential" = "Residential"),
+    letter = ifelse(is.na(.group), "", .group)
+  ) %>%
   drop_na(dominant_label)
 
 # Compute y-offsets for CLD text placement

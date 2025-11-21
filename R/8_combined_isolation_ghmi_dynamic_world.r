@@ -53,15 +53,16 @@ emm_poly_df <- as.data.frame(emm_poly)
 ## matching ghmi style — log-transformed axis with whole-number labels
 nn_distance_plot_log <- ggplot(
   emm_poly_df %>%
-    filter(analysis %in% c("residential", "migratory")),
+    filter(analysis %in% c("migratory", "residential")) %>%
+    mutate(analysis = ifelse(analysis == "migratory", "Migratory", "Residential")),
   aes(x = nearest_dist_m, y = response, color = Season, fill = Season)
 ) +
   geom_line(size = 1) +
   geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.2, color = NA) +
-  facet_wrap(~analysis) +
+  facet_wrap(~analysis, scales="free_y") +
   scale_x_log10(
     labels = scales::label_number(accuracy = 1, big.mark = ","),
-    breaks = scales::log_breaks(n = 6)
+    breaks = scales::log_breaks(n = 4)
   ) +
   scale_color_manual(values = c(
     "Overwintering"    = "#006400",
@@ -104,11 +105,13 @@ nn_distance_plot_log
 ################
 # Filter dataset to migratory & residential for analysis
 greenspaces <- greenspaces %>%
-  filter(analysis %in% c("migratory", "residential"))
+  filter(analysis %in% c("migratory", "residential")) %>%
+  mutate(analysis = ifelse(analysis == "migratory", "Migratory", "Residential"))
 
 # NB GLMM: GHMI * Season * analysis + log10(number_of_checklists)
 nb_glmm_ghmi_season_analysis <- glmmTMB(
-  species_richness ~ ghmi_mean * Season * analysis + log10(number_of_checklists),
+  species_richness ~ ghmi_mean * Season * analysis + 
+    log10(number_of_checklists)  + log10(Shape_Area),
   data = greenspaces,
   family = nbinom2
 )
@@ -154,7 +157,7 @@ ghmi_emmip_data <- as.data.frame(
 ghmi_plot <- ggplot(ghmi_emmip_data, aes(x = ghmi_mean, y = yvar, color = Season)) +
   geom_ribbon(aes(ymin = LCL, ymax = UCL, fill = Season), alpha = 0.2, color = NA) +
   geom_line(size = 1) +
-  facet_wrap(~analysis) +
+  facet_wrap(~analysis, scales="free_y") +
   labs(
     x = "GHMI (Global Human Modification Index)",
     y = "Predicted Species Richness",

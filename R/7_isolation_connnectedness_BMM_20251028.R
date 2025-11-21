@@ -13,6 +13,7 @@ library("stringr")
 library("forcats")
 library("DHARMa")
 library("readr")
+library("car")
 library("patchwork")
 
 # Read files
@@ -231,10 +232,8 @@ nn_distance_plot <- ggplot(emm_poly_df %>% filter(analysis %in% c("residential",
 
 nn_distance_plot
 
-ggsave("Figures/predicted_richness_nearest_neighbor.PNG", plot = nn_distance_plot, bg = "transparent")
-
 # Get slopes and p values
-ghmi_slopes_distance <- emtrends(
+slopes_distance <- emtrends(
   m_linear,
   specs = c("analysis", "Season"),
   var = "nearest_dist_m",
@@ -242,12 +241,12 @@ ghmi_slopes_distance <- emtrends(
 )
 
 # Convert to data frame for easier reading
-ghmi_slopes_df <- as.data.frame(ghmi_slopes_distance) %>%
+slopes_df <- as.data.frame(slopes_distance) %>%
   rename(slope = nearest_dist_m.trend) %>%
   dplyr::select(any_of(c("analysis", "Season", "slope", "SE", "df", "t.ratio", "p.value")))
 
 # View slopes and p-values
-ghmi_slopes_df
+slopes_df
 
 # Pairwise comparisons of slopes
-pairs(ghmi_slopes_distance)
+pairs(slopes_distance)
