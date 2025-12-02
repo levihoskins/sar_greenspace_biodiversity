@@ -3,15 +3,17 @@ library("ggplot2")
 library("dplyr")
 library("sf")
 library("ggpmisc")
+library("tidyverse")
 
 ##########################################
 ## DO NOT FORGET PARK_SIZE_ is in HECTARES
 ## Park_Siz_1 is in m^2, same as area
 ##########################################
 
-# Read the RDS
+# Read the files
 park_counts <- readRDS("Data/Intermediate_Data/park_counts.rds")
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
+avonet <- read_csv("Data/AVONET/AVONET1_BirdLife.csv")
 
 # Get unique species
 unique_species <- unique(park_counts[, c("SCIENTIFIC.NAME", "COMMON.NAME")])
@@ -22,9 +24,80 @@ unique_species <- unique_species[order(unique_species$SCIENTIFIC.NAME), ]
 # Remove geometry
 unique_species_null <- st_set_geometry(unique_species, NULL)
 
+## Now combine with AVONET data to add migratory status to each
+### But first add in the manual status for the 21 species
+# list of the 21 species with their migratory status that are not included with AVONOT
+## Adding in their migratory status with All About Birds distribution
+manual_status <- tibble::tibble(
+  SCIENTIFIC.NAME = c(
+    "Ardea ibis", 
+    "Leucophaeus atricilla",
+    "Nannopterum auritum",
+    "Astur cooperii",
+    "Chroicocephalus philadelphia",
+    "Himantopus mexicanus",
+    "Thectocercus acuticaudatus",
+    "Anser cygnoides",
+    "Butorides virescens",
+    "Dryocopus pileatus",
+    "Daptrius chimachima",
+    "Corthylio calendula",
+    "Porphyrio martinica",
+    "Anarhynchus wilsonia",
+    "Botaurus exilis",
+    "Nannopterum brasilianum",
+    "Porphyrio poliocephalus",
+    "Tyto furcata",
+    "Leucophaeus pipixcan",
+    "Psittacula krameri",
+    "Icterus bullockii"
+  ),
+  migration_status = c(
+    "residential",  # Cattle Egret
+    "residential",  # Laughing Gull
+    "residential",  # Double-crested Cormorant
+    "migratory",    # Cooper’s Hawk
+    "migratory",    # Bonaparte’s Gull
+    "migratory",    # Black-necked Stilt
+    "residential",  # Blue-crowned Parakeet (exotic)
+    "residential",  # Swan Goose (domestic/exotic)
+    "residential",  # Green Heron
+    "residential",  # Pileated Woodpecker
+    "migratory",    # Yellow-headed Caracara
+    "migratory",    # Ruby-crowned Kinglet
+    "residential",  # Purple Gallinule
+    "migratory",    # Wilson’s Plover
+    "migratory",    # Least Bittern
+    "residential",  # Neotropic Cormorant
+    "residential",  # Grey-headed Swamphen (exotic established in FL)
+    "residential",  # Barn Owl
+    "migratory",    # Franklin’s Gull
+    "residential",  # Rose-ringed Parakeet (exotic)
+    "migratory"     # Bullock’s Oriole (accidental)
+  )
+)
+
+# Calculate via greenspace and month
+species_status <- unique_species_null %>%
+  left_join(avonet, by = c("SCIENTIFIC.NAME" = "Species1")) %>%
+  dplyr::select(SCIENTIFIC.NAME, COMMON.NAME, Migration) %>%
+  mutate(
+    migration_status = case_when(
+      Migration == 1 ~ "residential",
+      Migration %in% c(2, 3) ~ "migratory",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  left_join(manual_status, by = "SCIENTIFIC.NAME") %>%
+  mutate(migration_status = coalesce(migration_status.y, migration_status.x)) %>%
+  select(-migration_status.x, -migration_status.y) %>%
+  group_by(SCIENTIFIC.NAME, COMMON.NAME, migration_status) %>%
+  dplyr::select(-Migration) %>%
+  arrange(migration_status)
+
 # Export table
-species_table <- as.data.frame(unique_species_null)
-write.csv(species_table, "Figures/unique_species.csv", row.names = FALSE)
+species_table <- as.data.frame(species_status)
+write.csv(species_table, "Figures/Supplementary/unique_species_status.csv", row.names = FALSE)
 
 ## Species Richness
 # Calculate species richness per park
