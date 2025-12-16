@@ -132,5 +132,6 @@ ghmi_plot <- ggplot(ghmi_emmip_data, aes(x = ghmi_mean, y = yvar, color = Season
 ghmi_plot
 
 # Save as png
-ggsave("Figures/figure_3_ghmi_predicted_response_migratory_residential_sig.png", ghmi_plot, bg = "transparent", width = 8, height = 5)
+ggsave("Figures/Fig_4/figure_4_ghmi_predicted_response_migratory_residential_sig.png", 
+       ghmi_plot, bg = "transparent", width = 8, height = 5)
 

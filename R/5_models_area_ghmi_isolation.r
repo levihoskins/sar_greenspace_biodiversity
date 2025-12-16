@@ -60,11 +60,12 @@ hist(greenspaces$species_richness,
 ############
 ##  area  ##
 ############
-
 ## start with poisson
 area_model_poisson <- glmmTMB(
   species_richness ~ 
-    (log10(Shape_Area) * Season) + (log10(Shape_Area) * analysis) + (log10(Shape_Area) * Season * analysis) +
+    (log10(Shape_Area) * Season) + 
+    (log10(Shape_Area) * analysis) + 
+    (log10(Shape_Area) * Season * analysis) +
     log10(number_of_checklists) + (1 | Park_Addre),
   data = greenspaces,
   family = poisson(link = "log")
@@ -80,7 +81,7 @@ sim_res <- simulateResiduals(area_model_poisson)
 plot(sim_res)
 # test dispersion parameters
 testDispersion(sim_res)
-#### slight under-dispersion which is surpising and means do not use negative binomial, instead keep poisson
+#### slightly underdispersed which is suprising and means do not use negative binomial, instead keep poisson
 
 ############
 ##  GHMI  ##

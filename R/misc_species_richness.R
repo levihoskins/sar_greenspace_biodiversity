@@ -15,6 +15,10 @@ park_counts <- readRDS("Data/Intermediate_Data/park_counts.rds")
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
 avonet <- read_csv("Data/AVONET/AVONET1_BirdLife.csv")
 
+### remove the three parks with NAs for GHMI and Isolation
+final_data_for_analysis <- final_data_for_analysis %>% 
+  drop_na()
+
 # Get unique species
 unique_species <- unique(park_counts[, c("SCIENTIFIC.NAME", "COMMON.NAME")])
 # Keep only one row per species
@@ -90,7 +94,7 @@ species_status <- unique_species_null %>%
   ) %>%
   left_join(manual_status, by = "SCIENTIFIC.NAME") %>%
   mutate(migration_status = coalesce(migration_status.y, migration_status.x)) %>%
-  select(-migration_status.x, -migration_status.y) %>%
+  dplyr::select(-migration_status.x, -migration_status.y) %>%
   group_by(SCIENTIFIC.NAME, COMMON.NAME, migration_status) %>%
   dplyr::select(-Migration) %>%
   arrange(migration_status)
@@ -158,5 +162,5 @@ ggplot(park_summary, aes(x = reorder(Park_Addre, mean_richness), y = mean_richne
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank()) +
   theme(panel.grid.minor.y = element_blank(), panel.grid.major.y = element_blank()) +
   coord_flip()
-ggsave('Figures/supplementary_unused/Summarized_Mean_Species_Richness_Park_error_bars.png', bg = "transparent", 
+ggsave('Figures/supplementary/Summarized_Mean_Species_Richness_Park_error_bars.png', bg = "transparent", 
        height = 6, width = 7)

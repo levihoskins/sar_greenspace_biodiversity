@@ -119,3 +119,7 @@ area_plot <- ggplot(
     linetype = guide_legend(override.aes = list(size = 1))
   )
 area_plot
+
+# Save as png
+ggsave("Figures/Fig_2/figure_2_area_predicted_response_migratory_residential_sig.png", 
+       area_plot, bg = "transparent", width = 8, height = 5)

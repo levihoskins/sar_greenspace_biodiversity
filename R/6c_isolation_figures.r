@@ -130,3 +130,7 @@ nn_distance_plot_log <- ggplot(
     linetype = guide_legend(override.aes = list(size = 1))
   )
 nn_distance_plot_log
+
+# Save as png
+ggsave("Figures/Fig_3/figure_3_isolation_predicted_response_migratory_residential_sig.png", 
+       nn_distance_plot_log, bg = "transparent", width = 8, height = 5)
