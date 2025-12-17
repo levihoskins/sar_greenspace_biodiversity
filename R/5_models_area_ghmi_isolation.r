@@ -15,6 +15,7 @@ library("tidyr")
 library("performance")
 library("gt")
 library("webshot2")
+library("sf")
 
 ## Load files
 greenspaces <- readRDS("Data/final_data_for_big_script.RDS")
