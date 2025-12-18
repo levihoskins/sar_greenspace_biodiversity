@@ -1,9 +1,7 @@
 # Load packages
-library("ggplot2")
-library("dplyr")
-library("sf")
-library("ggpmisc")
-library("tidyverse")
+library(sf)
+library(ggpmisc)
+library(tidyverse)
 
 ##########################################
 ## DO NOT FORGET PARK_SIZE_ is in HECTARES

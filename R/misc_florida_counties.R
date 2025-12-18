@@ -1,8 +1,7 @@
 # load packages
 library(tigris)
 library(sf)
-library(ggplot2)
-library(dplyr)
+library(tidyverse)
 
 #####################
 ### Figure for poster

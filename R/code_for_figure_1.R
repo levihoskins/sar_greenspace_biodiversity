@@ -1,21 +1,43 @@
 # looking at effects of SAR and marginal effects
 
 # Load packages
-library("ggplot2")
-library("tigris")
-library("dplyr")
-library("sf")
-library("rnaturalearth")
-library("rnaturalearthdata")
-library("glmmTMB")
-library("broom")
-library("viridis")
+library(tidyverse)
+library(sf)
+library(tigris)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(viridis)
 
 # Read files
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")
 final_shapefile_clean <- readRDS("Data/Intermediate_Data/final_shapefile_clean.RDS")
 
-# Reorder season and analysis for figures
+final_shapefile_clean <- final_shapefile_clean %>%
+  dplyr::filter(!Park_Addre %in% c(
+    "Enchanted Forest / Arch Creek Park",
+    "Jupiter Inlet Outstanding Natural Area",
+    "Seacrest Scrub Preserve"
+  ))
+
+## quick data exploration for ### checklists and ### observations
+# make sure observation count is numeric
+final_shapefile_clean <- final_shapefile_clean %>%
+  mutate(OBSERVATION.COUNT = as.numeric(OBSERVATION.COUNT))
+
+# sum OBSERVATION.COUNT per unique checklist (LOCALITY.ID)
+checklist_sums <- final_shapefile_clean %>%
+  group_by(LOCALITY.ID) %>%
+  summarise(total_observations = sum(OBSERVATION.COUNT, na.rm = TRUE))
+
+# number of unique checklists
+num_checklists <- nrow(checklist_sums)
+
+# total number of observations across all checklists
+total_observations <- sum(checklist_sums$total_observations)
+
+### resume code for figure 1
+
+# reorder season and analysis for figures
 final_data_for_analysis$analysis <- factor(
   final_data_for_analysis$analysis,
   levels = c("residential", "migratory", "total")
@@ -109,6 +131,3 @@ study_area
 
 # save with transparent background
 ggsave('Figures/Study_Area_Figure_1.png', bg = 'transparent', plot = study_area)
-
-
-

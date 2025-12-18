@@ -1,7 +1,7 @@
 # filtering eBird data to remove any outliers, random checklists, incomplete, etc.
 
 # Load packages
-library("tidyverse")
+library(tidyverse)
 
 # load in eBird data
 filtered_br <- readRDS("Data/eBird/RDS/filtered_br.rds")

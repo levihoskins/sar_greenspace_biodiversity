@@ -1,16 +1,15 @@
-#### ghmi figures
-
+# looking at area effects for predicted species richness
 
 # Load packages
-library("sf")
-library("dplyr")
-library("glmmTMB")
-library("emmeans")
-library("ggplot2")
-library("lme4")
-library("performance")
-library("car")
-library("DHARMa")
+library(sf)
+library(tidyverse)
+library(glmmTMB)
+library(emmeans)
+library(lme4)
+library(car)
+library(performance)
+library(DHARMa)
+library(scales) 
 
 # Read file
 greenspaces <- readRDS("Data/final_data_for_big_script.RDS")

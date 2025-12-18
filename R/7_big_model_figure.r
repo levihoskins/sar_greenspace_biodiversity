@@ -1,16 +1,15 @@
 ### big model with effect sizes of each attribute of residents versus migrants per season
 
 # Load packages
-library("sf")
-library("dplyr")
-library("glmmTMB")
-library("emmeans")
-library("ggplot2")
-library("lme4")
-library("performance")
-library("car")
-library("DHARMa")
-library("patchwork")
+library(sf)
+library(tidyverse)
+library(glmmTMB)
+library(emmeans)
+library(lme4)
+library(performance)
+library(car)
+library(DHARMa)
+library(patchwork)
 
 ## Load files
 greenspaces <- readRDS("Data/final_data_for_big_script.RDS")
@@ -200,7 +199,7 @@ res_plot <- ggplot(
     x = "Effect size (β ± 95% CI)",
     y = NULL,
     color = "Season",
-    title = "Residents"
+    title = "Residential"
   ) +
   theme_bw(base_size = 13) +
   theme(
@@ -226,7 +225,7 @@ mig_plot <- ggplot(
     x = "Effect size (β ± 95% CI)",
     y = NULL,
     color = "Season",
-    title = "Migrants"
+    title = "Migratory"
   ) +
   theme_bw(base_size = 13) +
   theme(
@@ -242,4 +241,8 @@ combined_plot <- mig_plot + res_plot +
     legend.position = "bottom"
   )
 combined_plot
+
+# Save as png
+ggsave("Figures/Fig_5/figure_5_effects_attributes.png", 
+       combined_plot, bg = "transparent", width = 8, height = 5)
 

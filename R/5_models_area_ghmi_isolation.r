@@ -1,21 +1,16 @@
 # Final Combined Model with all interactions for each variable with season and migratory status
 
 # Load packages
-library("dplyr")
-library("glmmTMB")
-library("emmeans")
-library("ggplot2")
-library("readr")
-library("MASS")
-library("ggeffects")
-library("patchwork")
-library("broom.mixed")
-library("car")
-library("tidyr")
-library("performance")
-library("gt")
-library("webshot2")
-library("sf")
+library(sf)
+library(tidyverse)
+library(glmmTMB)
+library(lme4)
+library(car)
+library(performance)
+library(DHARMa)
+library(broom.mixed)
+library(gt)
+library(webshot2)
 
 ## Load files
 greenspaces <- readRDS("Data/final_data_for_big_script.RDS")

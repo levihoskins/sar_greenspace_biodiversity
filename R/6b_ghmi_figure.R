@@ -1,23 +1,14 @@
-# Adding in external variables -- GHM index and Dynamic World
 ## GHMi shows the global human modification index which is a scale of 0-1 with one being 
-## a super urban area and 0 being the most absent from urban area
-### Dynamic World assigns a number to the habitat structure/type
 
 # Load packages
-library("sf")
-library("dplyr")
-library("glmmTMB")
-library("emmeans")
-library("ggplot2")
-library("lme4")
-library("readr")
-library("MASS")
-library("ggeffects")
-library("patchwork")
-library("broom")
-library("car")
-library("tidyr")
-library("performance")
+library(sf)
+library(tidyverse)
+library(glmmTMB)
+library(emmeans)
+library(lme4)
+library(car)
+library(performance)
+library(forcats)
 
 # Read file
 greenspaces <- readRDS("Data/final_data_for_big_script.RDS")
@@ -91,6 +82,19 @@ ghmi_emmip_data <- as.data.frame(
     CIs = TRUE,
     plotit = FALSE
   )
+)
+
+# reorder analysis for plotting: Migratory first, Residential second
+ghmi_emmip_data$analysis <- factor(
+  ghmi_emmip_data$analysis,
+  levels = c("migratory", "residential")
+)
+
+# capitalize Migratory and Residential
+ghmi_emmip_data$analysis <- fct_recode(
+  ghmi_emmip_data$analysis,
+  "Migratory" = "migratory",
+  "Residential" = "residential"
 )
 
 # now plot with shaded CIs

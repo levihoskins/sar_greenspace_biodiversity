@@ -1,20 +1,6 @@
 # Load packages
-library("sf")
-library("dplyr")
-library("ggplot2")
-library("glmmTMB")
-library("broom.mixed")
-library("emmeans")
-library("stats")
-library("tidyr")
-library("gt")
-library("RColorBrewer")
-library("stringr")
-library("forcats")
-library("DHARMa")
-library("readr")
-library("car")
-library("patchwork")
+library(sf)
+library(tidyverse)
 
 # Read files
 final_data_for_analysis <- readRDS("Data/AVONET/final_data_for_analysis.RDS")

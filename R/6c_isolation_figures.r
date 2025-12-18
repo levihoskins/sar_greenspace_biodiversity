@@ -1,20 +1,14 @@
-
+### modeling isolation effects and plotting the predicted richness
 
 # Load packages
-library("sf")
-library("dplyr")
-library("glmmTMB")
-library("emmeans")
-library("ggplot2")
-library("lme4")
-library("readr")
-library("MASS")
-library("ggeffects")
-library("patchwork")
-library("broom")
-library("car")
-library("tidyr")
-library("performance")
+library(sf)
+library(tidyverse)
+library(glmmTMB)
+library(emmeans)
+library(lme4)
+library(car)
+library(performance)
+library(scales)
 
 # Read file
 greenspaces <- readRDS("Data/final_data_for_big_script.RDS")
