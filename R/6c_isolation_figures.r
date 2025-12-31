@@ -48,6 +48,19 @@ summary(isolation_model_poisson)
 Anova(isolation_model_poisson, type = "III")
 performance(isolation_model_poisson)
 
+### run model without effort covariate for R^2 comparison
+isolation_model_poisson_sn <- glmmTMB(
+  species_richness ~ 
+    (log10(nearest_dist_m) * Season) + (log10(nearest_dist_m) * analysis) + 
+    (log10(nearest_dist_m) * Season * analysis) +
+    log10(number_of_checklists) + (1 | Park_Addre),
+  data = greenspaces,
+  family = poisson(link = "log")
+)
+
+performance(isolation_model_poisson_sn)
+
+#### resume original model and start making prediction grid
 # Create a prediction grid for nearest distance (log10 transformed)
 dist_grid <- with(greenspaces, 
                   list(

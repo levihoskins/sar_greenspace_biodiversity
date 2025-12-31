@@ -1,4 +1,4 @@
-# looking at effects of SAR and marginal effects
+# creating figure 1 with points on map for each remaining greenspace
 
 # Load packages
 library(tidyverse)
@@ -60,21 +60,8 @@ final_shapefile_clean <- final_shapefile_clean %>%
 final_data_fig1 <- final_shapefile_clean %>%
   filter(Park_Addre %in% final_data_for_analysis$Park_Addre)
 
-final_data_with_geometry <- final_data_for_analysis %>%
-  left_join(final_shapefile_clean, by = "Park_Addre") %>%
-  st_as_sf()
-
-# Reorder season and analysis for figures
-final_data_with_geometry$analysis <- factor(
-  final_data_with_geometry$analysis,
-  levels = c("residential", "migratory", "total")
-)
-
-final_data_with_geometry$Season <- factor(
-  final_data_with_geometry$Season,
-  levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
-  ordered = TRUE
-)
+final_data_fig1 <- final_data_fig1 %>%
+  drop_na()
 
 ###################################
 ### CODE FOR FIGURE 1 -- Study Area
@@ -88,10 +75,6 @@ fl_counties <- counties(state = "FL", cb = TRUE, year = 2022, class = "sf")
 # Filter to South Florida counties
 south_florida_counties <- fl_counties %>%
   filter(NAME %in% c("Broward", "Miami-Dade", "Palm Beach"))
-
-final_data_points <- final_data_with_geometry %>%
-  st_centroid(of_largest_polygon = TRUE) %>%
-  cbind(st_coordinates(.))
 
 final_data_fig1 <- final_data_fig1 %>%
   st_centroid(of_largest_polygon = TRUE) %>%

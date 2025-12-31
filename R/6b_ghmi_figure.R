@@ -47,6 +47,18 @@ summary(ghmi_model_poisson)
 Anova(ghmi_model_poisson, type = "III")
 performance(ghmi_model_poisson)
 
+#### compare R^2 value without effort covariate
+ghmi_model_poisson_sn <- glmmTMB(
+  species_richness ~ 
+    (ghmi_mean * Season) + (ghmi_mean * analysis) + (ghmi_mean * Season * analysis) +
+    (1 | Park_Addre),
+  data = greenspaces,
+  family = poisson(link = "log")
+)
+
+performance(ghmi_model_poisson_sn)
+
+#### resume original model and start making prediciton grid/marginal slopes
 # marginal slopes
 emm_ghmi_trends <- emtrends(
   ghmi_model_poisson,

@@ -47,6 +47,18 @@ summary(area_model_poisson)
 Anova(area_model_poisson, type = "III")
 performance(area_model_poisson)
 
+### compare the model to a semi-null distribution without checklists for R^2 values
+area_model_poisson_sn <- glmmTMB(
+  species_richness ~ 
+    (log10(Shape_Area) * Season) + (log10(Shape_Area) * analysis) + (log10(Shape_Area) * Season * analysis) +
+    (1 | Park_Addre),
+  data = greenspaces,
+  family = poisson(link = "log")
+)
+
+performance(area_model_poisson_sn)
+
+#### resume original model and start making prediciton grid
 # Create a prediction grid for area (log10 transformed)
 area_seq <- 10 ^ seq(
   log10(min(greenspaces$Shape_Area, na.rm = TRUE)),
@@ -96,7 +108,7 @@ area_plot <- ggplot(
     "Fall Migration"   = "#800080"
   )) +
   labs(
-    x = "Greenspace Area (m^2)",
+    x = expression(Greenspace~Area~(m^2)),
     y = "Predicted Species Richness",
     color = "Season",
     fill = "Season"
