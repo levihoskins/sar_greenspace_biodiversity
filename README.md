@@ -41,7 +41,7 @@ Scripts for data processing, modeling, and figure/table generation.
   - Create **Supplementary Figure S2**  
   - Create **Supplementary Table S1**
 
-⚠️ **Important notes**:
+**Important notes**:
 - Script **1** relies on raw data files that are too large to be hosted on GitHub. These files are available upon request (via email).  
 - Users without access to these files can begin inspection and execution at **Script 2**.
 - GHMI data extraction requires access to **Google Earth Engine**.
