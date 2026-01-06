@@ -1,4 +1,5 @@
 # download eBird data
+## make dataframe (RDS)
 
 # Load packages
 library(tidyverse)

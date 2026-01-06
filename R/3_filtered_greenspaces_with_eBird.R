@@ -6,6 +6,12 @@
 ### combine the two
 #### filter and summarize to analysis ready data
 
+## the beginning has a lot of # script because it takes a long time to run this, and I have saved an
+#### intermediate RDS and shapefile that can be loaded instead
+
+### the final part of the script is coded out as well, because I chose a different path for coding and
+###### selecting the greenspaces
+
 # Load packages
 library(tidyverse)
 library(sf)

@@ -1,3 +1,5 @@
+### creating part of figure 1 with just a map of florida and the highlighted counties
+
 # load packages
 library(tigris)
 library(sf)

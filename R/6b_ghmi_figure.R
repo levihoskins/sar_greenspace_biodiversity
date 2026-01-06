@@ -1,4 +1,6 @@
 ## GHMi shows the global human modification index which is a scale of 0-1 with one being 
+### code for figure 4
+###### calculation predicted species richness, slopes, and glmm for ghmi
 
 # Load packages
 library(sf)
@@ -150,4 +152,20 @@ ghmi_plot
 # Save as png
 ggsave("Figures/Fig_4/figure_4_ghmi_predicted_response_migratory_residential_sig.png", 
        ghmi_plot, bg = "transparent", width = 8, height = 5)
+
+### calculate slopes
+ghmi_slopes <- ghmi_emmip_data %>%
+  filter(analysis %in% c("Migratory", "Residential")) %>%
+  group_by(analysis, Season) %>%
+  do({
+    m <- lm(log(yvar) ~ ghmi_mean, data = .)
+    data.frame(
+      slope = coef(m)[2],
+      intercept = coef(m)[1],
+      r2 = summary(m)$r.squared
+    )
+  }) %>%
+  ungroup()
+
+ghmi_slopes
 

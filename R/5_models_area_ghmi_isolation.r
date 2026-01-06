@@ -1,5 +1,7 @@
 # Final Combined Model with all interactions for each variable with season and migratory status
 
+### This script runs every single model, and then is used to create supplementary tables for each model.
+
 # Load packages
 library(sf)
 library(tidyverse)

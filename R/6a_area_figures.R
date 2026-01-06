@@ -1,4 +1,6 @@
 # looking at area effects for predicted species richness
+### code for figure 2
+###### calculation predicted species richness, slopes, and glmm for area
 
 # Load packages
 library(sf)
@@ -134,3 +136,19 @@ area_plot
 # Save as png
 ggsave("Figures/Fig_2/figure_2_area_predicted_response_migratory_residential_sig.png", 
        area_plot, bg = "transparent", width = 8, height = 5)
+
+### calculate slopes
+area_slopes <- emm_area_df %>%
+  filter(analysis %in% c("migratory", "residential")) %>%
+  group_by(analysis, Season) %>%
+  do({
+    m <- lm(log(rate) ~ log(Shape_Area), data = .)
+    data.frame(
+      slope = coef(m)[2],
+      intercept = coef(m)[1],
+      r2 = summary(m)$r.squared
+    )
+  }) %>%
+  ungroup()
+
+area_slopes

@@ -1,3 +1,6 @@
+### exploring the data and creating supplementary figure for species richness per park
+### also creating supplementary table for species and migratory status
+
 # Load packages
 library(sf)
 library(ggpmisc)

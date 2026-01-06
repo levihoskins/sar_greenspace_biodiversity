@@ -1,4 +1,6 @@
 ### modeling isolation effects and plotting the predicted richness
+### code for figure 3
+###### calculation predicted species richness, slopes, and glmm for isolation
 
 # Load packages
 library(sf)
@@ -141,3 +143,24 @@ nn_distance_plot_log
 # Save as png
 ggsave("Figures/Fig_3/figure_3_isolation_predicted_response_migratory_residential_sig.png", 
        nn_distance_plot_log, bg = "transparent", width = 8, height = 5)
+
+
+### calculate slopes
+isolation_slopes <- emm_poly_df %>%
+  filter(analysis %in% c("migratory", "residential")) %>%
+  group_by(analysis, Season) %>%
+  summarise(
+    slope = coef(lm(rate ~ log10(nearest_dist_m)))[2],
+    intercept = coef(lm(rate ~ log10(nearest_dist_m)))[1],
+    r2 = summary(lm(rate ~ log10(nearest_dist_m)))$r.squared,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    analysis = dplyr::recode(
+      analysis,
+      migratory   = "Migratory",
+      residential = "Residential"
+    )
+  )
+
+isolation_slopes

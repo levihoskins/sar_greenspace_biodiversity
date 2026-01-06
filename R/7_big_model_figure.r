@@ -1,4 +1,7 @@
 ### big model with effect sizes of each attribute of residents versus migrants per season
+### separation of migratory and residential species by dataframe to show which attributes are most important
+###### for each migratory status
+### code for figure 5
 
 # Load packages
 library(sf)

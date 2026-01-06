@@ -1,4 +1,5 @@
 # filtering eBird data to remove any outliers, random checklists, incomplete, etc.
+## split by month function for full-annual cycle research
 
 # Load packages
 library(tidyverse)

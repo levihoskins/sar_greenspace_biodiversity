@@ -1,4 +1,4 @@
-# creating figure 1 with points on map for each remaining greenspace
+# creating part of figure 1 with points on map for each urban greenspace included in model
 
 # Load packages
 library(tidyverse)

@@ -1,3 +1,7 @@
+### this script is used for adding in GHMI and Isolation.
+
+### some things are coded out, but it's just the save files, so just un# them when you run script.
+
 # Load packages
 library(sf)
 library(tidyverse)
