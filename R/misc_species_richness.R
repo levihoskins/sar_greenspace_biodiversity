@@ -83,22 +83,44 @@ manual_status <- tibble::tibble(
 )
 
 # Calculate via greenspace and month
+manual_status2 <- manual_status %>%
+  dplyr::rename(migration_status_manual = migration_status)
+
 species_status <- unique_species_null %>%
   left_join(avonet, by = c("SCIENTIFIC.NAME" = "Species1")) %>%
   dplyr::select(SCIENTIFIC.NAME, COMMON.NAME, Migration) %>%
   mutate(
-    migration_status = case_when(
+    migration_status_avonet = case_when(
       Migration == 1 ~ "residential",
       Migration %in% c(2, 3) ~ "migratory",
       TRUE ~ NA_character_
     )
   ) %>%
-  left_join(manual_status, by = "SCIENTIFIC.NAME") %>%
-  mutate(migration_status = coalesce(migration_status.y, migration_status.x)) %>%
-  dplyr::select(-migration_status.x, -migration_status.y) %>%
-  group_by(SCIENTIFIC.NAME, COMMON.NAME, migration_status) %>%
-  dplyr::select(-Migration) %>%
-  arrange(migration_status)
+  left_join(manual_status2, by = "SCIENTIFIC.NAME") %>%
+  mutate(
+    migration_status = coalesce(
+      migration_status_manual,
+      migration_status_avonet
+    ),
+    Status_Origin = case_when(
+      !is.na(migration_status_manual) ~ "All About Birds",
+      !is.na(migration_status_avonet) ~ "AVONET",
+      TRUE ~ NA_character_
+    ),
+    # 🔹 CLEAN COMMON NAME ONLY FOR ALL ABOUT BIRDS
+    COMMON.NAME = if_else(
+      Status_Origin == "All About Birds",
+      gsub("\\s*\\(.*\\)$", "", COMMON.NAME),
+      COMMON.NAME
+    )
+  ) %>%
+  dplyr::select(
+    SCIENTIFIC.NAME,
+    COMMON.NAME,
+    migration_status,
+    Status_Origin
+  ) %>%
+  arrange(migration_status, SCIENTIFIC.NAME)
 
 # Export table
 species_table <- as.data.frame(species_status)

@@ -1,458 +1,367 @@
-"SCIENTIFIC.NAME","COMMON.NAME","migration_status"
-"Accipiter striatus","Sharp-shinned Hawk","migratory"
-"Acridotheres tristis","Common Myna","migratory"
-"Actitis macularius","Spotted Sandpiper","migratory"
-"Agelaius phoeniceus","Red-winged Blackbird","migratory"
-"Alca torda","Razorbill","migratory"
-"Alopochen aegyptiaca","Egyptian Goose","migratory"
-"Ammodramus savannarum","Grasshopper Sparrow","migratory"
-"Anarhynchus wilsonia","Wilsons Plover	Anarhynchus wilsonia				1					United States	US	Florida	US-FL	Miami-Dade	US-FL-086					Virginia Key Ecosystem Restoration Area	L502311	H	25.7368167	-80.1565167	2012-08-12	17:00:00	obsr91087	S11333476	Traveling	P22	EBIRD	120	4.023		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS162357823	2021-03-17 21:19:30.522929	5867	species	avibase-654D660C	Wilsons Plover","migratory"
-"Anas acuta","Northern Pintail","migratory"
-"Anas bahamensis","White-cheeked Pintail","migratory"
-"Anas crecca","Green-winged Teal","migratory"
-"Anas fulvigula","Mottled Duck","migratory"
-"Anas platyrhynchos","Mallard","migratory"
-"Anous stolidus","Brown Noddy","migratory"
-"Anser anser","Graylag Goose","migratory"
-"Anthus rubescens","American Pipit","migratory"
-"Antigone canadensis","Sandhill Crane","migratory"
-"Antrostomus carolinensis","Chuck-wills-widow	Antrostomus carolinensis				X					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tree Tops Park	L9215044	P	26.0694136	-80.2752626	2016-09-02		obsr450758	S55949726	Historical	P62	EBIRD	90			2	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS430357589	2021-03-30 11:54:55.225381	3541	species	avibase-8D3E8871	Chuck-wills-widow","migratory"
-"Antrostomus vociferus","Eastern Whip-poor-will","migratory"
-"Archilochus colubris","Ruby-throated Hummingbird","migratory"
-"Ardea alba","Great Egret","migratory"
-"Ardea herodias","Great Blue Heron","migratory"
-"Ardenna gravis","Great Shearwater","migratory"
-"Arenaria interpres","Ruddy Turnstone","migratory"
-"Astur cooperii","Coopers Hawk	Astur cooperii				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2016-04-03	08:00:00	obsr300344	S28721750	Traveling	P22	EBIRD	195	1.609		12	1	G1677087	0	1	0		April Bird Walk		
-URN:CornellLabOfOrnithology:EBIRD:OBS396505902	2021-03-19 11:09:37.145421	8183	species	avibase-EB98812F	Coopers Hawk","migratory"
-"Aythya affinis","Lesser Scaup","migratory"
-"Aythya americana","Redhead","migratory"
-"Aythya collaris","Ring-necked Duck","migratory"
-"Aythya marila","Greater Scaup","migratory"
-"Aythya valisineria","Canvasback","migratory"
-"Bombycilla cedrorum","Cedar Waxwing","migratory"
-"Botaurus exilis","Least Bittern","migratory"
-"Botaurus lentiginosus","American Bittern","migratory"
-"Branta canadensis","Canada Goose","migratory"
-"Branta leucopsis","Barnacle Goose","migratory"
-"Bucephala albeola","Bufflehead","migratory"
-"Buteo jamaicensis","Red-tailed Hawk","migratory"
-"Buteo lineatus","Red-shouldered Hawk","migratory"
-"Buteo platypterus","Broad-winged Hawk","migratory"
-"Buteo swainsoni","Swainsons Hawk	Buteo swainsoni				2					United States	US	Florida	US-FL	Miami-Dade	US-FL-086		31			Southern Glades Trail (C111 Canal outside ENP)	L582123	H	25.4034735	-80.5586135	2024-01-21	10:49:00	obsr1479559	S159463351	Traveling	P22	EBIRD	114	0.386		2	1	G11566659	1	1	0		Flycatchers (excluding GCFL) near parking area east of channel		
-URN:CornellLabOfOrnithology:EBIRD:OBS1930258679	2024-01-21 14:10:46.397829	8408	species	avibase-DE473F42	Swainsons Hawk","migratory"
-"Calidris alba","Sanderling","migratory"
-"Calidris alpina","Dunlin","migratory"
-"Calidris canutus","Red Knot","migratory"
-"Calidris fuscicollis","White-rumped Sandpiper","migratory"
-"Calidris himantopus","Stilt Sandpiper","migratory"
-"Calidris mauri","Western Sandpiper","migratory"
-"Calidris melanotos","Pectoral Sandpiper","migratory"
-"Calidris minutilla","Least Sandpiper","migratory"
-"Calidris pusilla","Semipalmated Sandpiper","migratory"
-"Calonectris borealis","Corys Shearwater	Calonectris borealis				1					United States	US	Florida	US-FL	Palm Beach	US-FL-099					Boynton Beach Inlet Park	L870652	H	26.5446541	-80.0426102	2024-11-28	07:10:00	obsr252459	S203886815	Traveling	P22	EBIRD	195	0.359		3	1	G13453566	1	1	1			Large shearwater with brown top, yellow bill, and white underside. All dark primaries. Photo.	
-URN:CornellLabOfOrnithology:EBIRD:OBS2595611168	2024-11-08 05:53:00.821435	7119	species	avibase-710BB4E6	Corys Shearwater","migratory"
-"Cardellina canadensis","Canada Warbler","migratory"
-"Cardellina pusilla","Wilsons Warbler	Cardellina pusilla				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2017-12-27	16:30:00	obsr653592	S41357227	Traveling	P22	EBIRD	45	0.805		1	1		0	1	1			As previously reported. Photos. 	
-URN:CornellLabOfOrnithology:EBIRD:OBS561417423	2017-12-30 06:36:27	34055	species	avibase-1F09CCCC	Wilsons Warbler","migratory"
-"Cathartes aura","Turkey Vulture","migratory"
-"Catharus fuscescens","Veery","migratory"
-"Catharus guttatus","Hermit Thrush","migratory"
-"Catharus minimus","Gray-cheeked Thrush","migratory"
-"Catharus ustulatus","Swainsons Thrush	Catharus ustulatus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Dr. Von D. Mizell-Eula Johnson SP	L5744252	H	26.0711624	-80.1124978	2018-10-15	08:10:00	obsr949865	S49512402	Traveling	P22	EBIRD	210	2.414		2	1	G3546586	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS666227964	2023-10-25 13:46:53.033788	28072	species	avibase-E53FC25C	Swainsons Thrush","migratory"
-"Chaetura pelagica","Chimney Swift","migratory"
-"Charadrius melodus","Piping Plover","migratory"
-"Charadrius semipalmatus","Semipalmated Plover","migratory"
-"Charadrius vociferus","Killdeer","migratory"
-"Chlidonias niger","Black Tern","migratory"
-"Chondestes grammacus","Lark Sparrow","migratory"
-"Chordeiles acutipennis","Lesser Nighthawk","migratory"
-"Chordeiles gundlachii","Antillean Nighthawk","migratory"
-"Chordeiles minor","Common Nighthawk","migratory"
-"Chroicocephalus philadelphia","Bonapartes Gull	Chroicocephalus philadelphia				1					United States	US	Florida	US-FL	Broward	US-FL-011					4408 El Mar Dr US-FL (26.1903,-80.0948)	L28740133	P	26.1902820	-80.0948360	2024-01-11	10:08:00	obsr1770235	S158663323	Traveling	P22	EBIRD	485	3.219		1	1		0	1	0			Near pier	
-URN:CornellLabOfOrnithology:EBIRD:OBS1941214403	2024-02-03 13:01:20.144573	6397	species	avibase-0337440E	Bonapartes Gull","migratory"
-"Circus hudsonius","Northern Harrier","migratory"
-"Cistothorus palustris","Marsh Wren","migratory"
-"Cistothorus stellaris","Sedge Wren","migratory"
-"Coccyzus americanus","Yellow-billed Cuckoo","migratory"
-"Coccyzus minor","Mangrove Cuckoo","migratory"
-"Colaptes auratus","Northern Flicker","migratory"
-"Contopus cooperi","Olive-sided Flycatcher","migratory"
-"Contopus virens","Eastern Wood-Pewee","migratory"
-"Coragyps atratus","Black Vulture","migratory"
-"Corthylio calendula","Ruby-crowned Kinglet","migratory"
-"Corvus brachyrhynchos","American Crow","migratory"
-"Cygnus atratus","Black Swan","migratory"
-"Cygnus olor","Mute Swan","migratory"
-"Daptrius chimachima","Yellow-headed Caracara","migratory"
-"Dendrocygna autumnalis","Black-bellied Whistling-Duck","migratory"
-"Dendrocygna bicolor","Fulvous Whistling-Duck","migratory"
-"Dendrocygna viduata","White-faced Whistling-Duck","migratory"
-"Dolichonyx oryzivorus","Bobolink","migratory"
-"Dumetella carolinensis","Gray Catbird","migratory"
-"Egretta thula","Snowy Egret","migratory"
-"Egretta tricolor","Tricolored Heron","migratory"
-"Elanoides forficatus","Swallow-tailed Kite","migratory"
-"Empidonax alnorum","Alder Flycatcher","migratory"
-"Empidonax difficilis","Western Flycatcher","migratory"
-"Empidonax flaviventris","Yellow-bellied Flycatcher","migratory"
-"Empidonax minimus","Least Flycatcher","migratory"
-"Empidonax virescens","Acadian Flycatcher","migratory"
-"Eudocimus albus","White Ibis","migratory"
-"Falco columbarius","Merlin","migratory"
-"Falco peregrinus","Peregrine Falcon","migratory"
-"Falco sparverius","American Kestrel","migratory"
-"Fregata magnificens","Magnificent Frigatebird","migratory"
-"Fulica americana","American Coot","migratory"
-"Gallinago delicata","Wilsons Snipe	Gallinago delicata				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2014-02-07	09:40:00	obsr390398	S16827887	Incidental	P20	EBIRD				1	0		0	1	0		looking for Harrier and Sora		
-URN:CornellLabOfOrnithology:EBIRD:OBS232117495	2023-10-25 13:49:11.699973	6042	species	avibase-F5C8516D	Wilsons Snipe","migratory"
-"Gavia immer","Common Loon","migratory"
-"Gavia stellata","Red-throated Loon","migratory"
-"Gelochelidon nilotica","Gull-billed Tern","migratory"
-"Geothlypis formosa","Kentucky Warbler","migratory"
-"Geothlypis philadelphia","Mourning Warbler","migratory"
-"Geothlypis tolmiei","Lincolns Sparrow	Melospiza lincolnii				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Markham Park	L2933693	H	26.1279694	-80.3596902	2020-10-15	10:30:00	obsr180555	S74883574	Traveling	P22	EBIRD	30	0.805		1	1		1	1	1				
-URN:CornellLabOfOrnithology:EBIRD:OBS999224130	2021-04-02 05:41:58.61302	6001	species	avibase-CB343E43	Long-billed Dowitcher	Limnodromus scolopaceus				4					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-19	10:07:00	obsr109672	S75095396	Traveling	P22	EBIRD	97	2.952		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS991889680	2021-08-22 19:48:06.98153	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011	BIRDLIFE_26200	31			West Miramar WCA	L1874513	H	25.9906768	-80.4098034	2020-10-06	06:02:00	obsr21049	S74487242	Traveling	P22	EBIRD	180	2.414		1	1		0	1	0		Sunrise at 7:16 AM temperature very warm 82°F and humid. There is a refreshing breeze from the east. The sky is partly cloudy. Listen for both barn owl and great horned owl without success but I did find three whippoorwills. Interestingly no Carolina wrens are singing and neither did I hear any Cardinals although I did see one. Got first of season Swainsons thrush.		
-URN:CornellLabOfOrnithology:EBIRD:OBS994866941	2023-10-25 13:44:36.060506	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-12	08:09:00	obsr109672	S74737479	Traveling	P22	EBIRD	74	1.462		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1000826164	2021-04-02 05:41:58.61302	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-22	02:36:00	obsr527619	S75234163	Traveling	P22	EBIRD	105	2.104		2	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1001753848	2023-10-25 10:46:48.304705	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-23	08:15:00	obsr300344	S75345954	Traveling	P22	EBIRD	120	1.287		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS992422568	2023-10-25 13:45:08.625574	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				3					United States	US	Florida	US-FL	Broward	US-FL-011		31			Vista View Park	L2596297	H	26.0658811	-80.3439456	2020-10-07	08:10:00	obsr96721	S74531652	Traveling	P22	EBIRD	175	1.931		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS994561230	2023-10-25 13:27:11.88408	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				3					United States	US	Florida	US-FL	Broward	US-FL-011		31			CLR- Hillsboro, University & Loxahatchee	L2429004	P	26.3331146	-80.2590752	2020-10-11	07:32:00	obsr390398	S74712345	Traveling	P22	EBIRD	250	8.047		2	1	G5790230	0	1	0		Almost all the Gnatys, warblers & vireos are from the Western tree-line		
-URN:CornellLabOfOrnithology:EBIRD:OBS995694438	2023-10-25 13:30:12.261792	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail Park And Nature Preserve, Pembroke Pines US-FL 26.02889, -80.41239	L12494111	P	26.0288880	-80.4123890	2020-10-14	08:30:00	obsr1068112	S74807366	Traveling	P22	EBIRD	150	1.545		1	1		1	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS992801588	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail Park And Nature Preserve, Pembroke Pines US-FL 26.02889, -80.41227	L12369937	P	26.0288910	-80.4122670	2020-10-08	08:30:00	obsr1068112	S74564244	Traveling	P22	EBIRD	180	1.465		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS996174151	2023-10-25 13:25:38.544547	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail Park And Nature Preserve, Pembroke Pines US-FL 26.02942, -80.41221	L12500623	P	26.0294250	-80.4122110	2020-10-15	08:45:00	obsr1068112	S74847218	Traveling	P22	EBIRD	150	1.609		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS991051841	2021-04-01 04:27:38.519275	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-04	07:40:00	obsr300344	S74419689	Traveling	P22	EBIRD	205	1.287		5	1	G5766219	0	1	0		Joined by a number of skilled birders today so not much was missed.		
-URN:CornellLabOfOrnithology:EBIRD:OBS1004050155	2021-08-17 17:37:16.3121	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				3					United States	US	Florida	US-FL	Broward	US-FL-011	BIRDLIFE_26200	31			West Miramar WCA	L1874513	H	25.9906768	-80.4098034	2020-10-29	06:22:00	obsr21049	S75552858	Traveling	P22	EBIRD	171	4.043		1	1		0	1	0		Sunrise at 7:28 AM. Temperature 80°F. There is a refreshing breeze out of the south. The sky is partly cloudy. Also photographed a Coyote which appears to be the female of  the group  which may have a den near here.		
-URN:CornellLabOfOrnithology:EBIRD:OBS991482415	2022-01-11 18:05:32.592465	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Quiet Waters Park	L3097045	H	26.3115986	-80.1548484	2020-10-05	11:22:00	obsr236410	S74454806	Traveling	P22	EBIRD	49	3.927		1	1		1	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1000797192	2021-04-02 05:41:58.61302	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-22	16:17:00	obsr897675	S75231635	Traveling	P22	EBIRD	125	1.609		2	1	G5831290	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1001926582	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-14	16:13:00	obsr611141	S75360955	Traveling	P22	EBIRD	27	0.402		2	1	G5838157	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS991920324	2020-10-06 17:05:36	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail Park And Nature Preserve, Pembroke Pines US-FL 26.02889, -80.41227	L12369937	P	26.0288910	-80.4122670	2020-10-06	07:50:00	obsr1068112	S74489820	Traveling	P22	EBIRD	146	1.609		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS992428067	2021-03-30 11:54:55.225381	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-07	08:20:00	obsr300344	S74532122	Traveling	P22	EBIRD	120	0.805		2	1		0	1	0			On lamp post at corner of Sample Rd.	
-URN:CornellLabOfOrnithology:EBIRD:OBS995259346	2023-10-25 13:36:41.691703	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Vista View Park	L2596297	H	26.0658811	-80.3439456	2020-10-13	08:20:00	obsr96721	S74771444	Traveling	P22	EBIRD	140	0.805		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1003462351	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-27	18:09:00	obsr296150	S75501632	Traveling	P22	EBIRD	60	1.609		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1005221987	2023-10-25 10:47:36.418542	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-31	08:15:00	obsr390398	S75657546	Traveling	P22	EBIRD	425	2.414		1	1		0	1	0		almost constant rain/drizzle, gloomy weather but decent birds		
-URN:CornellLabOfOrnithology:EBIRD:OBS992567690	2021-04-02 05:41:58.61302	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-07	15:30:00	obsr390398	S74544473	Traveling	P22	EBIRD	140	1.609		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1000683305	2023-09-23 15:07:12.365751	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-22	10:07:00	obsr109672	S75221263	Traveling	P22	EBIRD	182	4.764		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS995882257	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-14	16:13:00	obsr429352	S74822557	Traveling	P22	EBIRD	27	0.402		2	1	G5838157	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS996199938	2023-10-25 13:25:55.76801	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-15	08:53:00	obsr924603	S74849387	Traveling	P22	EBIRD	106	0.161		2	1	G5796842	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS993788493	2021-03-17 21:16:49.38768	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-10	07:40:00	obsr1068112	S74648016	Traveling	P22	EBIRD	180	2.897		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1001490508	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail Park And Nature Preserve, Pembroke Pines US-FL 26.02942, -80.41221	L12500623	P	26.0294250	-80.4122110	2020-10-24	09:00:00	obsr1068112	S75292369	Traveling	P22	EBIRD	68	1.368		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1003634853	2021-08-17 17:37:16.07647	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011	BIRDLIFE_26200	31			West Miramar WCA	L1874513	H	25.9906768	-80.4098034	2020-10-28	06:18:00	obsr21049	S75515393	Traveling	P22	EBIRD	151	2.849		1	1		0	1	0		Sunrise at 7:28 AM. Temperature 78°F. The sky is clear and the wind is calm. Listen for owls but didn’t hear ready only heard one Whippoorwill briefly. Walked the levee trail. No doves and no Cardinals today		
-URN:CornellLabOfOrnithology:EBIRD:OBS994936652	2020-10-12 14:01:37	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011	BIRDLIFE_26200	31			West Miramar WCA	L1874513	H	25.9906768	-80.4098034	2020-10-10	08:50:00	obsr390398	S74743365	Traveling	P22	EBIRD	85	1.207		1	1		0	1	0		Coming in from US27, only go so far due to flooded trails & dirt roads.		
-URN:CornellLabOfOrnithology:EBIRD:OBS1000434079	2023-10-25 10:46:36.203064	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Vista View Park	L2596297	H	26.0658811	-80.3439456	2020-10-18	13:26:00	obsr390398	S75199512	Traveling	P22	EBIRD	96	0.805		1	1		0	1	0		Western Boundary		
-URN:CornellLabOfOrnithology:EBIRD:OBS1001761366	2023-10-25 10:46:48.561966	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Vista View Park	L2596297	H	26.0658811	-80.3439456	2020-10-18	13:00:00	obsr999051	S75346641	Traveling	P22	EBIRD	60	1.609		1	1		1	1	0		breezy		
-URN:CornellLabOfOrnithology:EBIRD:OBS1001540285	2023-10-25 10:46:44.125687	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Vista View Park	L2596297	H	26.0658811	-80.3439456	2020-10-24	08:50:00	obsr96721	S75296766	Traveling	P22	EBIRD	130	1.287		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1005346271	2021-04-02 05:41:58.61302	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-31	16:49:00	obsr109672	S75667942	Traveling	P22	EBIRD	129	3.303		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1004228661	2023-10-25 10:47:16.705255	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-29	11:38:00	obsr1211093	S75570738	Traveling	P22	EBIRD	329	7.116		4	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1737570833	2023-05-22 21:57:20.534768	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Boca Ratón, Florida	L12461812	P	26.3075876	-80.1929640	2020-10-09	08:30:00	obsr1820478	S138922608	Stationary	P21	EBIRD	252			2	1	G10297777	1	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS994270140	2023-10-25 13:35:47.067335	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail Park And Nature Preserve, Pembroke Pines US-FL 26.02891, -80.41232	L12474066	P	26.0289070	-80.4123210	2020-10-11	08:10:00	obsr1068112	S74687241	Traveling	P22	EBIRD	150	1.674		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS991526721	2023-10-25 13:28:41.051058	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			CLR- Hillsboro, University & Loxahatchee	L2429004	P	26.3331146	-80.2590752	2020-10-04	12:10:00	obsr390398	S74458499	Traveling	P22	EBIRD	275	8.047		2	1	G5769390	0	1	0		mainly Western Tree line, continued on after Bruce left		
-URN:CornellLabOfOrnithology:EBIRD:OBS998421621	2020-10-18 23:08:05	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				4					United States	US	Florida	US-FL	Broward	US-FL-011		31			Green Belt Park	L903211	H	26.0640307	-80.1577306	2020-10-18	10:47:00	obsr1454354	S75033572	Incidental	P20	EBIRD				1	0		1	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1003461531	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-27	18:06:00	obsr326289	S75501574	Traveling	P22	EBIRD	36	1.143		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS996199889	2023-10-25 13:45:01.493709	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-15	08:53:00	obsr897675	S74849385	Traveling	P22	EBIRD	106	0.161		2	1	G5796842	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS994958220	2021-03-30 23:51:29.604785	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Robbins Park 	L635677	H	26.0708733	-80.3020120	2020-10-10	14:15:00	obsr390398	S74745280	Traveling	P22	EBIRD	40	1.207		1	1		0	1	0		walk around the pasture		
-URN:CornellLabOfOrnithology:EBIRD:OBS990235880	2021-03-30 14:43:49.276541	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-03	09:15:00	obsr300344	S74356452	Traveling	P22	EBIRD	105	0.805		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS2131842064	2024-05-07 12:04:50.770273	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-04	07:40:00	obsr305566	S172627395	Traveling	P22	EBIRD	205	1.287		5	1	G5766219	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS998701277	2020-10-18 16:29:14	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Windmill Park	L1444963	H	26.2406885	-80.1853455	2020-10-18	15:15:00	obsr1710884	S75055847	Traveling	P22	EBIRD	73	2.140		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS994781866	2021-08-17 17:37:08.594423	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				4					United States	US	Florida	US-FL	Broward	US-FL-011	BIRDLIFE_26200	31			West Miramar WCA	L1874513	H	25.9906768	-80.4098034	2020-10-12	06:07:00	obsr21049	S74730398	Traveling	P22	EBIRD	184	3.561		1	1		0	1	0		Sunrise at 7:19 AM. Temperature 79°F. The sky is mostly clear and the wind is calm. Listen to for barn owl and great horned owl without success this morning also did hear one Whippoorwill at a new location at the very north end of the trail.		
-URN:CornellLabOfOrnithology:EBIRD:OBS994951389	2020-10-13 14:58:30	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-10	10:27:00	obsr390398	S74744452	Traveling	P22	EBIRD	203	4.023		1	1		0	1	0		Boardwalk and the back trails. Almost all the Warblers/ vireos & gnatys were along the back trails		
-URN:CornellLabOfOrnithology:EBIRD:OBS1000690294	2020-10-22 14:46:00	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tradewinds Park  -- (North & South)	L714849	H	26.2742143	-80.1725793	2020-10-22	14:15:00	obsr1286828	S75221882	Traveling	P22	EBIRD	30	1.207		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS995797699	2021-03-30 14:43:49.276541	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-14	08:10:00	obsr300344	S74815925	Traveling	P22	EBIRD	95	0.805		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS991426022	2020-10-05 10:20:19	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Sabal Pines Park, Coconut Creek US-FL (26.2914,-80.1828)	L11998605	P	26.2913520	-80.1828090	2020-10-05	09:10:00	obsr1647154	S74450080	Traveling	P22	EBIRD	60	3.219		1	0		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS991101834	2021-04-01 04:27:38.519275	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-04	07:40:00	obsr383546	S74423939	Traveling	P22	EBIRD	205	1.287		5	1	G5766219	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS995050055	2023-10-25 13:43:35.683187	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				3					United States	US	Florida	US-FL	Broward	US-FL-011		31			CLR- Hillsboro, University & Loxahatchee	L2429004	P	26.3331146	-80.2590752	2020-10-11	07:32:00	obsr383546	S74753426	Traveling	P22	EBIRD	250	8.047		2	1	G5790230	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS991540434	2023-10-25 13:37:12.409571	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			CLR- Hillsboro, University & Loxahatchee	L2429004	P	26.3331146	-80.2590752	2020-10-04	12:10:00	obsr300344	S74459625	Traveling	P22	EBIRD	80	4.828		2	1	G5769390	0	1	0		mainly Western Tree line		
-URN:CornellLabOfOrnithology:EBIRD:OBS996148947	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-15	08:17:00	obsr21049	S74845054	Traveling	P22	EBIRD	140	0.805		1	1		1	1	0		Forgot to close the app after leaving the preserve actual time with approximately two hours and 20 minutes. I will correct the time and distance.		
-URN:CornellLabOfOrnithology:EBIRD:OBS991215019	2021-04-01 04:27:38.519275	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-04	07:40:00	obsr390398	S74433186	Traveling	P22	EBIRD	205	1.287		5	1	G5766219	0	1	0		Joined by a number of skilled birders today so not much was missed.		
-URN:CornellLabOfOrnithology:EBIRD:OBS997098559	2021-08-17 17:37:09.361334	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011	BIRDLIFE_26200	31			West Miramar WCA	L1874513	H	25.9906768	-80.4098034	2020-10-17	06:08:00	obsr21049	S74928389	Traveling	P22	EBIRD	197	2.963		1	1		1	1	0		Sunrise at 7:22 AM. Temperature 76°F. There is a slight breeze from the north east. The sky has some high clouds. Walked out the levee trail early in hopes of finding whippoorwil and indeed did hear and see one at the junction with the bar ditch trail.		
-URN:CornellLabOfOrnithology:EBIRD:OBS989843108	2023-10-25 13:46:15.336569	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				4					United States	US	Florida	US-FL	Broward	US-FL-011		31			Vista View Park	L2596297	H	26.0658811	-80.3439456	2020-10-02	11:25:00	obsr1211093	S74324601	Traveling	P22	EBIRD	227	8.229		4	1		1	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1003088205	2021-04-02 05:41:58.61302	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-22	16:10:00	obsr390398	S75468360	Traveling	P22	EBIRD	130	1.609		4	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS992804235	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-08	09:41:00	obsr21049	S74564448	Traveling	P22	EBIRD	107	0.856		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1000797234	2021-04-02 05:41:58.61302	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Plantation Preserve	L614607	H	26.1156777	-80.2391624	2020-10-22	16:17:00	obsr924603	S75231636	Traveling	P22	EBIRD	125	1.609		2	1	G5831290	0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1005208062	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-31	12:08:00	obsr1211093	S75656293	Traveling	P22	EBIRD	272	3.428		4	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1001007082	2021-03-30 22:50:13.217091	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Chapel Trail (Sheridan Street Mitigation Bank)	L580881	H	26.0285391	-80.4127336	2020-10-23	08:03:00	obsr21049	S75248243	Traveling	P22	EBIRD	120	1.055		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1002267747	2021-04-01 04:27:38.519275	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Frost Park	L8849724	H	26.0545506	-80.1387045	2020-10-24	13:08:00	obsr428978	S75389949	Stationary	P21	EBIRD	30			1	1		0	1	0		85 deg, partly cloudy  breeze E 10 - 15.		
-URN:CornellLabOfOrnithology:EBIRD:OBS993473512	2023-05-22 21:57:20.534768	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Boca Ratón, Florida	L12461812	P	26.3075876	-80.1929640	2020-10-09	08:30:00	obsr1833615	S74622068	Stationary	P21	EBIRD	252			2	1	G10297777	1	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1002704335	2020-10-27 16:18:10	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				2					United States	US	Florida	US-FL	Broward	US-FL-011	BIRDLIFE_26200	31			West Miramar WCA	L1874513	H	25.9906768	-80.4098034	2020-10-26	06:17:00	obsr21049	S75425989	Traveling	P22	EBIRD	124	3.626		1	1		1	1	0		Sunrise at 7:27 AM. Temperature 77°F and quite humid. The wind is calm and the sky is clear. Did not hear any owls and notably neither saw nor heard cardinal or Carolina Wren.		
-URN:CornellLabOfOrnithology:EBIRD:OBS999330590	2021-03-30 14:43:49.276541	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Tall Cypress Natural Area	L1306908	H	26.2768695	-80.2140570	2020-10-19	09:50:00	obsr300344	S75104147	Traveling	P22	EBIRD	130	1.609		1	1		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS992551293	2021-03-19 11:41:33.217171	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				3					United States	US	Florida	US-FL	Broward	US-FL-011		31			CLR-South of Loxahatchee Rd	L7964954	P	26.3266667	-80.2972222	2020-10-07	07:30:00	obsr357900	S74542933	Traveling	P22	EBIRD	264	7.889		1	1		1	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS992215737	2022-02-08 22:21:39.982328	20860	species	avibase-36171C2B	Loggerhead Shrike	Lanius ludovicianus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			FL yard	L9552765	P	26.1134490	-80.2408700	2020-10-06	07:30:00	obsr952102	S74515005	Incidental	P20	EBIRD				1	0		0	1	0				
-URN:CornellLabOfOrnithology:EBIRD:OBS1040456072	2023-10-25 10:50:46.77607	6293	species	avibase-1D446440	Long-tailed Jaeger	Stercorarius longicaudus				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Dr. Von D. Mizell-Eula Johnson SP	L5744252	H	26.0711624	-80.1124978	2020-10-10	09:40:00	obsr510251	S76767867	Traveling	P22	EBIRD	120	1.931		1	1		0	1	1			Unexpected given the lack of activity over the ocean in the fresh SW wind. I observed a Royal Tern raise up off the ocean being pursued by what I first thought was a Black Tern, which of course did not make any sense. So I zoomed the scope in to ID the darker bird. To my surprise it was a jaeger with a very small pale primary base flash on the hand of the underwing and a grayish-brown toned plumage with a pale belly. It only weakly chased the Royal Tern and was nowhere near as persistent or as fast flying as a Parasitic. It made one pass at the Royal, then it glided down closer to the surface and continued south. The direct size comparison, behavior and observed plumage details confirmed a Long-tailed Jaeger.	
-URN:CornellLabOfOrnithology:EBIRD:OBS1001613942	2021-03-30 11:54:55.225381	33728	species	avibase-85106518	MacGillivrays Warbler","migratory"
-"Geothlypis trichas","Common Yellowthroat","migratory"
-"Haemorhous mexicanus","House Finch","migratory"
-"Haliaeetus leucocephalus","Bald Eagle","migratory"
-"Helmitheros vermivorum","Worm-eating Warbler","migratory"
-"Himantopus mexicanus","Black-necked Stilt","migratory"
-"Hirundo rustica","Barn Swallow","migratory"
-"Hydrobates leucorhous","Leachs Storm-Petrel	Hydrobates leucorhous				5					United States	US	Florida	US-FL	Broward	US-FL-011					Deerfield Beach Pier	L588390	H	26.3164594	-80.0727206	2023-04-12	09:15:00	obsr300344	S133517377	Stationary	P21	EBIRD	105			1	1		1	1	1			Notched tail, bright carpal bars contrasting with black wings.	
-URN:CornellLabOfOrnithology:EBIRD:OBS1683352138	2023-10-30 11:24:32.372379	6974	species	avibase-C5FB15C6	Leachs Storm-Petrel","migratory"
-"Hydroprogne caspia","Caspian Tern","migratory"
-"Hylocichla mustelina","Wood Thrush","migratory"
-"Icterus bullockii","Bullocks Oriole	Icterus bullockii				1					United States	US	Florida	US-FL	Miami-Dade	US-FL-086		31			Tropical Park	L1823974	H	25.7279070	-80.3235126	2022-10-09	08:30:00	obsr3318354	S120307290	Traveling	P22	EBIRD	124	1.320		2	1	G9017085	0	1	1			Seen exceptionally briefly; came into large fruiting fig shortly following the BAOR. Disappeared as I pointed my viewfinder along with the Baltimore. -Continuing around this location: 25.723476,-80.325376-Both appeared in the fig around 0930.	
-URN:CornellLabOfOrnithology:EBIRD:OBS1536228671	2022-10-25 20:21:55.403669	33460	species	avibase-7E65A952	Bullocks Oriole","migratory"
-"Icterus galbula","Baltimore Oriole","migratory"
-"Icterus spurius","Orchard Oriole","migratory"
-"Ictinia mississippiensis","Mississippi Kite","migratory"
-"Lanius ludovicianus","Loggerhead Shrike","migratory"
-"Larus delawarensis","Ring-billed Gull","migratory"
-"Larus fuscus","Lesser Black-backed Gull","migratory"
-"Larus marinus","Great Black-backed Gull","migratory"
-"Larus smithsonianus","American Herring Gull","migratory"
-"Leiothlypis celata","Orange-crowned Warbler","migratory"
-"Leiothlypis peregrina","Tennessee Warbler","migratory"
-"Leiothlypis ruficapilla","Nashville Warbler","migratory"
-"Leucophaeus pipixcan","Franklins Gull	Leucophaeus pipixcan				1					United States	US	Florida	US-FL	Miami-Dade	US-FL-086		31			US-FL-Miami-315 Biscayne Blvd - 25.7760x-80.1846	L5137163	P	25.7760330	-80.1846180	2016-12-10	14:25:00	obsr594868	S32948913	Traveling	P22	EBIRD	15	0.483		3	1	G2072232	1	1	1			Continuing bird originally found by John Hoch.	
-URN:CornellLabOfOrnithology:EBIRD:OBS449749760	2024-09-10 19:02:37.168831	6428	species	avibase-57C93A74	Franklins Gull","migratory"
-"Limnodromus griseus","Short-billed Dowitcher","migratory"
-"Limnodromus scolopaceus","Long-billed Dowitcher","migratory"
-"Limnothlypis swainsonii","Swainsons Warbler	Limnothlypis swainsonii				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Evergreen Cemetery	L376632	H	26.1061594	-80.1318741	2015-04-22	10:48:00	obsr340931	S22998781	Traveling	P22	EBIRD	40	0.483		1	1		0	1	0		brief stop; only birded NE corner		
-URN:CornellLabOfOrnithology:EBIRD:OBS312765610	2021-03-30 14:43:49.276541	33687	species	avibase-D3624203	Swainsons Warbler","migratory"
-"Limosa fedoa","Marbled Godwit","migratory"
-"Lophodytes cucullatus","Hooded Merganser","migratory"
-"Mareca americana","American Wigeon","migratory"
-"Mareca strepera","Gadwall","migratory"
-"Megaceryle alcyon","Belted Kingfisher","migratory"
-"Melanitta americana","Black Scoter","migratory"
-"Melanitta perspicillata","Surf Scoter","migratory"
-"Melopsittacus undulatus","Budgerigar","migratory"
-"Melospiza georgiana","Swamp Sparrow","migratory"
-"Melospiza lincolnii","Lincolns Sparrow	Melospiza lincolnii				1					United States	US	Florida	US-FL	Miami-Dade	US-FL-086	US-FL_104	31			Black Point Park and Marina	L630779	H	25.5400214	-80.3274608	2021-10-27	07:30:00	obsr19006	S96761287	Traveling	P22	EBIRD	52	2.189		2	1	G7355622	1	1	0			&#x1f534;	
-URN:CornellLabOfOrnithology:EBIRD:OBS1266054701	2022-10-20 18:08:22.460727	33028	species	avibase-AF49F890	Lincolns Sparrow","migratory"
-"Mergus serrator","Red-breasted Merganser","migratory"
-"Mimus polyglottos","Northern Mockingbird","migratory"
-"Mniotilta varia","Black-and-white Warbler","migratory"
-"Molothrus ater","Brown-headed Cowbird","migratory"
-"Morus bassanus","Northern Gannet","migratory"
-"Mycteria americana","Wood Stork","migratory"
-"Myiarchus cinerascens","Ash-throated Flycatcher","migratory"
-"Myiarchus crinitus","Great Crested Flycatcher","migratory"
-"Myiarchus tyrannulus","Brown-crested Flycatcher","migratory"
-"Myiodynastes luteiventris","Sulphur-bellied Flycatcher","migratory"
-"Numenius phaeopus","Whimbrel","migratory"
-"Nyctanassa violacea","Yellow-crowned Night Heron","migratory"
-"Nycticorax nycticorax","Black-crowned Night Heron","migratory"
-"Nymphicus hollandicus","Cockatiel","migratory"
-"Oceanites oceanicus","Wilsons Storm-Petrel	Oceanites oceanicus				3					United States	US	Florida	US-FL	Palm Beach	US-FL-099					Pelagic Addicts 5/29/23 - Leg 1	L24789547	P	26.5430860	-80.0410250	2023-05-29	06:06:00	obsr464493	S139819082	Traveling	P22	EBIRD	53	24.588		3	1	G10344371	1	1	1			Small swallow-sized tubenose with legs extending beyond the tail in flight. Photos.	
-URN:CornellLabOfOrnithology:EBIRD:OBS1744489401	2023-05-29 09:26:13.445518	6934	species	avibase-D295D249	Wilsons Storm-Petrel","migratory"
-"Onychoprion anaethetus","Bridled Tern","migratory"
-"Onychoprion fuscatus","Sooty Tern","migratory"
-"Oporornis agilis","Connecticut Warbler","migratory"
-"Pandion haliaetus","Osprey","migratory"
-"Parkesia motacilla","Louisiana Waterthrush","migratory"
-"Parkesia noveboracensis","Northern Waterthrush","migratory"
-"Passerculus sandwichensis","Savannah Sparrow","migratory"
-"Passerina caerulea","Blue Grosbeak","migratory"
-"Passerina ciris","Painted Bunting","migratory"
-"Passerina cyanea","Indigo Bunting","migratory"
-"Pelecanus erythrorhynchos","American White Pelican","migratory"
-"Petrochelidon fulva","Cave Swallow","migratory"
-"Petrochelidon pyrrhonota","Cliff Swallow","migratory"
-"Peucaea aestivalis","Bachmans Sparrow	Peucaea aestivalis				1					United States	US	Florida	US-FL	Miami-Dade	US-FL-086		31			A. D. Barnes Park	L200830	H	25.7340827	-80.3108552	2018-09-16	07:05:00	obsr315975	S48584693	Traveling	P22	EBIRD	120	1.609		1	1		0	1	1			Seen with Dan Smyth and Smith Juan, sparrow with rusty crown and rusty streaked feathers, buff chest, streak through eye	
-URN:CornellLabOfOrnithology:EBIRD:OBS657666878	2018-09-16 16:28:47	32656	species	avibase-DAD22BB6	Bachmans Sparrow","migratory"
-"Phalaropus lobatus","Red-necked Phalarope","migratory"
-"Pheucticus ludovicianus","Rose-breasted Grosbeak","migratory"
-"Pipilo erythrophthalmus","Eastern Towhee","migratory"
-"Piranga ludoviciana","Western Tanager","migratory"
-"Piranga olivacea","Scarlet Tanager","migratory"
-"Piranga rubra","Summer Tanager","migratory"
-"Platalea ajaja","Roseate Spoonbill","migratory"
-"Plegadis falcinellus","Glossy Ibis","migratory"
-"Pluvialis squatarola","Black-bellied Plover","migratory"
-"Podiceps auritus","Horned Grebe","migratory"
-"Podilymbus podiceps","Pied-billed Grebe","migratory"
-"Polioptila caerulea","Blue-gray Gnatcatcher","migratory"
-"Porzana carolina","Sora","migratory"
-"Protonotaria citrea","Prothonotary Warbler","migratory"
-"Puffinus lherminieri","Sargasso Shearwater","migratory"
-"Quiscalus quiscula","Common Grackle","migratory"
-"Rallus crepitans","Clapper Rail","migratory"
-"Rallus limicola","Virginia Rail","migratory"
-"Recurvirostra americana","American Avocet","migratory"
-"Riparia riparia","Bank Swallow","migratory"
-"Rissa tridactyla","Black-legged Kittiwake","migratory"
-"Rostrhamus sociabilis","Snail Kite","migratory"
-"Rynchops niger","Black Skimmer","migratory"
-"Sayornis phoebe","Eastern Phoebe","migratory"
-"Seiurus aurocapilla","Ovenbird","migratory"
-"Setophaga americana","Northern Parula","migratory"
-"Setophaga caerulescens","Black-throated Blue Warbler","migratory"
-"Setophaga castanea","Bay-breasted Warbler","migratory"
-"Setophaga cerulea","Cerulean Warbler","migratory"
-"Setophaga citrina","Hooded Warbler","migratory"
-"Setophaga coronata","Yellow-rumped Warbler","migratory"
-"Setophaga discolor","Prairie Warbler","migratory"
-"Setophaga dominica","Yellow-throated Warbler","migratory"
-"Setophaga fusca","Blackburnian Warbler","migratory"
-"Setophaga kirtlandii","Kirtlands Warbler	Setophaga kirtlandii				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Richardson Historic Park and Nature Preserve	L1161428	H	26.1517688	-80.1418090	2011-10-21	10:30:00	obsr433097	S21257795	Historical	P62	EBIRD				1	0		1	1	1		Adding records I have photos of.		
-URN:CornellLabOfOrnithology:EBIRD:OBS407717701	2016-05-27 21:04:56	33780	species	avibase-B9A2B7CC	Kirtlands Warbler","migratory"
-"Setophaga magnolia","Magnolia Warbler","migratory"
-"Setophaga nigrescens","Black-throated Gray Warbler","migratory"
-"Setophaga palmarum","Palm Warbler","migratory"
-"Setophaga pensylvanica","Chestnut-sided Warbler","migratory"
-"Setophaga petechia","Yellow Warbler","migratory"
-"Setophaga pinus","Pine Warbler","migratory"
-"Setophaga ruticilla","American Redstart","migratory"
-"Setophaga striata","Blackpoll Warbler","migratory"
-"Setophaga tigrina","Cape May Warbler","migratory"
-"Setophaga townsendi","Townsends Warbler	Setophaga townsendi				1					United States	US	Florida	US-FL	Miami-Dade	US-FL-086		31			A. D. Barnes Park	L200830	H	25.7340827	-80.3108552	2018-09-12	13:12:00	obsr679812	S48460420	Traveling	P22	EBIRD	87	0.225		2	1		1	1	1			Bird relocated and observed for 15 minutes by birding party. White wing bars, yellow face contrasting with dark ear patch. White tail, yellow breast with streaking, dark olive back. Additional diagnostic photos by Jeanette Rawls on Facebook. Continuing bird, by exercise area, on ficus. Pics with Sony dsc-w830	
-URN:CornellLabOfOrnithology:EBIRD:OBS657256995	2022-02-08 22:22:36.606499	33916	species	avibase-F6C6C3F7	Townsends Warbler","migratory"
-"Setophaga virens","Black-throated Green Warbler","migratory"
-"Somateria mollissima","Common Eider","migratory"
-"Spatula clypeata","Northern Shoveler","migratory"
-"Spatula discors","Blue-winged Teal","migratory"
-"Sphyrapicus varius","Yellow-bellied Sapsucker","migratory"
-"Spiza americana","Dickcissel","migratory"
-"Spizella pallida","Clay-colored Sparrow","migratory"
-"Spizella passerina","Chipping Sparrow","migratory"
-"Stelgidopteryx serripennis","Northern Rough-winged Swallow","migratory"
-"Stercorarius parasiticus","Parasitic Jaeger","migratory"
-"Stercorarius pomarinus","Pomarine Jaeger","migratory"
-"Sterna dougallii","Roseate Tern","migratory"
-"Sterna forsteri","Forsters Tern	Sterna forsteri				4					United States	US	Florida	US-FL	Broward	US-FL-011		31			US-FL-Coconut Creek-3320 NW 21st Ct - 26.2553x-80.1706	L4333221	P	26.2553080	-80.1706340	2016-04-04	12:19:00	obsr601860	S28803755	Stationary	P21	EBIRD	10			1	1		0	1	0			Circling lake and diving for fish.	
-URN:CornellLabOfOrnithology:EBIRD:OBS389462451	2021-03-30 11:54:55.225381	6657	species	avibase-D13B9122	Forsters Tern","migratory"
-"Sterna hirundo","Common Tern","migratory"
-"Sterna paradisaea","Arctic Tern","migratory"
-"Sternula antillarum","Least Tern","migratory"
-"Sturnella magna","Eastern Meadowlark","migratory"
-"Sturnus vulgaris","European Starling","migratory"
-"Sula dactylatra","Masked Booby","migratory"
-"Sula leucogaster","Brown Booby","migratory"
-"Sula sula","Red-footed Booby","migratory"
-"Tachycineta bicolor","Tree Swallow","migratory"
-"Thalasseus maximus","Royal Tern","migratory"
-"Thalasseus sandvicensis","Sandwich Tern","migratory"
-"Toxostoma rufum","Brown Thrasher","migratory"
-"Tringa flavipes","Lesser Yellowlegs","migratory"
-"Tringa melanoleuca","Greater Yellowlegs","migratory"
-"Tringa semipalmata","Willet","migratory"
-"Tringa solitaria","Solitary Sandpiper","migratory"
-"Turdus migratorius","American Robin","migratory"
-"Tyrannus dominicensis","Gray Kingbird","migratory"
-"Tyrannus savana","Fork-tailed Flycatcher","migratory"
-"Tyrannus tyrannus","Eastern Kingbird","migratory"
-"Tyrannus verticalis","Western Kingbird","migratory"
-"Vermivora chrysoptera","Golden-winged Warbler","migratory"
-"Vermivora cyanoptera","Blue-winged Warbler","migratory"
-"Vireo bellii","Bells Vireo	Vireo bellii				1					United States	US	Florida	US-FL	Broward	US-FL-011		31			Richardson Historic Park and Nature Preserve	L1161428	H	26.1517688	-80.1418090	2012-04-13	10:12:00	obsr213534	S10432763	Traveling	P22	EBIRD	43	0.161		1	1		0	1	1				
-URN:CornellLabOfOrnithology:EBIRD:OBS148546767	2021-03-19 10:46:12.430215	18998	species	avibase-C3168495	Bells Vireo","migratory"
-"Vireo flavifrons","Yellow-throated Vireo","migratory"
-"Vireo gilvus","Warbling Vireo","migratory"
-"Vireo griseus","White-eyed Vireo","migratory"
-"Vireo olivaceus","Red-eyed Vireo","migratory"
-"Vireo philadelphicus","Philadelphia Vireo","migratory"
-"Vireo solitarius","Blue-headed Vireo","migratory"
-"Xanthocephalus xanthocephalus","Yellow-headed Blackbird","migratory"
-"Xema sabini","Sabines Gull	Xema sabini				1					United States	US	Florida	US-FL	Palm Beach	US-FL-099					Oceanfront Beach Park	L13328789	H	26.5302708	-80.0470459	2024-11-05	08:03:00	obsr2392450	S201485228	Stationary	P21	EBIRD	34			1	1		0	1	1			Seen just as I arrived- crisp white secondaries with black primaries	
-URN:CornellLabOfOrnithology:EBIRD:OBS2578941722	2024-11-01 17:08:33.9713	6390	species	avibase-86182656	Sabines Gull","migratory"
-"Zonotrichia albicollis","White-throated Sparrow","migratory"
-"Zonotrichia leucophrys","White-crowned Sparrow","migratory"
-"Aix sponsa","Wood Duck","residential"
-"Amazilia yucatanensis","Buff-bellied Hummingbird","residential"
-"Amazona aestiva","Turquoise-fronted Amazon","residential"
-"Amazona amazonica","Orange-winged Amazon","residential"
-"Amazona auropalliata","Yellow-naped Amazon","residential"
-"Amazona finschi","Lilac-crowned Amazon","residential"
-"Amazona viridigenalis","Red-crowned Amazon","residential"
-"Anhinga anhinga","Anhinga","residential"
-"Anser cygnoides","Swan Goose","residential"
-"Aphelocoma coerulescens","Florida Scrub-Jay","residential"
-"Ara ararauna","Blue-and-yellow Macaw","residential"
-"Ara severus","Chestnut-fronted Macaw","residential"
-"Aramus guarauna","Limpkin","residential"
-"Aratinga nenday","Nanday Parakeet","residential"
-"Ardea ibis","Western Cattle-Egret","residential"
-"Athene cunicularia","Burrowing Owl","residential"
-"Baeolophus bicolor","Tufted Titmouse","residential"
-"Brotogeris chiriri","Yellow-chevroned Parakeet","residential"
-"Brotogeris versicolurus","White-winged Parakeet","residential"
-"Bubo virginianus","Great Horned Owl","residential"
-"Buteo brachyurus","Short-tailed Hawk","residential"
-"Butorides virescens","Green Heron","residential"
-"Cairina moschata","Muscovy Duck","residential"
-"Caracara plancus","Crested Caracara","residential"
-"Cardinalis cardinalis","Northern Cardinal","residential"
-"Coccyzus melacoryphus","Dark-billed Cuckoo","residential"
-"Coereba flaveola","Bananaquit","residential"
-"Colinus virginianus","Northern Bobwhite","residential"
-"Columba livia","Rock Pigeon","residential"
-"Columbina passerina","Common Ground Dove","residential"
-"Corvus ossifragus","Fish Crow","residential"
-"Crithagra mozambica","Yellow-fronted Canary","residential"
-"Crotophaga ani","Smooth-billed Ani","residential"
-"Cyanerpes cyaneus","Red-legged Honeycreeper","residential"
-"Cyanocitta cristata","Blue Jay","residential"
-"Dryobates pubescens","Downy Woodpecker","residential"
-"Dryocopus pileatus","Pileated Woodpecker","residential"
-"Egretta caerulea","Little Blue Heron","residential"
-"Egretta rufescens","Reddish Egret","residential"
-"Estrilda melpoda","Orange-cheeked Waxbill","residential"
-"Euplectes franciscanus","Northern Red Bishop","residential"
-"Gallinula galeata","Common Gallinule","residential"
-"Gallus gallus","Red Junglefowl","residential"
-"Gracula religiosa","Common Hill Myna","residential"
-"Haematopus palliatus","American Oystercatcher","residential"
-"Icteria virens","Yellow-breasted Chat","residential"
-"Icterus pectoralis","Spot-breasted Oriole","residential"
-"Lamprotornis caudatus","Long-tailed Glossy Starling","residential"
-"Larus heermanni","Heermanns Gull	Larus heermanni				1					United States	US	Florida	US-FL	Palm Beach	US-FL-099		31			Lake Worth Beach Park	L5960906	H	26.6138722	-80.0372887	2020-01-25	12:10:00	obsr499432	S63787771	Traveling	P22	EBIRD	13	0.161		2	1	G4909760	1	1	1			continuing near the pier: see photos	
-URN:CornellLabOfOrnithology:EBIRD:OBS851631916	2021-03-18 05:26:26.167597	6446	species	avibase-6996D540	Heermanns Gull","residential"
-"Leucophaeus atricilla","Laughing Gull","residential"
-"Lonchura punctulata","Scaly-breasted Munia","residential"
-"Megascops asio","Eastern Screech-Owl","residential"
-"Melanerpes carolinus","Red-bellied Woodpecker","residential"
-"Melanerpes erythrocephalus","Red-headed Woodpecker","residential"
-"Melanospiza bicolor","Black-faced Grassquit","residential"
-"Meleagris gallopavo","Wild Turkey","residential"
-"Mimus gilvus","Tropical Mockingbird","residential"
-"Mimus gundlachii","Bahama Mockingbird","residential"
-"Molothrus aeneus","Bronzed Cowbird","residential"
-"Molothrus bonariensis","Shiny Cowbird","residential"
-"Myiarchus sagrae","La Sagras Flycatcher	Myiarchus sagrae				1					United States	US	Florida	US-FL	Miami-Dade	US-FL-086		31			Matheson Hammock Park	L127425	H	25.6806539	-80.2726364	2014-02-02	08:30:00	obsr410643	S16761059	Traveling	P22	EBIRD	45	0.805		1	1		0	1	1			Continuing Bird - good looks with pics - close to restroom with flock of warblers and gnatcatchers--All white breast and belly, long bill and grayish upper parts.--https://plus.google.com/114915808647940063020/posts/BufCP1xYRpU	
-URN:CornellLabOfOrnithology:EBIRD:OBS232884841	2014-02-07 12:59:50	17179	species	avibase-A7BEC2BF	La Sagras Flycatcher","residential"
-"Myiopsitta monachus","Monk Parakeet","residential"
-"Nannopterum auritum","Double-crested Cormorant","residential"
-"Nannopterum brasilianum","Neotropic Cormorant","residential"
-"Numida meleagris","Helmeted Guineafowl","residential"
-"Oxyura jamaicensis","Ruddy Duck","residential"
-"Passer domesticus","House Sparrow","residential"
-"Patagioenas leucocephala","White-crowned Pigeon","residential"
-"Pavo cristatus","Indian Peafowl","residential"
-"Pelecanus occidentalis","Brown Pelican","residential"
-"Phonipara canora","Cuban Grassquit","residential"
-"Poecile carolinensis","Carolina Chickadee","residential"
-"Porphyrio martinica","Purple Gallinule","residential"
-"Porphyrio poliocephalus","Gray-headed Swamphen","residential"
-"Progne subis","Purple Martin","residential"
-"Psittacara erythrogenys","Red-masked Parakeet","residential"
-"Psittacara finschi","Crimson-fronted Parakeet","residential"
-"Psittacara holochlorus","Green Parakeet","residential"
-"Psittacara leucophthalmus","White-eyed Parakeet","residential"
-"Psittacara mitratus","Mitred Parakeet","residential"
-"Psittacula krameri","Rose-ringed Parakeet","residential"
-"Pycnonotus jocosus","Red-whiskered Bulbul","residential"
-"Quiscalus major","Boat-tailed Grackle","residential"
-"Rallus elegans","King Rail","residential"
-"Ramphocelus carbo","Silver-beaked Tanager","residential"
-"Selasphorus rufus","Rufous Hummingbird","residential"
-"Sitta pusilla","Brown-headed Nuthatch","residential"
-"Spindalis zena","Western Spindalis","residential"
-"Spinus pinus","Pine Siskin","residential"
-"Spinus tristis","American Goldfinch","residential"
-"Streptopelia decaocto","Eurasian Collared-Dove","residential"
-"Strix varia","Barred Owl","residential"
-"Thectocercus acuticaudatus","Blue-crowned Parakeet","residential"
-"Thryothorus ludovicianus","Carolina Wren","residential"
-"Troglodytes aedon","Northern House Wren","residential"
-"Turdus plumbeus","Red-legged Thrush","residential"
-"Tyto furcata","American Barn Owl","residential"
-"Uraeginthus bengalus","Red-cheeked Cordonbleu","residential"
-"Vidua macroura","Pin-tailed Whydah","residential"
-"Vireo altiloquus","Black-whiskered Vireo","residential"
-"Vireo crassirostris","Thick-billed Vireo","residential"
-"Zenaida asiatica","White-winged Dove","residential"
-"Zenaida macroura","Mourning Dove","residential"
+SCIENTIFIC.NAME,COMMON.NAME,migration_status,Status_Origin
+Accipiter striatus,Sharp-shinned Hawk,migratory,AVONET
+Acridotheres tristis,Common Myna,migratory,AVONET
+Actitis macularius,Spotted Sandpiper,migratory,AVONET
+Agelaius phoeniceus,Red-winged Blackbird,migratory,AVONET
+Alca torda,Razorbill,migratory,AVONET
+Alopochen aegyptiaca,Egyptian Goose,migratory,AVONET
+Ammodramus savannarum,Grasshopper Sparrow,migratory,AVONET
+Anarhynchus wilsonia,Wilsons Plover,migratory,All About Birds
+Anas acuta,Northern Pintail,migratory,AVONET
+Anas bahamensis,White-cheeked Pintail,migratory,AVONET
+Anas crecca,Green-winged Teal,migratory,AVONET
+Anas fulvigula,Mottled Duck,migratory,AVONET
+Anas platyrhynchos,Mallard,migratory,AVONET
+Anous stolidus,Brown Noddy,migratory,AVONET
+Anser anser,Graylag Goose,migratory,AVONET
+Anthus rubescens,American Pipit,migratory,AVONET
+Antigone canadensis,Sandhill Crane,migratory,AVONET
+Antrostomus carolinensis,Chuck-wills-widow,migratory,AVONET
+Antrostomus vociferus,Eastern Whip-poor-will,migratory,AVONET
+Archilochus colubris,Ruby-throated Hummingbird,migratory,AVONET
+Ardea alba,Great Egret,migratory,AVONET
+Ardea herodias,Great Blue Heron,migratory,AVONET
+Ardenna gravis,Great Shearwater,migratory,AVONET
+Arenaria interpres,Ruddy Turnstone,migratory,AVONET
+Astur cooperii,Coopers Hawk,migratory,All About Birds
+Aythya affinis,Lesser Scaup,migratory,AVONET
+Aythya americana,Redhead,migratory,AVONET
+Aythya collaris,Ring-necked Duck,migratory,AVONET
+Aythya marila,Greater Scaup,migratory,AVONET
+Aythya valisineria,Canvasback,migratory,AVONET
+Bombycilla cedrorum,Cedar Waxwing,migratory,AVONET
+Botaurus exilis,Least Bittern,migratory,All About Birds
+Botaurus lentiginosus,American Bittern,migratory,AVONET
+Branta canadensis,Canada Goose,migratory,AVONET
+Branta leucopsis,Barnacle Goose,migratory,AVONET
+Bucephala albeola,Bufflehead,migratory,AVONET
+Buteo jamaicensis,Red-tailed Hawk,migratory,AVONET
+Buteo lineatus,Red-shouldered Hawk,migratory,AVONET
+Buteo platypterus,Broad-winged Hawk,migratory,AVONET
+Buteo swainsoni,Swainsons Hawk,migratory,AVONET
+Calidris alba,Sanderling,migratory,AVONET
+Calidris alpina,Dunlin,migratory,AVONET
+Calidris canutus,Red Knot,migratory,AVONET
+Calidris fuscicollis,White-rumped Sandpiper,migratory,AVONET
+Calidris himantopus,Stilt Sandpiper,migratory,AVONET
+Calidris mauri,Western Sandpiper,migratory,AVONET
+Calidris melanotos,Pectoral Sandpiper,migratory,AVONET
+Calidris minutilla,Least Sandpiper,migratory,AVONET
+Calidris pusilla,Semipalmated Sandpiper,migratory,AVONET
+Calonectris borealis,Corys Shearwater,migratory,AVONET
+Cardellina canadensis,Canada Warbler,migratory,AVONET
+Cardellina pusilla,Wilsons Warbler,migratory,AVONET
+Cathartes aura,Turkey Vulture,migratory,AVONET
+Catharus fuscescens,Veery,migratory,AVONET
+Catharus guttatus,Hermit Thrush,migratory,AVONET
+Catharus minimus,Gray-cheeked Thrush,migratory,AVONET
+Catharus ustulatus,Swainsons Thrush,migratory,AVONET
+Chaetura pelagica,Chimney Swift,migratory,AVONET
+Charadrius melodus,Piping Plover,migratory,AVONET
+Charadrius semipalmatus,Semipalmated Plover,migratory,AVONET
+Charadrius vociferus,Killdeer,migratory,AVONET
+Chlidonias niger,Black Tern,migratory,AVONET
+Chondestes grammacus,Lark Sparrow,migratory,AVONET
+Chordeiles acutipennis,Lesser Nighthawk,migratory,AVONET
+Chordeiles gundlachii,Antillean Nighthawk,migratory,AVONET
+Chordeiles minor,Common Nighthawk,migratory,AVONET
+Chroicocephalus philadelphia,Bonapartes Gull,migratory,All About Birds
+Circus hudsonius,Northern Harrier,migratory,AVONET
+Cistothorus palustris,Marsh Wren,migratory,AVONET
+Cistothorus stellaris,Sedge Wren,migratory,AVONET
+Coccyzus americanus,Yellow-billed Cuckoo,migratory,AVONET
+Coccyzus minor,Mangrove Cuckoo,migratory,AVONET
+Colaptes auratus,Northern Flicker,migratory,AVONET
+Contopus cooperi,Olive-sided Flycatcher,migratory,AVONET
+Contopus virens,Eastern Wood-Pewee,migratory,AVONET
+Coragyps atratus,Black Vulture,migratory,AVONET
+Corthylio calendula,Ruby-crowned Kinglet,migratory,All About Birds
+Corvus brachyrhynchos,American Crow,migratory,AVONET
+Cygnus atratus,Black Swan,migratory,AVONET
+Cygnus olor,Mute Swan,migratory,AVONET
+Daptrius chimachima,Yellow-headed Caracara,migratory,All About Birds
+Dendrocygna autumnalis,Black-bellied Whistling-Duck,migratory,AVONET
+Dendrocygna bicolor,Fulvous Whistling-Duck,migratory,AVONET
+Dendrocygna viduata,White-faced Whistling-Duck,migratory,AVONET
+Dolichonyx oryzivorus,Bobolink,migratory,AVONET
+Dumetella carolinensis,Gray Catbird,migratory,AVONET
+Egretta thula,Snowy Egret,migratory,AVONET
+Egretta tricolor,Tricolored Heron,migratory,AVONET
+Elanoides forficatus,Swallow-tailed Kite,migratory,AVONET
+Empidonax alnorum,Alder Flycatcher,migratory,AVONET
+Empidonax difficilis,Western Flycatcher,migratory,AVONET
+Empidonax flaviventris,Yellow-bellied Flycatcher,migratory,AVONET
+Empidonax minimus,Least Flycatcher,migratory,AVONET
+Empidonax virescens,Acadian Flycatcher,migratory,AVONET
+Eudocimus albus,White Ibis,migratory,AVONET
+Falco columbarius,Merlin,migratory,AVONET
+Falco peregrinus,Peregrine Falcon,migratory,AVONET
+Falco sparverius,American Kestrel,migratory,AVONET
+Fregata magnificens,Magnificent Frigatebird,migratory,AVONET
+Fulica americana,American Coot,migratory,AVONET
+Gallinago delicata,Wilsons Snipe,migratory,AVONET
+Gavia immer,Common Loon,migratory,AVONET
+Gavia stellata,Red-throated Loon,migratory,AVONET
+Gelochelidon nilotica,Gull-billed Tern,migratory,AVONET
+Geothlypis formosa,Kentucky Warbler,migratory,AVONET
+Geothlypis philadelphia,Mourning Warbler,migratory,AVONET
+Geothlypis tolmiei,MacGillivray's Sparrow,migratory,AVONET
+Geothlypis trichas,Common Yellowthroat,migratory,AVONET
+Haemorhous mexicanus,House Finch,migratory,AVONET
+Haliaeetus leucocephalus,Bald Eagle,migratory,AVONET
+Helmitheros vermivorum,Worm-eating Warbler,migratory,AVONET
+Himantopus mexicanus,Black-necked Stilt,migratory,All About Birds
+Hirundo rustica,Barn Swallow,migratory,AVONET
+Hydrobates leucorhous,Leachs Storm-Petrel,migratory,AVONET
+Hydroprogne caspia,Caspian Tern,migratory,AVONET
+Hylocichla mustelina,Wood Thrush,migratory,AVONET
+Icterus bullockii,Bullocks Oriole,migratory,All About Birds
+Icterus galbula,Baltimore Oriole,migratory,AVONET
+Icterus spurius,Orchard Oriole,migratory,AVONET
+Ictinia mississippiensis,Mississippi Kite,migratory,AVONET
+Lanius ludovicianus,Loggerhead Shrike,migratory,AVONET
+Larus delawarensis,Ring-billed Gull,migratory,AVONET
+Larus fuscus,Lesser Black-backed Gull,migratory,AVONET
+Larus marinus,Great Black-backed Gull,migratory,AVONET
+Larus smithsonianus,American Herring Gull,migratory,AVONET
+Leiothlypis celata,Orange-crowned Warbler,migratory,AVONET
+Leiothlypis peregrina,Tennessee Warbler,migratory,AVONET
+Leiothlypis ruficapilla,Nashville Warbler,migratory,AVONET
+Leucophaeus pipixcan,Franklins Gull,migratory,All About Birds
+Limnodromus griseus,Short-billed Dowitcher,migratory,AVONET
+Limnodromus scolopaceus,Long-billed Dowitcher,migratory,AVONET
+Limnothlypis swainsonii,Swainsons Warbler,migratory,AVONET
+Limosa fedoa,Marbled Godwit,migratory,AVONET
+Lophodytes cucullatus,Hooded Merganser,migratory,AVONET
+Mareca americana,American Wigeon,migratory,AVONET
+Mareca strepera,Gadwall,migratory,AVONET
+Megaceryle alcyon,Belted Kingfisher,migratory,AVONET
+Melanitta americana,Black Scoter,migratory,AVONET
+Melanitta perspicillata,Surf Scoter,migratory,AVONET
+Melopsittacus undulatus,Budgerigar,migratory,AVONET
+Melospiza georgiana,Swamp Sparrow,migratory,AVONET
+Melospiza lincolnii,Lincolns Sparrow,migratory,AVONET
+Mergus serrator,Red-breasted Merganser,migratory,AVONET
+Mimus polyglottos,Northern Mockingbird,migratory,AVONET
+Mniotilta varia,Black-and-white Warbler,migratory,AVONET
+Molothrus ater,Brown-headed Cowbird,migratory,AVONET
+Morus bassanus,Northern Gannet,migratory,AVONET
+Mycteria americana,Wood Stork,migratory,AVONET
+Myiarchus cinerascens,Ash-throated Flycatcher,migratory,AVONET
+Myiarchus crinitus,Great Crested Flycatcher,migratory,AVONET
+Myiarchus tyrannulus,Brown-crested Flycatcher,migratory,AVONET
+Myiodynastes luteiventris,Sulphur-bellied Flycatcher,migratory,AVONET
+Numenius phaeopus,Whimbrel,migratory,AVONET
+Nyctanassa violacea,Yellow-crowned Night Heron,migratory,AVONET
+Nycticorax nycticorax,Black-crowned Night Heron,migratory,AVONET
+Nymphicus hollandicus,Cockatiel,migratory,AVONET
+Oceanites oceanicus,Wilsons Storm-Petrel,migratory,AVONET
+Onychoprion anaethetus,Bridled Tern,migratory,AVONET
+Onychoprion fuscatus,Sooty Tern,migratory,AVONET
+Oporornis agilis,Connecticut Warbler,migratory,AVONET
+Pandion haliaetus,Osprey,migratory,AVONET
+Parkesia motacilla,Louisiana Waterthrush,migratory,AVONET
+Parkesia noveboracensis,Northern Waterthrush,migratory,AVONET
+Passerculus sandwichensis,Savannah Sparrow,migratory,AVONET
+Passerina caerulea,Blue Grosbeak,migratory,AVONET
+Passerina ciris,Painted Bunting,migratory,AVONET
+Passerina cyanea,Indigo Bunting,migratory,AVONET
+Pelecanus erythrorhynchos,American White Pelican,migratory,AVONET
+Petrochelidon fulva,Cave Swallow,migratory,AVONET
+Petrochelidon pyrrhonota,Cliff Swallow,migratory,AVONET
+Peucaea aestivalis,Bachmans Sparrow,migratory,AVONET
+Phalaropus lobatus,Red-necked Phalarope,migratory,AVONET
+Pheucticus ludovicianus,Rose-breasted Grosbeak,migratory,AVONET
+Pipilo erythrophthalmus,Eastern Towhee,migratory,AVONET
+Piranga ludoviciana,Western Tanager,migratory,AVONET
+Piranga olivacea,Scarlet Tanager,migratory,AVONET
+Piranga rubra,Summer Tanager,migratory,AVONET
+Platalea ajaja,Roseate Spoonbill,migratory,AVONET
+Plegadis falcinellus,Glossy Ibis,migratory,AVONET
+Pluvialis squatarola,Black-bellied Plover,migratory,AVONET
+Podiceps auritus,Horned Grebe,migratory,AVONET
+Podilymbus podiceps,Pied-billed Grebe,migratory,AVONET
+Polioptila caerulea,Blue-gray Gnatcatcher,migratory,AVONET
+Porzana carolina,Sora,migratory,AVONET
+Protonotaria citrea,Prothonotary Warbler,migratory,AVONET
+Puffinus lherminieri,Sargasso Shearwater,migratory,AVONET
+Quiscalus quiscula,Common Grackle,migratory,AVONET
+Rallus crepitans,Clapper Rail,migratory,AVONET
+Rallus limicola,Virginia Rail,migratory,AVONET
+Recurvirostra americana,American Avocet,migratory,AVONET
+Riparia riparia,Bank Swallow,migratory,AVONET
+Rissa tridactyla,Black-legged Kittiwake,migratory,AVONET
+Rostrhamus sociabilis,Snail Kite,migratory,AVONET
+Rynchops niger,Black Skimmer,migratory,AVONET
+Sayornis phoebe,Eastern Phoebe,migratory,AVONET
+Seiurus aurocapilla,Ovenbird,migratory,AVONET
+Setophaga americana,Northern Parula,migratory,AVONET
+Setophaga caerulescens,Black-throated Blue Warbler,migratory,AVONET
+Setophaga castanea,Bay-breasted Warbler,migratory,AVONET
+Setophaga cerulea,Cerulean Warbler,migratory,AVONET
+Setophaga citrina,Hooded Warbler,migratory,AVONET
+Setophaga coronata,Yellow-rumped Warbler,migratory,AVONET
+Setophaga discolor,Prairie Warbler,migratory,AVONET
+Setophaga dominica,Yellow-throated Warbler,migratory,AVONET
+Setophaga fusca,Blackburnian Warbler,migratory,AVONET
+Setophaga kirtlandii,Kirtlands Warbler,migratory,AVONET
+Setophaga magnolia,Magnolia Warbler,migratory,AVONET
+Setophaga nigrescens,Black-throated Gray Warbler,migratory,AVONET
+Setophaga palmarum,Palm Warbler,migratory,AVONET
+Setophaga pensylvanica,Chestnut-sided Warbler,migratory,AVONET
+Setophaga petechia,Yellow Warbler,migratory,AVONET
+Setophaga pinus,Pine Warbler,migratory,AVONET
+Setophaga ruticilla,American Redstart,migratory,AVONET
+Setophaga striata,Blackpoll Warbler,migratory,AVONET
+Setophaga tigrina,Cape May Warbler,migratory,AVONET
+Setophaga townsendi,Townsends Warbler,migratory,AVONET
+Setophaga virens,Black-throated Green Warbler,migratory,AVONET
+Somateria mollissima,Common Eider,migratory,AVONET
+Spatula clypeata,Northern Shoveler,migratory,AVONET
+Spatula discors,Blue-winged Teal,migratory,AVONET
+Sphyrapicus varius,Yellow-bellied Sapsucker,migratory,AVONET
+Spiza americana,Dickcissel,migratory,AVONET
+Spizella pallida,Clay-colored Sparrow,migratory,AVONET
+Spizella passerina,Chipping Sparrow,migratory,AVONET
+Stelgidopteryx serripennis,Northern Rough-winged Swallow,migratory,AVONET
+Stercorarius parasiticus,Parasitic Jaeger,migratory,AVONET
+Stercorarius pomarinus,Pomarine Jaeger,migratory,AVONET
+Sterna dougallii,Roseate Tern,migratory,AVONET
+Sterna forsteri,Forsters Tern,migratory,AVONET
+Sterna hirundo,Common Tern,migratory,AVONET
+Sterna paradisaea,Arctic Tern,migratory,AVONET
+Sternula antillarum,Least Tern,migratory,AVONET
+Sturnella magna,Eastern Meadowlark,migratory,AVONET
+Sturnus vulgaris,European Starling,migratory,AVONET
+Sula dactylatra,Masked Booby,migratory,AVONET
+Sula leucogaster,Brown Booby,migratory,AVONET
+Sula sula,Red-footed Booby,migratory,AVONET
+Tachycineta bicolor,Tree Swallow,migratory,AVONET
+Thalasseus maximus,Royal Tern,migratory,AVONET
+Thalasseus sandvicensis,Sandwich Tern,migratory,AVONET
+Toxostoma rufum,Brown Thrasher,migratory,AVONET
+Tringa flavipes,Lesser Yellowlegs,migratory,AVONET
+Tringa melanoleuca,Greater Yellowlegs,migratory,AVONET
+Tringa semipalmata,Willet,migratory,AVONET
+Tringa solitaria,Solitary Sandpiper,migratory,AVONET
+Turdus migratorius,American Robin,migratory,AVONET
+Tyrannus dominicensis,Gray Kingbird,migratory,AVONET
+Tyrannus savana,Fork-tailed Flycatcher,migratory,AVONET
+Tyrannus tyrannus,Eastern Kingbird,migratory,AVONET
+Tyrannus verticalis,Western Kingbird,migratory,AVONET
+Vermivora chrysoptera,Golden-winged Warbler,migratory,AVONET
+Vermivora cyanoptera,Blue-winged Warbler,migratory,AVONET
+Vireo bellii,Bells Vireo,migratory,AVONET
+Vireo flavifrons,Yellow-throated Vireo,migratory,AVONET
+Vireo gilvus,Warbling Vireo,migratory,AVONET
+Vireo griseus,White-eyed Vireo,migratory,AVONET
+Vireo olivaceus,Red-eyed Vireo,migratory,AVONET
+Vireo philadelphicus,Philadelphia Vireo,migratory,AVONET
+Vireo solitarius,Blue-headed Vireo,migratory,AVONET
+Xanthocephalus xanthocephalus,Yellow-headed Blackbird,migratory,AVONET
+Xema sabini,Sabines Gull,migratory,AVONET
+Zonotrichia albicollis,White-throated Sparrow,migratory,AVONET
+Zonotrichia leucophrys,White-crowned Sparrow,migratory,AVONET
+Aix sponsa,Wood Duck,residential,AVONET
+Amazilia yucatanensis,Buff-bellied Hummingbird,residential,AVONET
+Amazona aestiva,Turquoise-fronted Amazon,residential,AVONET
+Amazona amazonica,Orange-winged Amazon,residential,AVONET
+Amazona auropalliata,Yellow-naped Amazon,residential,AVONET
+Amazona finschi,Lilac-crowned Amazon,residential,AVONET
+Amazona viridigenalis,Red-crowned Amazon,residential,AVONET
+Anhinga anhinga,Anhinga,residential,AVONET
+Anser cygnoides,Swan Goose,residential,All About Birds
+Aphelocoma coerulescens,Florida Scrub-Jay,residential,AVONET
+Ara ararauna,Blue-and-yellow Macaw,residential,AVONET
+Ara severus,Chestnut-fronted Macaw,residential,AVONET
+Aramus guarauna,Limpkin,residential,AVONET
+Aratinga nenday,Nanday Parakeet,residential,AVONET
+Ardea ibis,Western Cattle-Egret,residential,All About Birds
+Athene cunicularia,Burrowing Owl,residential,AVONET
+Baeolophus bicolor,Tufted Titmouse,residential,AVONET
+Brotogeris chiriri,Yellow-chevroned Parakeet,residential,AVONET
+Brotogeris versicolurus,White-winged Parakeet,residential,AVONET
+Bubo virginianus,Great Horned Owl,residential,AVONET
+Buteo brachyurus,Short-tailed Hawk,residential,AVONET
+Butorides virescens,Green Heron,residential,All About Birds
+Cairina moschata,Muscovy Duck,residential,AVONET
+Caracara plancus,Crested Caracara,residential,AVONET
+Cardinalis cardinalis,Northern Cardinal,residential,AVONET
+Coccyzus melacoryphus,Dark-billed Cuckoo,residential,AVONET
+Coereba flaveola,Bananaquit,residential,AVONET
+Colinus virginianus,Northern Bobwhite,residential,AVONET
+Columba livia,Rock Pigeon,residential,AVONET
+Columbina passerina,Common Ground Dove,residential,AVONET
+Corvus ossifragus,Fish Crow,residential,AVONET
+Crithagra mozambica,Yellow-fronted Canary,residential,AVONET
+Crotophaga ani,Smooth-billed Ani,residential,AVONET
+Cyanerpes cyaneus,Red-legged Honeycreeper,residential,AVONET
+Cyanocitta cristata,Blue Jay,residential,AVONET
+Dryobates pubescens,Downy Woodpecker,residential,AVONET
+Dryocopus pileatus,Pileated Woodpecker,residential,All About Birds
+Egretta caerulea,Little Blue Heron,residential,AVONET
+Egretta rufescens,Reddish Egret,residential,AVONET
+Estrilda melpoda,Orange-cheeked Waxbill,residential,AVONET
+Euplectes franciscanus,Northern Red Bishop,residential,AVONET
+Gallinula galeata,Common Gallinule,residential,AVONET
+Gallus gallus,Red Junglefowl,residential,AVONET
+Gracula religiosa,Common Hill Myna,residential,AVONET
+Haematopus palliatus,American Oystercatcher,residential,AVONET
+Icteria virens,Yellow-breasted Chat,residential,AVONET
+Icterus pectoralis,Spot-breasted Oriole,residential,AVONET
+Lamprotornis caudatus,Long-tailed Glossy Starling,residential,AVONET
+Larus heermanni,Heermanns Gull ,residential,AVONET
+Leucophaeus atricilla,Laughing Gull,residential,All About Birds
+Lonchura punctulata,Scaly-breasted Munia,residential,AVONET
+Megascops asio,Eastern Screech-Owl,residential,AVONET
+Melanerpes carolinus,Red-bellied Woodpecker,residential,AVONET
+Melanerpes erythrocephalus,Red-headed Woodpecker,residential,AVONET
+Melanospiza bicolor,Black-faced Grassquit,residential,AVONET
+Meleagris gallopavo,Wild Turkey,residential,AVONET
+Mimus gilvus,Tropical Mockingbird,residential,AVONET
+Mimus gundlachii,Bahama Mockingbird,residential,AVONET
+Molothrus aeneus,Bronzed Cowbird,residential,AVONET
+Molothrus bonariensis,Shiny Cowbird,residential,AVONET
+Myiarchus sagrae,La Sagras Flycatcher,residential,AVONET
+Myiopsitta monachus,Monk Parakeet,residential,AVONET
+Nannopterum auritum,Double-crested Cormorant,residential,All About Birds
+Nannopterum brasilianum,Neotropic Cormorant,residential,All About Birds
+Numida meleagris,Helmeted Guineafowl,residential,AVONET
+Oxyura jamaicensis,Ruddy Duck,residential,AVONET
+Passer domesticus,House Sparrow,residential,AVONET
+Patagioenas leucocephala,White-crowned Pigeon,residential,AVONET
+Pavo cristatus,Indian Peafowl,residential,AVONET
+Pelecanus occidentalis,Brown Pelican,residential,AVONET
+Phonipara canora,Cuban Grassquit,residential,AVONET
+Poecile carolinensis,Carolina Chickadee,residential,AVONET
+Porphyrio martinica,Purple Gallinule,residential,All About Birds
+Porphyrio poliocephalus,Gray-headed Swamphen,residential,All About Birds
+Progne subis,Purple Martin,residential,AVONET
+Psittacara erythrogenys,Red-masked Parakeet,residential,AVONET
+Psittacara finschi,Crimson-fronted Parakeet,residential,AVONET
+Psittacara holochlorus,Green Parakeet,residential,AVONET
+Psittacara leucophthalmus,White-eyed Parakeet,residential,AVONET
+Psittacara mitratus,Mitred Parakeet,residential,AVONET
+Psittacula krameri,Rose-ringed Parakeet,residential,All About Birds
+Pycnonotus jocosus,Red-whiskered Bulbul,residential,AVONET
+Quiscalus major,Boat-tailed Grackle,residential,AVONET
+Rallus elegans,King Rail,residential,AVONET
+Ramphocelus carbo,Silver-beaked Tanager,residential,AVONET
+Selasphorus rufus,Rufous Hummingbird,residential,AVONET
+Sitta pusilla,Brown-headed Nuthatch,residential,AVONET
+Spindalis zena,Western Spindalis,residential,AVONET
+Spinus pinus,Pine Siskin,residential,AVONET
+Spinus tristis,American Goldfinch,residential,AVONET
+Streptopelia decaocto,Eurasian Collared-Dove,residential,AVONET
+Strix varia,Barred Owl,residential,AVONET
+Thectocercus acuticaudatus,Blue-crowned Parakeet,residential,All About Birds
+Thryothorus ludovicianus,Carolina Wren,residential,AVONET
+Troglodytes aedon,Northern House Wren,residential,AVONET
+Turdus plumbeus,Red-legged Thrush,residential,AVONET
+Tyto furcata,American Barn Owl,residential,All About Birds
+Uraeginthus bengalus,Red-cheeked Cordonbleu,residential,AVONET
+Vidua macroura,Pin-tailed Whydah,residential,AVONET
+Vireo altiloquus,Black-whiskered Vireo,residential,AVONET
+Vireo crassirostris,Thick-billed Vireo,residential,AVONET
+Zenaida asiatica,White-winged Dove,residential,AVONET
+Zenaida macroura,Mourning Dove,residential,AVONET
