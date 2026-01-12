@@ -20,10 +20,14 @@ greenspaces <- readRDS("Data/final_data_for_big_script.RDS")
 greenspaces <- greenspaces %>% 
   drop_na()
 
+# Filter dataset to migratory & residential for analysis
+greenspaces <- greenspaces %>%
+  filter(analysis %in% c("migratory", "residential"))
+
 # Reorder season and analysis for figures
 greenspaces$analysis <- factor(
   greenspaces$analysis,
-  levels = c("residential", "migratory", "total")
+  levels = c("residential", "migratory")
 )
 
 greenspaces$Season <- factor(
@@ -31,10 +35,6 @@ greenspaces$Season <- factor(
   levels = c("Overwintering", "Spring Migration", "Breeding", "Fall Migration"),
   ordered = TRUE
 )
-
-# Filter dataset to migratory & residential for analysis
-greenspaces <- greenspaces %>%
-  filter(analysis %in% c("migratory", "residential"))
 
 ### run the same model as other script
 area_model_poisson <- glmmTMB(

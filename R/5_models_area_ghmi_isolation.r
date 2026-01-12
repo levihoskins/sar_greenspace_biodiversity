@@ -2,6 +2,8 @@
 
 ### This script runs every single model, and then is used to create supplementary tables for each model.
 
+##### GO BAKC THROUGH AND REMOVE TOTAL FROM MODEL
+
 # Load packages
 library(sf)
 library(tidyverse)
@@ -19,7 +21,8 @@ greenspaces <- readRDS("Data/final_data_for_big_script.RDS")
 
 ### remove the three parks with NAs for GHMI and Isolation
 greenspaces <- greenspaces %>% 
-  drop_na()
+  drop_na() %>%
+  filter(analysis != "total")
 
 ####################
 ### Exploratory data
