@@ -55,7 +55,7 @@ isolation_model_poisson_sn <- glmmTMB(
   species_richness ~ 
     (log10(nearest_dist_m) * Season) + (log10(nearest_dist_m) * analysis) + 
     (log10(nearest_dist_m) * Season * analysis) +
-    log10(number_of_checklists) + (1 | Park_Addre),
+    (1 | Park_Addre),
   data = greenspaces,
   family = poisson(link = "log")
 )

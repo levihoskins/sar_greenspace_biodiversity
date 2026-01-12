@@ -51,6 +51,19 @@ summary(combined_model_residential)
 Anova(combined_model_residential, type = "III")
 performance(combined_model_residential) # R^2 (cond.) = 0.740 and R^2 (marg) = 0.671
 
+### repeat without sampling effort
+combined_model_residential_sn <- glmmTMB(
+  species_richness ~ 
+    (log10(nearest_dist_m) * Season) +
+    (ghmi_mean * Season) +
+    (log10(Shape_Area) * Season) +
+    (1 | Park_Addre),
+  data = residential_df,
+  family = poisson(link = "log")
+)
+
+performance(combined_model_residential_sn) # R^2 (cond.) = 0.750 and R^2 (marg) = 0.213
+
 ## migratory
 combined_model_migratory <- glmmTMB(
   species_richness ~ 
@@ -65,6 +78,19 @@ combined_model_migratory <- glmmTMB(
 summary(combined_model_migratory)
 Anova(combined_model_migratory, type = "III")
 performance(combined_model_migratory) # R^2 (cond.) = 0.930 and R^2 (marg) = 0.876
+
+### repeat without sampling effort
+combined_model_migratory_sn <- glmmTMB(
+  species_richness ~ 
+    (log10(nearest_dist_m) * Season) +
+    (ghmi_mean * Season) +
+    (log10(Shape_Area) * Season) +
+    (1 | Park_Addre),
+  data = migratory_df,
+  family = poisson(link = "log")
+)
+
+performance(combined_model_migratory_sn) # R^2 (cond.) = 0.935 and R^2 (marg) = 0.380
 
 ### create figure
 # extract season specific slope sizes:

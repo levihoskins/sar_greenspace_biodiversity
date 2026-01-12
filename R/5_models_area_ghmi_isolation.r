@@ -2,8 +2,6 @@
 
 ### This script runs every single model, and then is used to create supplementary tables for each model.
 
-##### GO BAKC THROUGH AND REMOVE TOTAL FROM MODEL
-
 # Load packages
 library(sf)
 library(tidyverse)
