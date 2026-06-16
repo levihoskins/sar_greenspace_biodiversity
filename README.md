@@ -1,4 +1,5 @@
-# Avian usage of urban greenspaces throughout the full annual cycle and between migratory groups
+# Urban greenspace drivers of bird species richness differ between migratory and residential species across the full-annual cycle
+
 
 This repository contains all code and derived data necessary to reproduce the analyses, figures, and tables for the manuscript:
 
