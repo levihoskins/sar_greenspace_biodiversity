@@ -13,8 +13,9 @@ The project quantifies seasonal patterns of avian species richness across urban 
 The simplest way to reproduce the full workflow is to open the project’s `.Rproj` file and run the scripts in order.
 
 **Recommended execution order:**
-1. Run scripts **1–7** in the `R/` directory sequentially  
-2. Run the scripts titled 'misc' last
+1. Run scripts **1–7** in the `R/` directory sequentially
+2. Run scripts **2_1-7_1** in the `R/` directory sequentially *(these files include checklists with X observations included and do the exact same thing as files **2-7**)*.
+4. Run the scripts titled 'misc' last
 
 All analyses were conducted in **R**, and required packages are loaded within individual scripts.
 
@@ -38,8 +39,8 @@ Scripts for data processing, modeling, and figure/table generation.
 
 - **Miscellaneous scripts** (`R/misc/`):  
   - Create **Figure 1**  
-  - Create **Supplementary Figure S2**  
-  - Create **Supplementary Table S1**
+  - Create **Supplementary Figures**  
+  - Create **Supplementary Tables**
 
 **Important notes**:
 - Script **1** relies on raw data files that are too large to be hosted on GitHub. These files are available upon request (via email).  
