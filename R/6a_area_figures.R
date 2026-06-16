@@ -193,4 +193,12 @@ area_slopes <- emm_area_df %>%
   group_by(analysis, Season) %>%
   do({
     m <- lm(log(rate) ~ log(Shape_Area), data = .)
-    d
+    data.frame(
+      slope = coef(m)[2],
+      intercept = coef(m)[1],
+      r2 = summary(m)$r.squared
+    )
+  }) %>%
+  ungroup()
+
+area_slopes

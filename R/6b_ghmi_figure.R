@@ -224,3 +224,8 @@ ghmi_slopes <- ghmi_emmip_data %>%
       intercept = coef(m)[1],
       r2 = summary(m)$r.squared
     )
+  }) %>%
+  ungroup()
+
+ghmi_slopes
+
