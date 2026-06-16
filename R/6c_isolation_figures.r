@@ -1,5 +1,5 @@
 ### modeling isolation effects and plotting the predicted richness
-### code for figure 3
+### code for figure 4
 ###### calculation predicted species richness, slopes, and glmm for isolation
 
 # Load packages
@@ -50,6 +50,15 @@ summary(isolation_model_poisson)
 Anova(isolation_model_poisson, type = "III")
 performance(isolation_model_poisson)
 
+summary(
+  emtrends(
+    isolation_model_poisson,
+    ~ analysis,
+    var = "log10(nearest_dist_m)"
+  ),
+  infer = c(TRUE, TRUE)
+)
+
 ### run model without effort covariate for R^2 comparison
 isolation_model_poisson_sn <- glmmTMB(
   species_richness ~ 
@@ -82,6 +91,31 @@ dist_grid$analysis <- intersect(
   levels(model.frame(isolation_model_poisson)$analysis)
 )
 
+## get signficance
+isolation_trends <- emtrends(
+  isolation_model_poisson,
+  ~ Season * analysis,
+  var = "nearest_dist_m"
+)
+
+isolation_trends_df <- as.data.frame(
+  summary(isolation_trends, infer = TRUE)
+)
+
+isolation_trends_df
+
+## create labels
+sig_lookup <- isolation_trends_df %>%
+  mutate(
+    sig = case_when(
+      p.value < 0.001 ~ "***",
+      p.value < 0.01  ~ "**",
+      p.value < 0.05  ~ "*",
+      TRUE            ~ NA_character_
+    )
+  ) %>%
+  select(analysis, Season, sig)
+
 # Get predicted response from emmeans
 emm_poly <- emmeans(isolation_model_poisson,
                     ~ nearest_dist_m | analysis + Season,
@@ -89,6 +123,20 @@ emm_poly <- emmeans(isolation_model_poisson,
                     type = "response")
 
 emm_poly_df <- as.data.frame(emm_poly)
+
+emm_poly_df <- emm_poly_df %>%
+  left_join(sig_lookup, by = c("analysis", "Season"))
+
+## star positions
+sig_points <- emm_poly_df %>%
+  group_by(analysis, Season) %>%
+  summarise(
+    x = max(nearest_dist_m) * 1.05,
+    y = max(rate, na.rm = TRUE),
+    sig = first(sig),
+    .groups = "drop"
+  ) %>%
+  filter(!is.na(sig))
 
 # plot
 nn_distance_plot_log <- ggplot(
@@ -98,6 +146,18 @@ nn_distance_plot_log <- ggplot(
   aes(x = nearest_dist_m, y = rate, color = Season, fill = Season)
 ) +
   geom_line(size = 1) +
+  geom_text(
+    data = sig_points %>%
+      mutate(
+        analysis = ifelse(
+          analysis == "migratory",
+          "Migratory",
+          "Residential"
+        )
+      ),
+    aes(x = x, y = y, label = sig, color = Season),
+    inherit.aes = FALSE, size = 5, hjust = 0, show.legend = FALSE
+  ) +
   geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.2, color = NA) +
   facet_wrap(~analysis, scales="free_y") +
   scale_x_log10(
@@ -117,7 +177,7 @@ nn_distance_plot_log <- ggplot(
     "Fall Migration"   = "#800080"
   )) +
   labs(
-    x = "Nearest Neighbor Distance (m)",
+    x = "Isolation (m)",
     y = "Predicted Species Richness",
     color = "Season",
     fill = "Season"
@@ -126,22 +186,25 @@ nn_distance_plot_log <- ggplot(
   theme(
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    panel.background = element_rect(color = "black", linewidth = 0.5),
+    panel.border = element_rect(
+      color = "black",
+      fill = NA,
+      linewidth = 0.5
+    ),
     axis.title = element_text(size = 14),
     axis.text = element_text(color = "black", size = 12),
     strip.text = element_text(size = 14),
     legend.position = "bottom",
-    legend.title = element_text(size = 12),
-    legend.text = element_text(size = 12)
+    plot.margin = margin(5.5, 30, 5.5, 5.5)
   ) +
-  guides(
-    colour = guide_legend(override.aes = list(linetype = 1, shape = NA, alpha = 1)),
-    linetype = guide_legend(override.aes = list(size = 1))
+  coord_cartesian(clip = "off") +
+  theme(
+    plot.margin = margin(5.5, 30, 5.5, 5.5)
   )
 nn_distance_plot_log
 
 # Save as png
-ggsave("Figures/Fig_3/figure_3_isolation_predicted_response_migratory_residential_sig.png", 
+ggsave("Figures/isolation/isolation_predicted_response_migratory_residential_sig.png", 
        nn_distance_plot_log, bg = "transparent", width = 8, height = 5)
 
 

@@ -122,6 +122,9 @@ species_status <- unique_species_null %>%
   ) %>%
   arrange(migration_status, SCIENTIFIC.NAME)
 
+sum(species_table$migration_status == "residential", na.rm = TRUE)
+sum(species_table$migration_status == "migratory", na.rm = TRUE)
+
 # Export table
 species_table <- as.data.frame(species_status)
 write.csv(species_table, "Figures/Supplementary/unique_species_status.csv", row.names = FALSE)

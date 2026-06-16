@@ -1,7 +1,7 @@
 ### big model with effect sizes of each attribute of residents versus migrants per season
 ### separation of migratory and residential species by dataframe to show which attributes are most important
 ###### for each migratory status
-### code for figure 5
+### code for figure 2
 
 # Load packages
 library(sf)
@@ -21,6 +21,24 @@ greenspaces <- readRDS("Data/final_data_for_big_script.RDS")
 greenspaces <- greenspaces %>% 
   drop_na()
 
+##############################
+## standardize predictors   ##
+##############################
+# log-transform first, then z-transform
+greenspaces <- greenspaces %>%
+  mutate(
+    # log transformed variables
+    log_area = log10(Shape_Area),
+    log_isolation = log10(nearest_dist_m),
+    log_effort = log10(number_of_checklists),
+    
+    # z-transformed variables
+    z_area = as.numeric(scale(log_area)),
+    z_isolation = as.numeric(scale(log_isolation)),
+    z_ghmi = as.numeric(scale(ghmi_mean)),
+    z_effort = as.numeric(scale(log_effort))
+  )
+
 #################
 ##  big model  ##
 #################
@@ -39,10 +57,11 @@ migratory_df <- migratory_df %>% dplyr::select(-analysis)
 ## residential
 combined_model_residential <- glmmTMB(
   species_richness ~ 
-    (log10(nearest_dist_m) * Season) +
-    (ghmi_mean * Season) +
-    (log10(Shape_Area) * Season) +
-    log10(number_of_checklists) + (1 | Park_Addre),
+    (z_isolation * Season) +
+    (z_ghmi * Season) +
+    (z_area * Season) +
+    z_effort +
+    (1 | Park_Addre),
   data = residential_df,
   family = poisson(link = "log")
 )
@@ -54,9 +73,9 @@ performance(combined_model_residential) # R^2 (cond.) = 0.740 and R^2 (marg) = 0
 ### repeat without sampling effort
 combined_model_residential_sn <- glmmTMB(
   species_richness ~ 
-    (log10(nearest_dist_m) * Season) +
-    (ghmi_mean * Season) +
-    (log10(Shape_Area) * Season) +
+    (z_isolation * Season) +
+    (z_ghmi * Season) +
+    (z_area * Season) +
     (1 | Park_Addre),
   data = residential_df,
   family = poisson(link = "log")
@@ -67,10 +86,11 @@ performance(combined_model_residential_sn) # R^2 (cond.) = 0.750 and R^2 (marg) 
 ## migratory
 combined_model_migratory <- glmmTMB(
   species_richness ~ 
-    (log10(nearest_dist_m) * Season) +
-    (ghmi_mean * Season) +
-    (log10(Shape_Area) * Season) +
-    log10(number_of_checklists) + (1 | Park_Addre),
+    (z_isolation * Season) +
+    (z_ghmi * Season) +
+    (z_area * Season) +
+    z_effort +
+    (1 | Park_Addre),
   data = migratory_df,
   family = poisson(link = "log")
 )
@@ -82,15 +102,16 @@ performance(combined_model_migratory) # R^2 (cond.) = 0.930 and R^2 (marg) = 0.8
 ### repeat without sampling effort
 combined_model_migratory_sn <- glmmTMB(
   species_richness ~ 
-    (log10(nearest_dist_m) * Season) +
-    (ghmi_mean * Season) +
-    (log10(Shape_Area) * Season) +
+    (z_isolation * Season) +
+    (z_ghmi * Season) +
+    (z_area * Season) +
     (1 | Park_Addre),
   data = migratory_df,
   family = poisson(link = "log")
 )
 
 performance(combined_model_migratory_sn) # R^2 (cond.) = 0.935 and R^2 (marg) = 0.380
+
 
 ### create figure
 # extract season specific slope sizes:
@@ -99,45 +120,48 @@ performance(combined_model_migratory_sn) # R^2 (cond.) = 0.935 and R^2 (marg) = 
 res_area <- emtrends(
   combined_model_residential, 
   ~ Season, 
-  var = "log10(Shape_Area)"
+  var = "z_area"
 ) %>%
   as.data.frame() %>%
-  rename(Effect = `log10(Shape_Area).trend`) %>%
+  rename(Effect = z_area.trend) %>%
   mutate(
     Attribute = "Area",
     Group = "Residents",
     lower = Effect - 1.96 * SE,
-    upper = Effect + 1.96 * SE
+    upper = Effect + 1.96 * SE,
+    signif = ifelse(lower > 0 | upper < 0, "*", "")
   )
 
 # Isolation (residents)
 res_iso <- emtrends(
   combined_model_residential, 
   ~ Season, 
-  var = "log10(nearest_dist_m)"
+  var = "z_isolation"
 ) %>%
   as.data.frame() %>%
-  rename(Effect = `log10(nearest_dist_m).trend`) %>%
+  rename(Effect = z_isolation.trend) %>%
   mutate(
     Attribute = "Isolation",
     Group = "Residents",
     lower = Effect - 1.96 * SE,
-    upper = Effect + 1.96 * SE
+    upper = Effect + 1.96 * SE,
+    signif = ifelse(lower > 0 | upper < 0, "*", "")
   )
 
 # GHMI (residents)
 res_ghmi <- emtrends(
   combined_model_residential, 
   ~ Season, 
-  var = "ghmi_mean"
+  var = "z_ghmi"
 ) %>%
   as.data.frame() %>%
-  rename(Effect = `ghmi_mean.trend`) %>%
+  rename(Effect = z_ghmi.trend) %>%
   mutate(
     Attribute = "GHMI",
     Group = "Residents",
     lower = Effect - 1.96 * SE,
-    upper = Effect + 1.96 * SE
+    upper = Effect + 1.96 * SE,
+    signif = ifelse(lower > 0 | upper < 0, "*", "")
   )
 
 
@@ -146,45 +170,48 @@ res_ghmi <- emtrends(
 mig_area <- emtrends(
   combined_model_migratory,
   ~ Season,
-  var = "log10(Shape_Area)"
+  var = "z_area"
 ) %>%
   as.data.frame() %>%
-  rename(Effect = `log10(Shape_Area).trend`) %>%
+  rename(Effect = z_area.trend) %>%
   mutate(
     Attribute = "Area",
     Group = "Migrants",
     lower = Effect - 1.96 * SE,
-    upper = Effect + 1.96 * SE
+    upper = Effect + 1.96 * SE,
+    signif = ifelse(lower > 0 | upper < 0, "*", "")
   )
 
 ## GHMI
 mig_ghmi <- emtrends(
   combined_model_migratory,
   ~ Season,
-  var = "ghmi_mean"
+  var = "z_ghmi"
 ) %>%
   as.data.frame() %>%
-  rename(Effect = `ghmi_mean.trend`) %>%
+  rename(Effect = z_ghmi.trend) %>%
   mutate(
     Attribute = "GHMI",
     Group = "Migrants",
     lower = Effect - 1.96 * SE,
-    upper = Effect + 1.96 * SE
+    upper = Effect + 1.96 * SE,
+    signif = ifelse(lower > 0 | upper < 0, "*", "")
   )
 
 ## Isolation
 mig_iso <- emtrends(
   combined_model_migratory,
   ~ Season,
-  var = "log10(nearest_dist_m)"
-)  %>%
+  var = "z_isolation"
+) %>%
   as.data.frame() %>%
-  rename(Effect = `log10(nearest_dist_m).trend`) %>%
+  rename(Effect = z_isolation.trend) %>%
   mutate(
     Attribute = "Isolation",
     Group = "Migrants",
     lower = Effect - 1.96 * SE,
-    upper = Effect + 1.96 * SE
+    upper = Effect + 1.96 * SE,
+    signif = ifelse(lower > 0 | upper < 0, "*", "")
   )
 
 
@@ -198,7 +225,10 @@ effects_df <- bind_rows(
       Attribute,
       levels = c("Area", "GHMI", "Isolation")
     ),
-    Group = factor(Group, levels = c("Residents", "Migrants"))
+    Group = factor(
+      Group,
+      levels = c("Residents", "Migrants")
+    )
   )
 
 ### color palette
@@ -218,14 +248,31 @@ res_plot <- ggplot(
   res_effects_df,
   aes(x = Effect, y = Attribute, color = Season)
 ) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-  geom_point(position = position_dodge(width = 0.6), size = 3) +
-  geom_errorbarh(aes(xmin = lower, xmax = upper),
-                 position = position_dodge(width = 0.6),
-                 height = 0.2, linewidth = 0.8) +
+  geom_vline(
+    xintercept = 0,
+    linetype = "dashed",
+    color = "black"
+  ) +
+  geom_point(
+    position = position_dodge(width = 0.6),
+    size = 3
+  ) +
+  geom_errorbarh(
+    aes(xmin = lower, xmax = upper),
+    position = position_dodge(width = 0.6),
+    height = 0.2,
+    linewidth = 0.8
+  ) +
+  geom_text(
+    aes(x = Effect + 0.05, label = signif),
+    position = position_dodge(width = 0.6),
+    hjust = 0,
+    size = 5,
+    show.legend = FALSE
+  ) +
   scale_color_manual(values = season_colors) +
   labs(
-    x = "Effect size (β ± 95% CI)",
+    x = "Standardized effect size (β ± 95% CI)",
     y = NULL,
     color = "Season",
     title = "Residential"
@@ -244,14 +291,31 @@ mig_plot <- ggplot(
   mig_effects_df,
   aes(x = Effect, y = Attribute, color = Season)
 ) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-  geom_point(position = position_dodge(width = 0.6), size = 3) +
-  geom_errorbarh(aes(xmin = lower, xmax = upper),
-                 position = position_dodge(width = 0.6),
-                 height = 0.2, linewidth = 0.8) +
+  geom_vline(
+    xintercept = 0,
+    linetype = "dashed",
+    color = "black"
+  ) +
+  geom_point(
+    position = position_dodge(width = 0.6),
+    size = 3
+  ) +
+  geom_errorbarh(
+    aes(xmin = lower, xmax = upper),
+    position = position_dodge(width = 0.6),
+    height = 0.2,
+    linewidth = 0.8
+  ) +
+  geom_text(
+    aes(x = Effect + 0.05, label = signif),
+    position = position_dodge(width = 0.6),
+    hjust = 0,
+    size = 5,
+    show.legend = FALSE
+  ) +
   scale_color_manual(values = season_colors) +
   labs(
-    x = "Effect size (β ± 95% CI)",
+    x = "Standardized effect size (β ± 95% CI)",
     y = NULL,
     color = "Season",
     title = "Migratory"
@@ -262,7 +326,6 @@ mig_plot <- ggplot(
     plot.title = element_text(hjust = 0.5)
   )
 
-
 ### combined plot
 combined_plot <- mig_plot + res_plot +
   plot_layout(ncol = 2, guides = "collect") & 
@@ -272,6 +335,5 @@ combined_plot <- mig_plot + res_plot +
 combined_plot
 
 # Save as png
-ggsave("Figures/Fig_5/figure_5_effects_attributes.png", 
+ggsave("Figures/effect_size/effects_attributes.png", 
        combined_plot, bg = "transparent", width = 8, height = 5)
-

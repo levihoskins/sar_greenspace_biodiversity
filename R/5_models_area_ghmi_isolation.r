@@ -216,3 +216,99 @@ gtsave(tab_ghmi, "Figures/supplementary/models/ghmi_model.pdf")
 gtsave(tab_isolation, "Figures/supplementary/models/isolation_model.pdf")
 gtsave(tab_comb_res, "Figures/supplementary/models/combined_residential_model.pdf")
 gtsave(tab_comb_mig, "Figures/supplementary/models/combined_migratory_model.pdf")
+
+### clean tables for Ben using ANOVA instead
+extract_interaction_pvals <- function(model) {
+  car::Anova(model, type = "III") %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column("term") %>%
+    dplyr::filter(grepl(":", term)) %>%
+    dplyr::select(term, `Pr(>Chisq)`) %>%
+    dplyr::mutate(
+      `Pr(>Chisq)` = dplyr::case_when(
+        `Pr(>Chisq)` < 0.001 ~ "<0.001*",
+        `Pr(>Chisq)` < 0.05  ~ paste0(round(`Pr(>Chisq)`, 3), "*"),
+        TRUE                ~ as.character(round(`Pr(>Chisq)`, 3))
+      )
+    )
+}
+
+## apply to each model
+tab_area_anova <- extract_interaction_pvals(area_model_poisson)
+tab_ghmi_anova <- extract_interaction_pvals(ghmi_model_poisson)
+tab_isolation_anova <- extract_interaction_pvals(isolation_model_poisson)
+tab_comb_res_anova <- extract_interaction_pvals(combined_model_residential)
+tab_comb_mig_anova <- extract_interaction_pvals(combined_model_migratory)
+
+### or this way with main effects
+tidy_glmmTMB_main_effects <- function(model) {
+  
+  coef_tbl <- broom.mixed::tidy(model, effects = "fixed") %>%
+    dplyr::filter(!grepl(":", term)) %>%   # REMOVE interaction levels
+    dplyr::mutate(
+      estimate = round(estimate, 3),
+      std.error = round(std.error, 3),
+      statistic = round(statistic, 3),
+      p.value.formatted = dplyr::case_when(
+        p.value < 0.001 ~ "<0.001*",
+        p.value < 0.05  ~ paste0(round(p.value, 3), "*"),
+        TRUE            ~ as.character(round(p.value, 3))
+      )
+    )
+  
+  r2_vals <- performance::r2(model)
+  r2_text <- paste0(
+    "R² (marginal) = ", round(r2_vals$R2_marginal, 3),
+    ", R² (conditional) = ", round(r2_vals$R2_conditional, 3)
+  )
+  
+  coef_tbl %>%
+    gt::gt() %>%
+    gt::tab_header(
+      title = "Model Summary (Main Effects Only)",
+      subtitle = r2_text
+    ) %>%
+    gt::cols_label(
+      term = "Predictor",
+      estimate = "Estimate",
+      std.error = "Std. Error",
+      statistic = "z value",
+      p.value.formatted = "p value"
+    ) %>%
+    gt::cols_hide(columns = "p.value")
+}
+
+## apply to each model
+tab_area_clean <- tidy_glmmTMB_main_effects(area_model_poisson)
+tab_ghmi_clean <- tidy_glmmTMB_main_effects(ghmi_model_poisson)
+tab_isolation_clean <- tidy_glmmTMB_main_effects(isolation_model_poisson)
+tab_comb_res_clean <- tidy_glmmTMB_main_effects(combined_model_residential)
+tab_comb_mig_clean <- tidy_glmmTMB_main_effects(combined_model_migratory)
+
+# save tables as PDFs
+gtsave(tab_area_clean, "Figures/supplementary/models/area_model_clean.pdf")
+gtsave(tab_ghmi_clean, "Figures/supplementary/models/ghmi_model_clean.pdf")
+gtsave(tab_isolation_clean, "Figures/supplementary/models/isolation_model_clean.pdf")
+gtsave(tab_comb_res_clean, "Figures/supplementary/models/combined_residential_model_clean.pdf")
+gtsave(tab_comb_mig_clean, "Figures/supplementary/models/combined_migratory_model_clean.pdf")
+
+
+### interaction table
+interaction_table <- function(model) {
+  extract_interaction_pvals(model) %>%
+    gt::gt() %>%
+    gt::tab_header(
+      title = "Global Interaction Tests (Type III Wald χ²)"
+    ) %>%
+    gt::cols_label(
+      term = "Interaction term",
+      `Pr(>Chisq)` = "p value"
+    )
+}
+
+## apply to each model
+tab_area_interaction <- interaction_table(area_model_poisson)
+tab_ghmi_interaction <- interaction_table(ghmi_model_poisson)
+tab_isolation_interaction <- interaction_table(isolation_model_poisson)
+tab_comb_res_interaction <- interaction_table(combined_model_residential)
+tab_comb_mig_interaction <- interaction_table(combined_model_migratory)
