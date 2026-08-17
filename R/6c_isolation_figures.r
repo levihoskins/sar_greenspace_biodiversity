@@ -142,7 +142,13 @@ sig_points <- emm_poly_df %>%
 nn_distance_plot_log <- ggplot(
   emm_poly_df %>%
     filter(analysis %in% c("migratory", "residential")) %>%
-    mutate(analysis = ifelse(analysis == "migratory", "Migratory", "Residential")),
+    mutate(
+      analysis = ifelse(
+        analysis == "migratory",
+        "Migratory",
+        "Resident"
+      )
+    ),
   aes(x = nearest_dist_m, y = rate, color = Season, fill = Season)
 ) +
   geom_line(size = 1) +
@@ -152,33 +158,63 @@ nn_distance_plot_log <- ggplot(
         analysis = ifelse(
           analysis == "migratory",
           "Migratory",
-          "Residential"
+          "Resident"
         )
       ),
     aes(x = x, y = y, label = sig, color = Season),
-    inherit.aes = FALSE, size = 5, hjust = 0, show.legend = FALSE
+    inherit.aes = FALSE,
+    size = 0,
+    hjust = 0,
+    show.legend = FALSE
   ) +
-  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL), alpha = 0.2, color = NA) +
-  facet_wrap(~analysis, scales="free_y") +
+  geom_ribbon(
+    aes(ymin = asymp.LCL, ymax = asymp.UCL),
+    alpha = 0.2,
+    color = NA
+  ) +
+  facet_wrap(
+    ~analysis,
+    scales = "free_y",
+    labeller = as_labeller(c(
+      "Migratory" = "A. Migratory",
+      "Resident" = "B. Resident"
+    ))
+  ) +
   scale_x_log10(
     labels = scales::label_number(accuracy = 1, big.mark = ","),
     breaks = scales::log_breaks(n = 4)
   ) +
-  scale_color_manual(values = c(
-    "Overwintering"    = "#006400",
-    "Spring Migration" = "#FF8C00",
-    "Breeding"         = "#1E90FF",
-    "Fall Migration"   = "#800080"
-  )) +
-  scale_fill_manual(values = c(
-    "Overwintering"    = "#006400",
-    "Spring Migration" = "#FF8C00",
-    "Breeding"         = "#1E90FF",
-    "Fall Migration"   = "#800080"
-  )) +
+  scale_color_manual(
+    values = c(
+      "Overwintering"    = "#006400",
+      "Spring Migration" = "#FF8C00",
+      "Breeding"         = "#1E90FF",
+      "Fall Migration"   = "#800080"
+    ),
+    labels = c(
+      "Overwintering"    = "Non-breeding",
+      "Spring Migration" = "Spring migration",
+      "Breeding"         = "Breeding",
+      "Fall Migration"   = "Fall migration"
+    )
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Overwintering"    = "#006400",
+      "Spring Migration" = "#FF8C00",
+      "Breeding"         = "#1E90FF",
+      "Fall Migration"   = "#800080"
+    ),
+    labels = c(
+      "Overwintering"    = "Non-breeding",
+      "Spring Migration" = "Spring migration",
+      "Breeding"         = "Breeding",
+      "Fall Migration"   = "Fall migration"
+    )
+  ) +
   labs(
     x = "Isolation (m)",
-    y = "Predicted Species Richness",
+    y = "Predicted species richness",
     color = "Season",
     fill = "Season"
   ) +
@@ -201,11 +237,12 @@ nn_distance_plot_log <- ggplot(
   theme(
     plot.margin = margin(5.5, 30, 5.5, 5.5)
   )
+
 nn_distance_plot_log
 
 # Save as png
 ggsave("Figures/isolation/isolation_predicted_response_migratory_residential_sig.png", 
-       nn_distance_plot_log, bg = "transparent", width = 8, height = 5)
+       nn_distance_plot_log, bg = "transparent", width = 7, height = 5, dpi = 600)
 
 
 ### calculate slopes

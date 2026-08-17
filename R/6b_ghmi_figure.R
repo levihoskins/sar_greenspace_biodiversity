@@ -168,25 +168,52 @@ ghmi_plot <- ggplot(ghmi_df, aes(x = ghmi_mean, y = rate, color = Season)) +
   ) +
   geom_line(linewidth = 1) +
   geom_text(
-    data = sig_points, aes(x = x, y = y, label = sig, color = Season),
-    inherit.aes = FALSE, size = 5, hjust = 0, show.legend = FALSE
+    data = sig_points,
+    aes(x = x, y = y, label = sig, color = Season),
+    inherit.aes = FALSE,
+    size = 0,
+    hjust = 0,
+    show.legend = FALSE
   ) +
-  facet_wrap(~analysis, scales = "free_y") +
-  scale_color_manual(values = c(
-    "Overwintering"    = "#006400",
-    "Spring Migration" = "#FF8C00",
-    "Breeding"         = "#1E90FF",
-    "Fall Migration"   = "#800080"
-  )) +
-  scale_fill_manual(values = c(
-    "Overwintering"    = "#006400",
-    "Spring Migration" = "#FF8C00",
-    "Breeding"         = "#1E90FF",
-    "Fall Migration"   = "#800080"
-  )) +
+  facet_wrap(
+    ~analysis,
+    scales = "free_y",
+    labeller = as_labeller(c(
+      "Migratory" = "A. Migratory",
+      "Residential" = "B. Resident"
+    ))
+  ) +
+  scale_color_manual(
+    values = c(
+      "Overwintering"    = "#006400",
+      "Spring Migration" = "#FF8C00",
+      "Breeding"         = "#1E90FF",
+      "Fall Migration"   = "#800080"
+    ),
+    labels = c(
+      "Overwintering"    = "Non-breeding",
+      "Spring Migration" = "Spring migration",
+      "Breeding"         = "Breeding",
+      "Fall Migration"   = "Fall migration"
+    )
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Overwintering"    = "#006400",
+      "Spring Migration" = "#FF8C00",
+      "Breeding"         = "#1E90FF",
+      "Fall Migration"   = "#800080"
+    ),
+    labels = c(
+      "Overwintering"    = "Non-breeding",
+      "Spring Migration" = "Spring migration",
+      "Breeding"         = "Breeding",
+      "Fall Migration"   = "Fall migration"
+    )
+  ) +
   labs(
-    x = "GHMI (Global Human Modification Index)",
-    y = "Predicted Species Richness",
+    x = "GHMI (global human modification index)",
+    y = "Predicted species richness",
     color = "Season",
     fill = "Season"
   ) +
@@ -211,7 +238,7 @@ ghmi_plot
 
 # Save as png
 ggsave("Figures/ghmi/ghmi_predicted_response_migratory_residential_sig.png", 
-       ghmi_plot, bg = "transparent", width = 8, height = 5)
+       ghmi_plot, bg = "transparent", width = 7, height = 5, dpi = 600)
 
 ### calculate slopes
 ghmi_slopes <- ghmi_emmip_data %>%

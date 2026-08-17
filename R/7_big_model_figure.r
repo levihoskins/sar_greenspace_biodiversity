@@ -267,21 +267,30 @@ res_plot <- ggplot(
     aes(x = Effect + 0.05, label = signif),
     position = position_dodge(width = 0.6),
     hjust = 0,
-    size = 5,
+    size = 8,
     show.legend = FALSE
   ) +
-  scale_color_manual(values = season_colors) +
+  scale_color_manual(
+    values = season_colors,
+    labels = c(
+      "Overwintering" = "Non-breeding",
+      "Spring Migration" = "Spring migration",
+      "Breeding" = "Breeding",
+      "Fall Migration" = "Fall migration"
+    )
+  ) +
   labs(
     x = "Standardized effect size (β ± 95% CI)",
     y = NULL,
     color = "Season",
-    title = "Residential"
+    title = "B. Resident"
   ) +
   theme_bw(base_size = 13) +
   theme(
     panel.grid = element_blank(),
     plot.title = element_text(hjust = 0.5)
   )
+
 
 ## migrants:
 mig_effects_df <- effects_df %>%
@@ -310,21 +319,30 @@ mig_plot <- ggplot(
     aes(x = Effect + 0.05, label = signif),
     position = position_dodge(width = 0.6),
     hjust = 0,
-    size = 5,
+    size = 8,
     show.legend = FALSE
   ) +
-  scale_color_manual(values = season_colors) +
+  scale_color_manual(
+    values = season_colors,
+    labels = c(
+      "Overwintering" = "Non-breeding",
+      "Spring Migration" = "Spring migration",
+      "Breeding" = "Breeding",
+      "Fall Migration" = "Fall migration"
+    )
+  ) +
   labs(
     x = "Standardized effect size (β ± 95% CI)",
     y = NULL,
     color = "Season",
-    title = "Migratory"
+    title = "A. Migratory"
   ) +
   theme_bw(base_size = 13) +
   theme(
     panel.grid = element_blank(),
     plot.title = element_text(hjust = 0.5)
   )
+
 
 ### combined plot
 combined_plot <- mig_plot + res_plot +
@@ -336,4 +354,4 @@ combined_plot
 
 # Save as png
 ggsave("Figures/effect_size/effects_attributes.png", 
-       combined_plot, bg = "transparent", width = 8, height = 5)
+       combined_plot, bg = "transparent", width = 7, height = 5, dpi = 600)

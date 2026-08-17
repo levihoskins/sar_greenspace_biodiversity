@@ -130,39 +130,78 @@ sig_points <- emm_area_df %>%
 # plot
 area_plot <- ggplot(
   emm_area_df %>%
-    mutate(analysis = ifelse(analysis == "migratory", "Migratory", "Residential")),
+    mutate(
+      analysis = ifelse(
+        analysis == "migratory",
+        "Migratory",
+        "Residential"
+      )
+    ),
   aes(x = Shape_Area, y = rate, color = Season, fill = Season)
 ) +
   geom_line(linewidth = 1) +
-  geom_ribbon(aes(ymin = asymp.LCL, ymax = asymp.UCL),
-              alpha = 0.2, color = NA) +
+  geom_ribbon(
+    aes(ymin = asymp.LCL, ymax = asymp.UCL),
+    alpha = 0.2,
+    color = NA
+  ) +
   geom_text(
     data = sig_points %>%
-      mutate(analysis = ifelse(analysis == "migratory", "Migratory", "Residential")),
-    aes(x = x, y = y, label = sig, color = Season), 
-    inherit.aes = FALSE, size = 5, show.legend = FALSE
+      mutate(
+        analysis = ifelse(
+          analysis == "migratory",
+          "Migratory",
+          "Residential"
+        )
+      ),
+    aes(x = x, y = y, label = sig, color = Season),
+    inherit.aes = FALSE,
+    size = 5,
+    show.legend = FALSE
   ) +
-  facet_wrap(~analysis, scales = "free_y") +
+  facet_wrap(
+    ~analysis,
+    scales = "free_y",
+    labeller = as_labeller(c(
+      "Migratory" = "A. Migratory",
+      "Residential" = "B. Resident"
+    ))
+  ) +
   scale_x_log10(
     labels = scales::label_number(accuracy = 1, big.mark = ","),
     breaks = scales::log_breaks(n = 4)
   ) +
-  scale_color_manual(values = c(
-    "Overwintering"    = "#006400",
-    "Spring Migration" = "#FF8C00",
-    "Breeding"         = "#1E90FF",
-    "Fall Migration"   = "#800080"
-  )) +
-  
-  scale_fill_manual(values = c(
-    "Overwintering"    = "#006400",
-    "Spring Migration" = "#FF8C00",
-    "Breeding"         = "#1E90FF",
-    "Fall Migration"   = "#800080"
-  )) +
+  scale_color_manual(
+    values = c(
+      "Overwintering"    = "#006400",
+      "Spring Migration" = "#FF8C00",
+      "Breeding"         = "#1E90FF",
+      "Fall Migration"   = "#800080"
+    ),
+    labels = c(
+      "Overwintering"    = "Non-breeding",
+      "Spring Migration" = "Spring migration",
+      "Breeding"         = "Breeding",
+      "Fall Migration"   = "Fall migration"
+    )
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Overwintering"    = "#006400",
+      "Spring Migration" = "#FF8C00",
+      "Breeding"         = "#1E90FF",
+      "Fall Migration"   = "#800080"
+    ),
+    labels = c(
+      "Overwintering"    = "Non-breeding",
+      "Spring Migration" = "Spring migration",
+      "Breeding"         = "Breeding",
+      "Fall Migration"   = "Fall migration"
+    )
+  ) +
   labs(
-    x = expression(Greenspace~Area~(m^2)),
-    y = "Predicted Species Richness",
+    x = expression(Greenspace~area~(m^2)),
+    y = "Predicted species richness",
     color = "Season",
     fill = "Season"
   ) +
@@ -181,11 +220,12 @@ area_plot <- ggplot(
     legend.position = "bottom",
     plot.margin = margin(5.5, 30, 5.5, 5.5)
   )
+
 area_plot
 
 # Save as png
 ggsave("Figures/area/area_predicted_response_migratory_residential_sig.png", 
-       area_plot, bg = "transparent", width = 8, height = 5)
+       area_plot, bg = "transparent", width = 7, height = 5, dpi = 600)
 
 ### calculate slopes
 area_slopes <- emm_area_df %>%
